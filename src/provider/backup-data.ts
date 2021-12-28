@@ -32,8 +32,8 @@ interface BackupDataError extends Error {}
    */
 
 export async function backupData(this: Provider, secret: string) {
-    this.uploadData()
-    return this.generateKeyFile(secret)
+    const result = this.generateKeyFile(secret)
+    return this.uploadData().then(() => result)
 }
 
   /**
