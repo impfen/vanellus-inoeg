@@ -1,16 +1,20 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 import { AdminKeys } from "./"
 import { ecdhEncrypt, ecdhDecrypt } from "../../crypto"
 import { Backend } from "../../backend"
 import { Provider } from "../../provider"
-import { ProviderData, RPCError, KeyPair } from "../../interfaces"
+import { ProviderData, KeyPair, Status } from "../../interfaces"
 
 export async function unverifiedProvider(
     backend: Backend,
     adminKeys: AdminKeys
-): Promise<Provider | RPCError> {
+): Promise<Provider> {
     const provider = new Provider("provider", backend)
 
-    await provider.generateKeyPairs()
+    await provider.initialize()
 
     const providerData: ProviderData = {
         name: "Max Mustermann",
@@ -27,20 +31,10 @@ export async function unverifiedProvider(
 
     provider.data = providerData
 
-    const jsonData = JSON.stringify(providerData)
+    const result = await provider.storeData()
 
-    const encryptedData = await ecdhEncrypt(
-        jsonData,
-        provider.keyPairs!.data,
-        adminKeys.provider.publicKey
-    )
-
-    const response = await backend.appointments.storeProviderData(
-        { encryptedData: encryptedData! },
-        provider.keyPairs!.signing
-    )
-
-    if (response != "ok") return response // this is an error
+    if (result.status === Status.Failed)
+        throw new Error("cannot store provider data")
 
     return provider
 }

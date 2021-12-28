@@ -22,6 +22,11 @@ export function formatDate(date: string | Date) {
     return [year, month, day].join("-")
 }
 
+export function formatDatetime(datetime: string | Date) {
+    let d = new Date(datetime)
+    return d.toISOString()
+}
+
 // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
 export function formatTime(date: string | Date) {
     let d = new Date(date),

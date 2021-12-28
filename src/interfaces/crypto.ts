@@ -7,7 +7,7 @@ export interface KeyPair {
     privateKey: JsonWebKey // JWK (due to Firefox not supporting PKCS8)
 }
 
-export interface Data {
+export interface AESData {
     iv: string
     data: string
 }

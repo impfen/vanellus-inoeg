@@ -8,7 +8,7 @@ eslint:
 	npx eslint . --ext .ts
 
 test:
-	npx mocha
+	npx mocha $(args)
 
 build:
 	npx tsc --build

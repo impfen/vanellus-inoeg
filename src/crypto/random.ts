@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer"
 import { buf2b64 } from "../helpers/conversion"
 
 export function randomBytes(n: number) {

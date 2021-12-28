@@ -3,16 +3,18 @@
 // README.md contains license information.
 
 import { randomBytes, sign } from "../crypto"
-import { Appointment, SignedData } from "../interfaces"
+import { Appointment, SignedData, Result, Error, Status } from "../interfaces"
 import { Provider } from "./"
 
-  /**
-   * Upload new or changed appointments to the server.
-   * @param apps an array of appointment objects
-   */
+/**
+ * Upload new or changed appointments to the server.
+ * @param apps an array of appointment objects
+ */
 
-export async function publishAppointments(this: Provider, apps: Appointment[]) {
-
+export async function publishAppointments(
+    this: Provider,
+    apps: Appointment[]
+): Promise<Result | Error> {
     const signedAppointments: SignedData[] = []
     const relevantAppointments = apps.filter(
         (oa: any) =>
@@ -22,54 +24,49 @@ export async function publishAppointments(this: Provider, apps: Appointment[]) {
     )
 
     for (const appointment of relevantAppointments) {
-        try {
-            const convertedAppointment = {
-                id: appointment.id,
-                duration: appointment.duration,
-                timestamp: appointment.timestamp,
-                publicKey: this.keyPairs!.encryption.publicKey,
-                properties: appointment.properties,
-                slotData: appointment.slotData.map((sl: any) => ({
-                    id: sl.id,
-                })),
-            }
-
-            /* WTF?
-            for (const [k, v] of Object.entries(
-                this.backend.settings.appointment.properties
-            )) {
-                for (const [kk] of Object.entries(v.values)) {
-                    if (appointment[kk] === true)
-                        convertedAppointment.properties[k] = kk
-                }
-            }
-            */
-
-            // we sign each appointment individually so that the client can
-            // verify that they've been posted by a valid provider
-            const signedAppointment = await sign(
-                this.keyPairs!.signing.privateKey,
-                JSON.stringify(convertedAppointment),
-                this.keyPairs!.signing.publicKey
-            )
-
-            if (signedAppointment === null) throw "null"
-
-            signedAppointments.push(signedAppointment)
-        } catch (e) {
-            console.error(e)
-            continue
+        const convertedAppointment = {
+            id: appointment.id,
+            duration: appointment.duration,
+            timestamp: appointment.timestamp,
+            publicKey: this.keyPairs!.encryption.publicKey,
+            properties: appointment.properties,
+            slotData: appointment.slotData.map((sl: any) => ({
+                id: sl.id,
+            })),
         }
+
+        // we sign each appointment individually so that the client can
+        // verify that they've been posted by a valid provider
+        const signedAppointment = await sign(
+            this.keyPairs!.signing.privateKey,
+            JSON.stringify(convertedAppointment),
+            this.keyPairs!.signing.publicKey
+        )
+
+        if (signedAppointment === null) continue
+
+        signedAppointments.push(signedAppointment)
     }
 
-    if (signedAppointments.length === 0) throw new Error("no appointments to publish")
+    if (signedAppointments.length === 0)
+        return {
+            status: Status.Succeeded,
+        }
 
     const result = await this.backend.appointments.publishAppointments(
         {
-            offers: signedAppointments,
+            appointments: signedAppointments,
         },
         this.keyPairs!.signing
     )
 
-    return result;
+    if (result !== "ok")
+        return {
+            status: Status.Failed,
+            error: result,
+        }
+
+    return {
+        status: Status.Succeeded,
+    }
 }

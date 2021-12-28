@@ -1,3 +1,7 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 import { ECDHData, KeyPair } from "./"
 
 export interface ProviderBackupReferenceData {
@@ -7,6 +11,19 @@ export interface ProviderBackupReferenceData {
 export interface EncryptedProviderData {
     encryptedData: ECDHData
     data?: ProviderData
+}
+
+export interface EncryptedConfirmedProviderData {
+    iv: string
+    data: string
+    json?: ProviderData
+}
+
+export interface ConfirmedProviderData {
+    publicKey?: string
+    signature: string
+    data: string
+    json?: EncryptedConfirmedProviderData
 }
 
 export interface VerifiedProviderData {}
@@ -26,6 +43,8 @@ export interface ProviderData {
     accessible?: boolean
     website?: string
     publicKeys: ProviderPublicKeys
+    submittedAt?: string
+    version?: string
 }
 
 export interface ProviderKeyPairs {

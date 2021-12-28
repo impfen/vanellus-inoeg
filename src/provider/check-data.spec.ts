@@ -3,7 +3,7 @@
 // README.md contains license information.
 
 import { equal } from "assert"
-import { formatDatetime } from "../helpers/time"
+import { formatDate } from "../helpers/time"
 import { ecdhDecrypt } from "../crypto"
 import { Status } from "../interfaces"
 import {
@@ -14,19 +14,16 @@ import {
     verifiedProvider,
 } from "../testing/fixtures"
 
-describe("Provider.getAppointments()", function () {
-    it("we should be able to get provider appointments", async function () {
+describe("Provider.checkData()", function () {
+    it("we should be able to retrieve confirmed provider data", async function () {
         const be = backend()
         const keys = await adminKeys()
         await resetDB(be, keys)
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
-        const fromDate = new Date()
-        const toDate = new Date(fromDate.getTime() + 60 * 60 * 24 * 1000)
-        const result = await vp.getAppointments({
-            from: formatDatetime(fromDate),
-            to: formatDatetime(toDate),
-        })
-        equal(result.status, Status.Succeeded)
+        const result = await vp.checkData({})
+
+        if (result.status === Status.Failed)
+            throw new Error("cannot get confirmed data")
     })
 })

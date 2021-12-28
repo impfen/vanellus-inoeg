@@ -4,52 +4,38 @@
 
 import { aesDecrypt, deriveSecrets } from "../crypto"
 import { base322buf, b642buf } from "../helpers/conversion"
-import { backupKeys } from "./backup-data"
+import { Status, Result, Error, AESData } from "../interfaces"
+import { CloudBackupData } from "./backup-data"
+import { User } from "./"
+
+interface RestoreFromBackupResult extends Result {
+    data: CloudBackupData
+}
 
 // make sure the signing and encryption key pairs exist
 export async function restoreFromBackup(
-    state: any,
-    keyStore: any,
-    settings: any,
-    secret: any
-) {
-    const backend = settings.get("backend")
+    this: User
+): Promise<RestoreFromBackupResult | Error> {
+    const secrets = await deriveSecrets(base322buf(this.secret!), 32, 2)
+    const [id, key] = secrets!
+    const response = await this.backend.storage.getSettings({ id: id })
 
-    try {
-        // we lock the local backend to make sure we don't have any data races
-        await backend.local.lock("restoreFromBackup")
-    } catch (e) {
-        throw null // we throw a null exception (which won't affect the store state)
-    }
-
-    try {
-        const secrets = await deriveSecrets(base322buf(secret), 32, 2)
-        const [id, key] = secrets!
-        const data = await backend.storage.getSettings({ id: id })
-        const decryptedData = await aesDecrypt(data, b642buf(key))
-        if (decryptedData == null) throw new Error("Decryption failed")
-
-        const dd = JSON.parse(decryptedData)
-
-        for (const key of backupKeys) {
-            backend.local.set(`user::${key}`, dd[key])
-        }
-
-        backend.local.set("user::secret", secret)
-
+    if ("code" in response)
         return {
-            status: "succeeded",
-            data: dd,
+            status: Status.Failed,
+            error: response,
         }
-    } catch (e) {
-        console.error(e)
-        return {
-            status: "failed",
-            error: e,
-        }
-    } finally {
-        backend.local.unlock("restoreFromBackup")
+
+    const decryptedData = await aesDecrypt(response, b642buf(key))
+    const dd: CloudBackupData = JSON.parse(decryptedData!)
+
+    this.tokenData = dd.tokenData
+    this.queueData = dd.queueData
+    this.contactData = dd.contactData
+    this.acceptedAppointment = dd.acceptedAppointment
+
+    return {
+        status: Status.Succeeded,
+        data: dd,
     }
 }
-
-restoreFromBackup.actionName = "restoreFromBackup"

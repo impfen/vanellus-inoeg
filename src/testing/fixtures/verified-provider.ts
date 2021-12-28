@@ -1,18 +1,19 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 import { AdminKeys } from "./"
 import { Backend } from "../../backend"
 import { Mediator } from "../../mediator"
 import { Provider } from "../../provider"
 import { unverifiedProvider } from "./unverified-provider"
-import {
-    EncryptedProviderData,
-    Status,
-} from "../../interfaces"
+import { EncryptedProviderData, Status } from "../../interfaces"
 
 export async function verifiedProvider(
     backend: Backend,
     adminKeys: AdminKeys,
     mediator: Mediator
-) {
+): Promise<Provider> {
     const provider = await unverifiedProvider(backend, adminKeys)
 
     let pendingProviders = await mediator.pendingProviders()

@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer"
 
 // https://gist.github.com/Glamdring/04eacabae3188dd5978241183b4d4bc5
 export function buf2hex(buffer: ArrayBuffer) {

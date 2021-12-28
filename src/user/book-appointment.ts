@@ -7,28 +7,26 @@ import {
     Status,
     OK,
     Result,
-    AcceptedInvitation,
-    SignedProviderData,
-    SignedAppointment,
+    AcceptedAppointment,
+    PublicProviderData,
+    Appointment,
     Error,
 } from "../interfaces"
 import { User } from "./"
 
-interface ConfirmOffersResult extends Result {
-    acceptedInvitation: AcceptedInvitation
+interface BookAppointmentResult extends Result {
+    acceptedAppointment: AcceptedAppointment
 }
 
 export async function bookAppointment(
     this: User,
-    signedAppointment: SignedAppointment,
-    provider: SignedProviderData
-): Promise<ConfirmOffersResult | Error> {
+    appointment: Appointment,
+    provider: PublicProviderData
+): Promise<BookAppointmentResult | Error> {
     const providerData = {
         signedToken: this.tokenData!.signedToken,
         userToken: this.tokenData!.userToken,
     }
-
-    const appointment = signedAppointment.json!
 
     const encryptedDataAndPublicKey = await ephemeralECDHEncrypt(
         JSON.stringify(providerData),
@@ -45,7 +43,7 @@ export async function bookAppointment(
             encryptedData: encryptedData,
             signedTokenData: this.tokenData!.signedToken,
         },
-        this.tokenData!.signingKeyPair
+        this.tokenData!.keyPairs.signing
     )
 
     if ("code" in response)
@@ -54,17 +52,17 @@ export async function bookAppointment(
             error: response,
         }
 
-    const acceptedInvitation: AcceptedInvitation = {
-        appointment: signedAppointment,
+    const acceptedAppointment: AcceptedAppointment = {
+        appointment: appointment,
         provider: provider,
         booking: response,
     }
 
     // we store the information about the offer which we've accepted
-    this.acceptedInvitation = acceptedInvitation
+    this.acceptedAppointment = acceptedAppointment
 
     return {
         status: Status.Succeeded,
-        acceptedInvitation: acceptedInvitation,
+        acceptedAppointment: acceptedAppointment,
     }
 }

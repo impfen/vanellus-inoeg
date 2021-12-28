@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Provider } from "./"
 import { randomBytes } from "../crypto"
 import { Appointment, Slot } from "../interfaces"
 
@@ -23,13 +24,17 @@ export function createSlot() {
  */
 
 export async function createAppointment(
-    duration: number, vaccine: string, slotN: number, timestamp: string
+    this: Provider,
+    duration: number,
+    vaccine: string,
+    slots: number,
+    timestamp: string
 ) {
-    var slots : Slot[] = [];
-    for (var i = 0; i < slotN; i++) {
-        slots[i] = {
-            "id": randomBytes(32),
-            "open": true,
+    var slotData: Slot[] = []
+    for (var i = 0; i < slots; i++) {
+        slotData[i] = {
+            id: randomBytes(32),
+            open: true,
         }
     }
     const now = new Date().toISOString()
@@ -40,9 +45,9 @@ export async function createAppointment(
         modified: true,
         timestamp: timestamp,
         duration: duration,
-        properties: {"vaccine": vaccine},
+        properties: { vaccine: vaccine },
         id: randomBytes(32),
         publicKey: "",
-        slotData: slots,
+        slotData: slotData,
     }
 }

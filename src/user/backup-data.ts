@@ -4,84 +4,75 @@
 
 import { aesEncrypt, deriveSecrets } from "../crypto"
 import { base322buf, b642buf } from "../helpers/conversion"
+import {
+    TokenData,
+    QueueData,
+    ContactData,
+    AcceptedAppointment,
+    Status,
+    AESData,
+    Result,
+    Error,
+} from "../interfaces"
+import { User } from "./"
 
-export const backupKeys = [
-    "tokenData",
-    "queueData",
-    "invitation",
-    "invitation::verified",
-    "invitation::accepted",
-    "invitation::slots",
-    "secret",
-]
+interface BackupData {
+    createdAt: string
+    version: string
+    [Key: string]: any
+}
 
-interface Dictionary<T> {
-    [Key: string]: T
+export interface CloudBackupData extends BackupData {
+    tokenData: TokenData | null
+    queueData: QueueData | null
+    contactData: ContactData | null
+    acceptedAppointment: AcceptedAppointment | null
+}
+
+interface BackupDataResult extends Result {
+    data: AESData
 }
 
 // make sure the signing and encryption key pairs exist
 export async function backupData(
-    state: any,
-    keyStore: any,
-    settings: any,
-    secret: any,
-    lockName: string
-) {
-    const backend = settings.get("backend")
-
-    if (lockName === undefined) lockName = "backupData"
-
-    try {
-        // we lock the local backend to make sure we don't have any data races
-        await backend.local.lock(lockName)
-    } catch (e) {
-        throw null // we throw a null exception (which won't affect the store state)
+    this: User
+): Promise<BackupDataResult | Error> {
+    const cloudData: CloudBackupData = {
+        version: "0.2",
+        createdAt: new Date().toISOString(),
+        tokenData: this.tokenData,
+        queueData: this.queueData,
+        contactData: this.contactData,
+        acceptedAppointment: this.acceptedAppointment,
     }
 
-    try {
-        const data: Dictionary<any> = {}
+    const idAndKey = await deriveSecrets(base322buf(this.secret!), 32, 2)
 
-        for (const key of backupKeys) {
-            data[key] = backend.local.get(`user::${key}`)
-        }
+    const [id, key] = idAndKey!
 
-        const fullData = {
-            ...data,
-            version: "0.1",
-            createdAt: new Date().toISOString(),
-        }
+    const encryptedData = await aesEncrypt(
+        JSON.stringify(cloudData),
+        b642buf(key)
+    )
 
-        const idAndKey = await deriveSecrets(base322buf(secret), 32, 2)
-
-        const [id, key] = idAndKey!
-
-        const encryptedData = await aesEncrypt(
-            JSON.stringify(fullData),
-            b642buf(key)
-        )
-
-        if (state !== undefined && state.referenceData != undefined) {
-            if (JSON.stringify(state.referenceData) === JSON.stringify(data)) {
-                return state
-            }
-        }
-
-        await backend.storage.storeSettings({ id: id, data: encryptedData })
-
+    if (encryptedData === null)
         return {
-            status: "succeeded",
-            data: encryptedData,
-            referenceData: data,
+            status: Status.Failed,
         }
-    } catch (e) {
-        console.error(e)
+
+    const response = await this.backend.storage.storeSettings({
+        id: id,
+        data: encryptedData,
+    })
+
+    if (response !== "ok")
         return {
-            status: "failed",
-            error: e,
+            status: Status.Failed,
+            error: response,
         }
-    } finally {
-        backend.local.unlock(lockName)
+
+    return {
+        status: Status.Succeeded,
+        data: encryptedData!,
     }
 }
-
-backupData.actionName = "backupData"

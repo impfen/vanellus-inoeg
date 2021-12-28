@@ -5,8 +5,10 @@
 import { restoreFromBackup } from "./restore-from-backup"
 import { getToken } from "./get-token"
 import { backupData } from "./backup-data"
+import { generateKeyPairs } from "./generate-key-pairs"
 import { bookAppointment } from "./book-appointment"
 import { cancelAppointment } from "./cancel-appointment"
+import { getAppointment } from "./get-appointment"
 import { getAppointments } from "./get-appointments"
 import { buf2base32, b642buf } from "../helpers/conversion"
 import { randomBytes } from "../crypto"
@@ -16,7 +18,8 @@ import {
     QueueData,
     TokenData,
     ContactData,
-    AcceptedInvitation,
+    UserKeyPairs,
+    AcceptedAppointment,
     ProviderAppointments,
 } from "../interfaces"
 
@@ -25,21 +28,24 @@ import { Actor } from "../actor"
 export class User extends Actor {
     public restoreFromBackup = restoreFromBackup
     public cancelAppointment = cancelAppointment
+    public generateKeyPairs = generateKeyPairs
     public bookAppointment = bookAppointment
     public getAppointments = getAppointments
+    public getAppointment = getAppointment
     public backupData = backupData
     public getToken = getToken
 
-    private generateUserSecret(): string {
-        return buf2base32(b642buf(randomBytes(10)))
+    private generateSecret() {
+        this.secret = buf2base32(b642buf(randomBytes(10)))
     }
 
     constructor(id: string, backend: Backend) {
         super("user", id, backend)
     }
 
-    public initialize() {
-        this.userSecret = this.generateUserSecret()
+    public async initialize() {
+        this.generateSecret()
+        await this.generateKeyPairs()
     }
 
     public get queueData(): QueueData | null {
@@ -50,12 +56,20 @@ export class User extends Actor {
         this.set("queueData", queueData)
     }
 
-    public get userSecret(): string | null {
-        return this.get("userSecret")
+    public get secret(): string | null {
+        return this.get("secret")
     }
 
-    public set userSecret(userSecret: string | null) {
-        this.set("userSecret", userSecret)
+    public set secret(secret: string | null) {
+        this.set("secret", secret)
+    }
+
+    public get keyPairs(): UserKeyPairs | null {
+        return this.get("keyPairs")
+    }
+
+    public set keyPairs(keyPairs: UserKeyPairs | null) {
+        this.set("keyPairs", keyPairs)
     }
 
     public get tokenData(): TokenData | null {
@@ -84,13 +98,13 @@ export class User extends Actor {
         this.set("verifiedAppointments", verifiedAppointments)
     }
 
-    public get acceptedInvitation(): AcceptedInvitation | null {
-        return this.get("acceptedInvitation")
+    public get acceptedAppointment(): AcceptedAppointment | null {
+        return this.get("acceptedAppointment")
     }
 
-    public set acceptedInvitation(
-        acceptedInvitation: AcceptedInvitation | null
+    public set acceptedAppointment(
+        acceptedAppointment: AcceptedAppointment | null
     ) {
-        this.set("acceptedInvitation", acceptedInvitation)
+        this.set("acceptedAppointment", acceptedAppointment)
     }
 }

@@ -8,26 +8,26 @@ import { formatDate } from "../helpers/time"
 import { backend } from "../testing/fixtures"
 import { User } from "./"
 
-beforeEach(function () {
-    this.backend = backend()
-    this.user = new User("main", this.backend)
-    // we generate a secret etc.
-    this.user.initialize()
-    // we set the queue data
-    this.user.queueData = {
-        zipCode: "10707",
-    }
-    // we set the contact data
-    this.user.contactData = {
-        name: "Max Mustermann",
-    }
-})
-
 describe("User.getToken()", function () {
     it("we should be able to get a token", async function () {
-        const today = formatDate(new Date())
-        const result = await this.user.getToken({})
-        equal(result.status, Status.Succeeded)
+        const be = backend()
+        const user = new User("main", be)
+        // we generate a secret etc.
+        await user.initialize()
+        // we set the queue data
+        user.queueData = {
+            zipCode: "10707",
+        }
+        // we set the contact data
+        user.contactData = {
+            name: "Max Mustermann",
+        }
+
+        const result = await user.getToken({})
+
+        if (result.status !== Status.Succeeded)
+            throw new Error("should not fail")
+
         equal(result.tokenData.userToken.version, "0.3")
     })
 })

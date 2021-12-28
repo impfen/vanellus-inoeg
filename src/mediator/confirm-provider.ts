@@ -33,7 +33,6 @@ export async function confirmProvider(
     }
 
     const publicProviderJSONData = JSON.stringify(publicProviderData)
-    const providerJSONData = JSON.stringify(data)
 
     const signedKeyData = await sign(
         this.keyPairs!.signing.privateKey,
@@ -44,7 +43,7 @@ export async function confirmProvider(
     // this will be stored for the provider, so we add the public key data
     const signedProviderData = await sign(
         this.keyPairs!.signing.privateKey,
-        providerJSONData,
+        JSON.stringify(data),
         this.keyPairs!.signing.publicKey
     )
 
@@ -61,22 +60,20 @@ export async function confirmProvider(
     }
 
     // we encrypt the data with the public key supplied by the provider
-    const [encryptedProviderData] = (await ephemeralECDHEncrypt(
+    const [confirmedProviderData] = (await ephemeralECDHEncrypt(
         JSON.stringify(fullData),
         providerData.encryptedData.publicKey
     ))!
 
-    const encryptedProviderDataJSON = JSON.stringify(encryptedProviderData)
-
-    const signedEncryptedProviderData = await sign(
+    const signedConfirmedProviderData = await sign(
         this.keyPairs!.signing.privateKey,
-        encryptedProviderDataJSON,
+        JSON.stringify(confirmedProviderData),
         this.keyPairs!.signing.publicKey
     )
 
     const result = await this.backend.appointments.confirmProvider(
         {
-            encryptedProviderData: signedEncryptedProviderData!,
+            confirmedProviderData: signedConfirmedProviderData!,
             publicProviderData: signedPublicProviderData!,
             signedKeyData: signedKeyData!,
         },

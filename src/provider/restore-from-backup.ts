@@ -5,28 +5,34 @@
 import { aesDecrypt, deriveSecrets } from "../crypto"
 import { base322buf, b642buf } from "../helpers/conversion"
 import { Provider } from "./"
-import { Data } from "../interfaces"
+import { LocalBackupData, CloudBackupData } from "./backup-data"
+import { AESData, Result, Error, Status } from "../interfaces"
 
-  /**
-   * Restores the data of a provider by decrypting the provider keys and
-   * subsequently downloading the provider metadata from the server
-   * @param secret the 24 character alphanumeric secret from the provider
-   * @param data the encrypted keys from the provider backup file
-   */
+interface RestoreFromBackupResult extends Result {
+    data: { [Key: string]: any } | null
+}
+
+/**
+ * Restores the data of a provider by decrypting the provider keys and
+ * subsequently downloading the provider metadata from the server
+ * @param secret the 24 character alphanumeric secret from the provider
+ * @param data the encrypted keys from the provider backup file
+ */
 
 export async function restoreFromBackup(
     this: Provider,
-    secret: string,
-    data: Data
-) {
-    const decryptedKeyData = await aesDecrypt(data, base322buf(secret))
-    if (decryptedKeyData === null) throw new Error("decryption failed")
+    data: AESData
+): Promise<RestoreFromBackupResult | Error> {
+    const decryptedKeyData = await aesDecrypt(data, base322buf(this.secret!))
+    const dd: LocalBackupData = JSON.parse(decryptedKeyData!)
 
-    const dd = JSON.parse(decryptedKeyData)
-    if (!dd.keyPairs.sync) throw new Error("sync key missing")
+    if (dd === null)
+        return {
+            status: Status.Failed,
+        }
 
     const derivedSecrets = await deriveSecrets(
-        b642buf(dd.keyPairs.sync),
+        b642buf(dd.keyPairs!.sync),
         32,
         2
     )
@@ -36,16 +42,22 @@ export async function restoreFromBackup(
     const response = await this.backend.storage.getSettings({
         id: id,
     })
-    const decryptedData = await aesDecrypt(
-        response,
-        b642buf(key)
-    )
-    if (decryptedData == null) throw new Error("Decryption failed")
-    const ddCloud = JSON.parse(decryptedData)
 
-    this.data = ddCloud.data;
+    if ("code" in response)
+        return {
+            status: Status.Failed,
+            error: response,
+        }
+
+    const decryptedData = await aesDecrypt(response, b642buf(key))
+    const ddCloud: CloudBackupData = JSON.parse(decryptedData!)
+
     this.keyPairs = dd.keyPairs
-    this.secret = secret
+    this.data = ddCloud.data
+    this.verifiedData = ddCloud.verifiedData
 
-    return ddCloud.data
+    return {
+        status: Status.Succeeded,
+        data: ddCloud.data,
+    }
 }

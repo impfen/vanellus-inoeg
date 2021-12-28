@@ -3,37 +3,29 @@
 // README.md contains license information.
 
 import { ecdhEncrypt } from "../crypto"
-import { Result } from "../interfaces"
+import { Result, Error, Status, AcceptedAppointment } from "../interfaces"
 import { User } from "./"
 
 export async function cancelAppointment(
     this: User,
-    state: any,
-    keyStore: any,
-    settings: any,
-    acceptedInvitation: any,
-    tokenData: any
-) {
-    const id = acceptedInvitation.offer.id
+    acceptedAppointment: AcceptedAppointment
+): Promise<Result | Error> {
+    const result = await this.backend.appointments.cancelAppointment(
+        {
+            id: acceptedAppointment.appointment.id,
+            signedTokenData: this.tokenData!.signedToken,
+            providerID: acceptedAppointment.provider.id,
+        },
+        this.tokenData!.keyPairs.signing
+    )
 
-    try {
-        const result = await this.backend.appointments.cancelAppointment(
-            {
-                id: id,
-                signedTokenData: tokenData.signedToken,
-                providerID: acceptedInvitation.invitation.provider.id,
-            },
-            tokenData.signingKeyPair
-        )
-    } catch (e) {
-        console.error(e)
+    if (result !== "ok")
         return {
-            status: "failed",
-            error: e,
+            status: Status.Failed,
+            error: result,
         }
-    }
 
     return {
-        status: "succeeded",
+        status: Status.Succeeded,
     }
 }

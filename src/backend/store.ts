@@ -54,7 +54,7 @@ export class StorageStore implements Store {
     }
 
     deleteAll(prefix: string) {
-        this.storage.getKeys().forEach( key => {
+        this.storage.getKeys().forEach((key) => {
             if (key.startsWith(prefix)) this.storage.removeItem(key)
         })
     }

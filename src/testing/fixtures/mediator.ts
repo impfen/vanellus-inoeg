@@ -1,3 +1,7 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 import { AdminKeys } from "./"
 import { Backend } from "../../backend"
 import { Mediator } from "../../mediator"
@@ -6,13 +10,12 @@ import {
     MediatorKeyData,
     SignedMediatorKeyData,
     KeyPair,
-    RPCError,
 } from "../../interfaces"
 
 export async function mediator(
     backend: Backend,
     adminKeys: AdminKeys
-): Promise<Mediator | RPCError> {
+): Promise<Mediator> {
     const signingKeyPair = await generateECDSAKeyPair()
     const encryptionKeyPair = await generateECDHKeyPair()
 
@@ -38,7 +41,7 @@ export async function mediator(
         adminKeys.root
     )
 
-    if (response != "ok") return response // this is an error
+    if (response != "ok") throw new Error("cannot create mediator") // this is an error
 
     const mediator = new Mediator("mediator", backend)
 
