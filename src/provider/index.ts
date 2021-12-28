@@ -69,7 +69,7 @@ export class Provider extends Actor {
      */
 
     public static async init(id: string, backend: Backend, data: ProviderData) {
-        const provider = new Provider("provider", backend)
+        const provider = new Provider(id, backend)
 
         await provider.generateKeyPairs()
 
