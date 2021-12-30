@@ -107,4 +107,12 @@ export class User extends Actor {
     ) {
         this.set("acceptedAppointment", acceptedAppointment)
     }
+
+    /**
+     * Deletes the local data for this user
+     */
+
+    public clear() {
+        super.clear()
+    }
 }

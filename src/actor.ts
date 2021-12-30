@@ -29,6 +29,10 @@ export class Actor {
         this.backend.local.set(`${this.actor}::${this.id}::${key}`, value)
     }
 
+    protected clear() {
+        this.backend.local.deleteAll(`${this.actor}::${this.id}`)
+    }
+
     public unlock(key: string) {}
 
     public clearLocks() {}

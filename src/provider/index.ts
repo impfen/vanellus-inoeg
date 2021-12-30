@@ -6,6 +6,7 @@ import { backupData } from "./backup-data"
 import { checkData } from "./check-data"
 import { generateKeyPairs } from "./generate-key-pairs"
 import { storeData } from "./store-data"
+import { cancelAppointment } from "./cancel-appointment"
 import { createAppointment } from "./create-appointment"
 import { restoreFromBackup } from "./restore-from-backup"
 import { publishAppointments } from "./publish-appointments"
@@ -31,6 +32,7 @@ export class Provider extends Actor {
     public backupData = backupData
     public checkData = checkData
     public storeData = storeData
+    public cancelAppointment = cancelAppointment
     public createAppointment = createAppointment
     public restoreFromBackup = restoreFromBackup
     public publishAppointments = publishAppointments
@@ -49,13 +51,43 @@ export class Provider extends Actor {
         super("provider", id, backend)
     }
 
-    public async initialize() {
-        this.generateSecret()
-        await this.generateKeyPairs()
+    /**
+     * create a new complete provider object from user provided data,
+     * including fresh keys
+     * @param id A string to identify the provoder. Used to diferentiate objects
+     * in the storage backend
+     * @param backend The backend used for data storage and network
+     * communication
+     * @param data The provider data
+     */
+
+    public static async initialize(
+        id: string,
+        backend: Backend,
+        data: ProviderData,
+    ) {
+        const provider = new Provider(id, backend)
+        provider.generateSecret()
+        await provider.generateKeyPairs()
+        provider.data = {
+            name: data.name,
+            street: data.street,
+            city: data.city,
+            zipCode: data.zipCode,
+            description: data.description,
+            email: data.email,
+            accessible: data.accessible,
+            website: data.website,
+            publicKeys: {
+                encryption: provider.keyPairs!.encryption.publicKey,
+                signing: provider.keyPairs!.signing.publicKey,
+            },
+        }
+        return provider
     }
 
     private generateSecret() {
-        this.secret = buf2base32(b642buf(randomBytes(10)))
+        this.secret = buf2base32(b642buf(randomBytes(15)))
     }
 
     public get loggedOut(): boolean {
@@ -96,5 +128,13 @@ export class Provider extends Actor {
 
     public set secret(secret: string) {
         this.set("secret", secret)
+    }
+
+    /**
+     * Deletes the local data for this provider
+     */
+
+    public clear() {
+        super.clear()
     }
 }

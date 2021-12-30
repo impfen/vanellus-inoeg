@@ -34,6 +34,11 @@ interface BackupDataResult extends Result {
     data: AESData
 }
 
+  /**
+   * Upload data to the backend. Only successfull if the provider has a sync
+   * key.
+   */
+
 export async function backupData(
     this: Provider
 ): Promise<BackupDataResult | Error> {

@@ -3,11 +3,19 @@
 // README.md contains license information.
 
 import { ecdhEncrypt, generateECDHKeyPair, sign } from "../crypto"
-import { ProviderData, PublicKeys, Status, OK } from "../interfaces"
+import { ProviderData, PublicKeys, Error, Result, Status, OK } from "../interfaces"
 import { Provider } from "./"
 
-// store the provider data for validation in the backend
-export async function storeData(this: Provider, code?: string) {
+  /**
+   * Store data of a new provider in the backend for approval of a mediator
+   * @param code an optional registration code. Necessary if configured to be
+   * in the backend.
+   */
+
+export async function storeData(
+    this: Provider,
+    code?: string
+): Promise<Result | Error> {
     const publicKeys = await this.getKeys()
 
     if (publicKeys.status === Status.Failed) return publicKeys

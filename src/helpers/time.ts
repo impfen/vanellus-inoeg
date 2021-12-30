@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Dayjs } from 'dayjs'
+
 export function getMonday(d: string | Date) {
     d = new Date(d)
     const day = d.getDay(),
@@ -22,9 +24,14 @@ export function formatDate(date: string | Date) {
     return [year, month, day].join("-")
 }
 
-export function formatDatetime(datetime: string | Date) {
-    let d = new Date(datetime)
-    return d.toISOString()
+export function formatDatetime(timestamp: string | Date | Dayjs) {
+    if (typeof timestamp === "object") {
+      return timestamp.toISOString()
+    }
+    else {
+      const d = new Date(timestamp)
+      return d.toISOString()
+    }
 }
 
 // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd

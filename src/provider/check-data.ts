@@ -16,9 +16,14 @@ interface CheckDataResult extends Result {
     data: ProviderData
 }
 
+/**
+ * Tests whether the provider can successfully authenticate against the
+ * backend. This may be used as a test whether the provider is verified by a
+ * mediator.
+ */
+
 export async function checkData(
     this: Provider,
-    data: any
 ): Promise<CheckDataResult | Error> {
     const response = await this.backend.appointments.checkProviderData(
         {},

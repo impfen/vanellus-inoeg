@@ -13,8 +13,9 @@ interface RestoreFromBackupResult extends Result {
 }
 
 /**
- * Restores the data of a provider by decrypting the provider keys and
- * subsequently downloading the provider metadata from the server
+ * Restores the data of a provider by decrypting the provider keys with the
+ * provider secret and subsequently downloading the provider metadata from the
+ * server.
  * @param secret the 24 character alphanumeric secret from the provider
  * @param data the encrypted keys from the provider backup file
  */

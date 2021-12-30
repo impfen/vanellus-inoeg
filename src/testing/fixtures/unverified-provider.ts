@@ -12,10 +12,6 @@ export async function unverifiedProvider(
     backend: Backend,
     adminKeys: AdminKeys
 ): Promise<Provider> {
-    const provider = new Provider("provider", backend)
-
-    await provider.initialize()
-
     const providerData: ProviderData = {
         name: "Max Mustermann",
         street: "Musterstr. 23",
@@ -24,12 +20,16 @@ export async function unverifiedProvider(
         description: "",
         email: "max@mustermann.de",
         publicKeys: {
-            encryption: provider.keyPairs!.encryption.publicKey,
-            signing: provider.keyPairs!.signing.publicKey,
-        },
+            encryption: "",
+            signing: "",
+        }
     }
 
-    provider.data = providerData
+    const provider = await Provider.initialize(
+        "provider",
+        backend,
+        providerData,
+    )
 
     const result = await provider.storeData()
 

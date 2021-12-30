@@ -5,6 +5,15 @@
 import { randomBytes } from "../crypto"
 import { Slot, Appointment } from "../interfaces"
 
+  /**
+   * Creates a new appointment object.
+   * @param duration the duration of the appointment in minutes
+   * @param properties additional properties for the appointment like the
+   * vaccine offered
+   * @param slots the number of bookable slots
+   * @param timestamp the time of the appointment as an ISO string
+   */
+
 export function createAppointment(
     duration: number,
     properties: { [Key: string]: any },

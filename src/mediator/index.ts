@@ -26,4 +26,12 @@ export class Mediator extends Actor {
     public set keyPairs(keyPairs: MediatorKeyPairs | null) {
         this.set("keyPairs", keyPairs)
     }
+
+    /**
+     * Deletes the local data for this mediator
+     */
+
+    public clear() {
+        super.clear()
+    }
 }

@@ -45,6 +45,7 @@ export interface ProviderData {
     publicKeys: ProviderPublicKeys
     submittedAt?: string
     version?: string
+    id?: string
 }
 
 export interface ProviderKeyPairs {

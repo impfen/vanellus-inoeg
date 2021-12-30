@@ -11,7 +11,11 @@ import {
 import { Provider } from "./"
 import { ProviderKeyPairs } from "../interfaces"
 
-// make sure the signing and encryption key pairs exist
+  /**
+   * Generates all needed key pairs for the provider and stores them in the
+   * provider object
+   */
+
 export async function generateKeyPairs(
     this: Provider
 ): Promise<ProviderKeyPairs> {

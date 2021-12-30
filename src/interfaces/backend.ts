@@ -9,13 +9,6 @@ export interface Store {
     deleteAll(prefix: string): void
 }
 
-export interface Storage {
-    getItem(key: string): any | null
-    setItem(key: string, value: any): void
-    getKeys(): string[]
-    removeItem(key: string): void
-}
-
 export enum Status {
     Succeeded = "succeeded",
     Failed = "failed",

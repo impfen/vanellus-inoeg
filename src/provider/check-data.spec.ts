@@ -21,7 +21,7 @@ describe("Provider.checkData()", function () {
         await resetDB(be, keys)
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
-        const result = await vp.checkData({})
+        const result = await vp.checkData()
 
         if (result.status === Status.Failed)
             throw new Error("cannot get confirmed data")

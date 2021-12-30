@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Store, Storage } from "../interfaces"
+import { Store } from "../interfaces"
 
 export class PrefixStore implements Store {
     public prefix: string
@@ -54,17 +54,32 @@ export class StorageStore implements Store {
     }
 
     deleteAll(prefix: string) {
-        this.storage.getKeys().forEach((key) => {
-            if (key.startsWith(prefix)) this.storage.removeItem(key)
-        })
+        var keys: string[] = [];
+        for (var i = 0; i < this.storage.length; i++) {
+            const key = this.storage.key(i)
+            if (key !== null && key.startsWith(prefix)) keys.push(key)
+        }
+        keys.forEach(key => this.storage.removeItem(key))
     }
 }
+
+  /**
+   * Implements the Storage interface for local testing. Frontends running in a
+   * browser should use localStorage
+   */
 
 export class InMemoryStorage implements Storage {
     private _data: { [Key: string]: any }
 
+    private updateLength() {
+        this.length = Object.keys(this._data).length
+    }
+
+    public length: number = 0
+
     constructor() {
         this._data = {}
+        this.updateLength()
     }
 
     getItem(key: string): any | null {
@@ -73,13 +88,19 @@ export class InMemoryStorage implements Storage {
 
     setItem(key: string, value: any): void {
         this._data[key] = value
+        this.updateLength()
     }
 
-    getKeys() {
-        return Object.keys(this._data)
+    key(index: number) {
+        return Object.keys(this._data)[index]
+    }
+
+    clear() {
+      Object.keys(this._data).forEach( key => this.removeItem(key) )
     }
 
     removeItem(key: string): void {
         delete this._data[key]
+        this.updateLength()
     }
 }

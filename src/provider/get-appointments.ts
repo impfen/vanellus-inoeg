@@ -17,6 +17,14 @@ interface GetAppointmentsResult extends Result {
     appointments: Appointment[]
 }
 
+  /**
+   * Retrieves the appointments that belong to the provider from the backend
+   * @param from earliest timestamp for the returned appointments as an ISO
+   * string
+   * @param to time latest timestamp for the returned appointments as an ISO
+   * string
+   */
+
 export async function getAppointments(
     this: Provider,
     { from, to }: { from: string; to: string }
