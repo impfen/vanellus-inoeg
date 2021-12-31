@@ -18,12 +18,9 @@ import { Actor } from "../actor"
 import { Backend } from "../backend"
 
 import {
-    ProviderBackupReferenceData,
     ProviderData,
     VerifiedProviderData,
-    KeyPair,
     ProviderKeyPairs,
-    Appointment,
 } from "../interfaces"
 
 export * from "./helpers"
@@ -67,9 +64,7 @@ export class Provider extends Actor {
         data: ProviderData,
     ) {
         const provider = new Provider(id, backend)
-        provider.generateSecret()
-        await provider.generateKeyPairs()
-        provider.data = {
+        await provider.create({
             name: data.name,
             street: data.street,
             city: data.city,
@@ -79,11 +74,36 @@ export class Provider extends Actor {
             accessible: data.accessible,
             website: data.website,
             publicKeys: {
-                encryption: provider.keyPairs!.encryption.publicKey,
-                signing: provider.keyPairs!.signing.publicKey,
+                encryption: "",
+                signing: "",
+            },
+        })
+        return provider
+    }
+
+
+    public async create(
+        data: ProviderData,
+    ) {
+        this.clear()
+        this.generateSecret()
+        const keyPairs = await this.generateKeyPairs()
+        
+        this.data = {
+            name: data.name,
+            street: data.street,
+            city: data.city,
+            zipCode: data.zipCode,
+            description: data.description,
+            email: data.email,
+            accessible: data.accessible,
+            website: data.website,
+            publicKeys: {
+                encryption: keyPairs.encryption.publicKey,
+                signing: keyPairs.signing.publicKey,
             },
         }
-        return provider
+        return this
     }
 
     private generateSecret() {
