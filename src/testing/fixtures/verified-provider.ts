@@ -15,7 +15,8 @@ export async function verifiedProvider(
     adminKeys: AdminKeys,
     mediator: Mediator
 ): Promise<Provider | VanellusError> {
-    const provider = await unverifiedProvider(backend, adminKeys)
+    const provider = await unverifiedProvider(backend)
+    if (provider instanceof VanellusError) return provider
 
     const pendingProviders = await mediator.pendingProviders()
     if (pendingProviders instanceof VanellusError) return pendingProviders;

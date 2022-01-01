@@ -11,7 +11,7 @@ import {
     resetDB,
     mediator,
     backend,
-    verifiedProvider,
+    unverifiedProvider,
 } from "../testing/fixtures"
 import { VanellusError } from '../errors'
 
@@ -21,13 +21,25 @@ describe("Provider.checkData()", function () {
         const keys = await adminKeys()
         await resetDB(be, keys)
         const med = await mediator(be, keys)
-        const vp = await verifiedProvider(be, keys, med)
-        if (vp instanceof VanellusError)
-            throw new Error("could not verify provider")
+        const provider = await unverifiedProvider(be)
+        if (provider instanceof VanellusError)
+            throw new Error("could not create unverified provider")
 
-        const result = await vp.checkData()
+        const result = await provider.checkData()
+        if (!(result instanceof VanellusError))
+            throw new Error("check data should fail for unverified provider")
 
-        if (result instanceof VanellusError)
-            throw new Error("cannot get confirmed data")
+        
+        const pendingProviders = await med.pendingProviders()
+        if (pendingProviders instanceof VanellusError)
+            throw new Error("could not get pending providers")
+        
+        const result2 = await med.confirmProvider(pendingProviders.providers[0])
+        if (result2 instanceof VanellusError)
+            throw new Error("could not confirm provider")
+
+        const result3 = await provider.checkData()
+        if (result3 instanceof VanellusError)
+            throw new Error("check data failed for verified provider")
     })
 })

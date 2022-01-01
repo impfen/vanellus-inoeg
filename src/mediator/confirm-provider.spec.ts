@@ -19,7 +19,10 @@ describe("Mediator.confirmProvider()", function () {
         const keys = await adminKeys()
         await resetDB(be, keys)
         const med = await mediator(be, keys)
-        const up = await unverifiedProvider(be, keys)
+        const up = await unverifiedProvider(be)
+        if (up instanceof VanellusError)
+            throw new Error("could not create unverified provider")
+
         let pendingProviders = await med.pendingProviders()
 
         if (pendingProviders instanceof VanellusError) {

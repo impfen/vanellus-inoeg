@@ -11,7 +11,7 @@ import {
     resetDB,
     mediator,
     backend,
-    unverifiedProvider,
+    verifiedProvider,
 } from "../testing/fixtures"
 import { VanellusError } from '../errors'
 
@@ -21,7 +21,10 @@ describe("Provider.storeData()", function () {
         const keys = await adminKeys()
         await resetDB(be, keys)
         const med = await mediator(be, keys)
-        const up = await unverifiedProvider(be, keys)
+        
+        const up = await verifiedProvider(be, keys, med)
+        if (up instanceof VanellusError)
+            throw new Error("could create verified provider")
 
         const result = await up.storeData()
 

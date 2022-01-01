@@ -11,8 +11,7 @@ import { VanellusError } from '../../errors/vanellusError'
 
 export async function unverifiedProvider(
     backend: Backend,
-    adminKeys: AdminKeys
-): Promise<Provider> {
+): Promise<Provider | VanellusError> {
     const providerData: ProviderData = {
         name: "Max Mustermann",
         street: "Musterstr. 23",
@@ -35,7 +34,7 @@ export async function unverifiedProvider(
     const result = await provider.storeData()
 
     if (result instanceof VanellusError)
-        throw new Error("cannot store provider data")
+        return result
 
     return provider
 }
