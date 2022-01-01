@@ -5,8 +5,9 @@
 import { generateECDHKeyPair } from "./generate-key"
 import { b642buf, buf2b64, str2ab, ab2str } from "../helpers/conversion"
 import { salt } from "./token"
+import { ErrorCode, UnexpectedError } from '../errors'
 
-export async function deriveSecrets(key: ArrayBuffer, len: number, n: number) {
+export async function deriveSecrets(key: ArrayBuffer, len: number, n: number): Promise<string[]> {
     try {
         const baseKey = await crypto.subtle.importKey(
             "raw",
@@ -33,6 +34,6 @@ export async function deriveSecrets(key: ArrayBuffer, len: number, n: number) {
         return secrets
     } catch (e) {
         console.error(e)
-        return null
+        throw new UnexpectedError(ErrorCode.Crypto)
     }
 }

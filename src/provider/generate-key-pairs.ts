@@ -25,10 +25,10 @@ export async function generateKeyPairs(
     const encryptionKeyPair = await generateECDHKeyPair()
 
     const keyPairs = {
-        sync: syncKey!,
-        signing: signingKeyPair!,
-        data: dataKeyPair!,
-        encryption: encryptionKeyPair!,
+        sync: syncKey,
+        signing: signingKeyPair,
+        data: dataKeyPair,
+        encryption: encryptionKeyPair,
     }
 
     this.keyPairs = keyPairs

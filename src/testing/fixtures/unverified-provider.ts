@@ -7,6 +7,7 @@ import { ecdhEncrypt, ecdhDecrypt } from "../../crypto"
 import { Backend } from "../../backend"
 import { Provider } from "../../provider"
 import { ProviderData, KeyPair, Status } from "../../interfaces"
+import { VanellusError } from '../../errors/vanellusError'
 
 export async function unverifiedProvider(
     backend: Backend,
@@ -33,7 +34,7 @@ export async function unverifiedProvider(
 
     const result = await provider.storeData()
 
-    if (result.status === Status.Failed)
+    if (result instanceof VanellusError)
         throw new Error("cannot store provider data")
 
     return provider

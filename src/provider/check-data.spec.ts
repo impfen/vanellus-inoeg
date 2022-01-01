@@ -13,6 +13,7 @@ import {
     backend,
     verifiedProvider,
 } from "../testing/fixtures"
+import { VanellusError } from '../errors'
 
 describe("Provider.checkData()", function () {
     it("we should be able to retrieve confirmed provider data", async function () {
@@ -21,9 +22,12 @@ describe("Provider.checkData()", function () {
         await resetDB(be, keys)
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
+        if (vp instanceof VanellusError)
+            throw new Error("could not verify provider")
+
         const result = await vp.checkData()
 
-        if (result.status === Status.Failed)
+        if (result instanceof VanellusError)
             throw new Error("cannot get confirmed data")
     })
 })

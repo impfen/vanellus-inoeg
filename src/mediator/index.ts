@@ -8,6 +8,7 @@ import { getStats } from "./get-stats"
 import { MediatorKeyPairs } from "../interfaces"
 import { Actor } from "../actor"
 import { Backend } from "../backend"
+import { Optional } from '../helpers/optional'
 
 export class Mediator extends Actor {
     public confirmProvider = confirmProvider
@@ -19,11 +20,11 @@ export class Mediator extends Actor {
         super("mediator", id, backend)
     }
 
-    public get keyPairs(): MediatorKeyPairs | null {
+    public get keyPairs(): Optional<MediatorKeyPairs> {
         return this.get("keyPairs")
     }
 
-    public set keyPairs(keyPairs: MediatorKeyPairs | null) {
+    public set keyPairs(keyPairs: Optional<MediatorKeyPairs>) {
         this.set("keyPairs", keyPairs)
     }
 

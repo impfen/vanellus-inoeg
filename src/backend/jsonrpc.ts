@@ -2,8 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { VanellusError, BackendError } from '../errors'
 import { sign } from "../crypto"
-import { Settings, Error, RPCResponse, RPCError } from "../interfaces"
+import { Settings } from "../interfaces"
 import { KeyPair } from "../interfaces"
 
 enum JSONRPCMethods {
@@ -12,6 +13,7 @@ enum JSONRPCMethods {
     cancelAppointment = "cancelAppointment",
     checkProviderData = "checkProviderData",
     confirmProvider = "confirmProvider",
+    getAppointment = "getAppointment",
     getAppointmentsByZipCode = "getAppointmentsByZipCode",
     getBookedAppointments = "getBookedAppointments",
     getKeys = "getKeys",
@@ -46,7 +48,7 @@ class JSONRPCBackend {
         params: Record<string, unknown>,
         keyPair?: KeyPair,
         id?: string
-    ): Promise<R | RPCError> {
+    ): Promise<R | VanellusError> {
         let callParams
 
         if (typeof keyPair === "object") {
@@ -80,25 +82,18 @@ class JSONRPCBackend {
             })
 
             if (!response.ok) {
-                return {
-                    code: -1,
-                    message: "request failed",
-                    data: {
+                return new BackendError({
                         error: response.statusText,
                         data: await response.json(),
-                    },
-                } as RPCError
+                    }
+                )
             }
 
             return (await response.json()).result as R
         } catch (e) {
-            return {
-                code: -1,
-                message: "request failed",
-                data: {
-                    error: (e as Error).toString(),
-                },
-            } as RPCError
+            return new BackendError({
+                error: JSON.stringify(e),
+            })
         }
     }
 }

@@ -13,6 +13,7 @@ import {
     backend,
     unverifiedProvider,
 } from "../testing/fixtures"
+import { VanellusError } from '../errors'
 
 describe("Provider.storeData()", function () {
     it("we should be able to store provider data", async function () {
@@ -24,7 +25,7 @@ describe("Provider.storeData()", function () {
 
         const result = await up.storeData()
 
-        if (result.status === Status.Failed)
+        if (result instanceof VanellusError)
             throw new Error("cannot store provider data")
     })
 })

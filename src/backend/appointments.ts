@@ -57,7 +57,7 @@ export class AppointmentsBackend extends JSONRPCBackend {
         id: string
         providerID: string
     }) {
-        return this.call<ProviderAppointments>("getAppointment", {
+        return this.call<ProviderAppointments>(this.methods.getAppointment, {
             id,
             providerID,
         })

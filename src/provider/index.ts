@@ -25,6 +25,7 @@ import {
     ProviderKeyPairs,
     Appointment,
 } from "../interfaces"
+import { ErrorCode, UnexpectedError } from '../errors'
 
 export * from "./helpers"
 
@@ -69,6 +70,11 @@ export class Provider extends Actor {
         const provider = new Provider(id, backend)
         provider.generateSecret()
         await provider.generateKeyPairs()
+
+        if (!provider.keyPairs) {
+            throw new UnexpectedError(ErrorCode.KeysMissing)
+        }
+
         provider.data = {
             name: data.name,
             street: data.street,
@@ -79,8 +85,8 @@ export class Provider extends Actor {
             accessible: data.accessible,
             website: data.website,
             publicKeys: {
-                encryption: provider.keyPairs!.encryption.publicKey,
-                signing: provider.keyPairs!.signing.publicKey,
+                encryption: provider.keyPairs.encryption.publicKey,
+                signing: provider.keyPairs.signing.publicKey,
             },
         }
         return provider

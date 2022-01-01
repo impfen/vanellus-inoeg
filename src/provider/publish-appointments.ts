@@ -2,8 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, VanellusError } from '../errors'
 import { randomBytes, sign } from "../crypto"
-import { Appointment, SignedData, Result, Error, Status } from "../interfaces"
+import { Appointment, SignedData, Result, Status, Slot } from "../interfaces"
 import { Provider } from "./"
 
 /**
@@ -14,10 +15,12 @@ import { Provider } from "./"
 export async function publishAppointments(
     this: Provider,
     apps: Appointment[]
-): Promise<Result | Error> {
+): Promise<Result | VanellusError> {
+    if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
+
     const signedAppointments: SignedData[] = []
     const relevantAppointments = apps.filter(
-        (oa: any) =>
+        (oa: Appointment) =>
             new Date(oa.timestamp) >
                 new Date(new Date().getTime() - 1000 * 60 * 60 * 4) &&
             oa.modified
@@ -28,9 +31,9 @@ export async function publishAppointments(
             id: appointment.id,
             duration: appointment.duration,
             timestamp: appointment.timestamp,
-            publicKey: this.keyPairs!.encryption.publicKey,
+            publicKey: this.keyPairs.encryption.publicKey,
             properties: appointment.properties,
-            slotData: appointment.slotData.map((sl: any) => ({
+            slotData: appointment.slotData.map((sl: Slot) => ({
                 id: sl.id,
             })),
         }
@@ -38,12 +41,10 @@ export async function publishAppointments(
         // we sign each appointment individually so that the client can
         // verify that they've been posted by a valid provider
         const signedAppointment = await sign(
-            this.keyPairs!.signing.privateKey,
+            this.keyPairs.signing.privateKey,
             JSON.stringify(convertedAppointment),
-            this.keyPairs!.signing.publicKey
+            this.keyPairs.signing.publicKey
         )
-
-        if (signedAppointment === null) continue
 
         signedAppointments.push(signedAppointment)
     }
@@ -57,14 +58,11 @@ export async function publishAppointments(
         {
             appointments: signedAppointments,
         },
-        this.keyPairs!.signing
+        this.keyPairs.signing
     )
 
-    if (result !== "ok")
-        return {
-            status: Status.Failed,
-            error: result,
-        }
+    if (result instanceof VanellusError) return result
+
 
     return {
         status: Status.Succeeded,

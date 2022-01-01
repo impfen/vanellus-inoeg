@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, UnexpectedError, VanellusError } from '../errors'
 import { b642buf, buf2b64, str2ab } from "../helpers/conversion"
 import { SignedData } from "../interfaces"
 
@@ -9,7 +10,7 @@ export async function sign(
     keyData: JsonWebKey,
     rawData: string,
     publicKeyData: string
-) {
+): Promise<SignedData> {
     const data = str2ab(rawData)
     try {
         // we import the key data
@@ -31,6 +32,6 @@ export async function sign(
         return d
     } catch (e) {
         console.error(e)
+        throw new UnexpectedError(ErrorCode.Crypto)
     }
-    return null
 }

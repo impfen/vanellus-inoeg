@@ -3,6 +3,7 @@
 // README.md contains license information.
 
 import { equal } from "assert"
+import { VanellusError } from '../errors'
 import { Status } from "../interfaces"
 import {
     adminKeys,
@@ -21,7 +22,7 @@ describe("Mediator.confirmProvider()", function () {
         const up = await unverifiedProvider(be, keys)
         let pendingProviders = await med.pendingProviders()
 
-        if (pendingProviders.status == Status.Failed) {
+        if (pendingProviders instanceof VanellusError) {
             throw new Error("fetching provider data failed")
         }
 
@@ -34,7 +35,7 @@ describe("Mediator.confirmProvider()", function () {
 
         pendingProviders = await med.pendingProviders()
 
-        if (pendingProviders.status == Status.Failed) {
+        if (pendingProviders instanceof VanellusError) {
             throw new Error("fetching provider data failed")
         }
 
@@ -43,7 +44,7 @@ describe("Mediator.confirmProvider()", function () {
 
         const verifiedProviders = await med.verifiedProviders()
 
-        if (verifiedProviders.status == Status.Failed) {
+        if (verifiedProviders instanceof VanellusError) {
             throw new Error("fetching provider data failed")
         }
 

@@ -20,7 +20,7 @@ export interface Result {
     [key: string]: any
 }
 
-export interface Error {
-    status: Status.Failed
-    error?: { [key: string]: any }
-}
+// export interface Error {
+//     status: Status.Failed
+//     error?: { [key: string]: any }
+// }

@@ -2,51 +2,64 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { BackendError, ErrorCode, VanellusError } from '../errors'
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 import { verify, ecdhDecrypt } from "../crypto"
 import {
-    Error,
     Result,
     Status,
     EncryptedProviderData,
     KeyPair,
     ProviderData,
+    DecryptedProviderData,
 } from "../interfaces"
 import { Mediator } from "./"
 
-interface ProvidersResult extends Result {
-    providers: EncryptedProviderData[]
+export interface ProvidersResult extends Result {
+    providers: DecryptedProviderData[]
 }
+
+
+
+async function decryptProviderData(encData: EncryptedProviderData[], privKey: JsonWebKey): Promise<DecryptedProviderData[]> {
+    const providerData: DecryptedProviderData[] = []
+    for (const pd of encData) {
+        const decryptedData = await ecdhDecrypt(
+            pd.encryptedData,
+            privKey
+        )
+        if (decryptedData instanceof VanellusError) continue
+
+        // to do: verify provider data!
+        const parsedData: DecryptedProviderData = {
+            encryptedData: pd.encryptedData,
+            data: parseUntrustedJSON(decryptedData) as ProviderData
+        }
+            
+        if (parsedData)
+            providerData.push(parsedData)
+    }
+
+    return providerData
+}
+
 
 export async function pendingProviders(
     this: Mediator
-): Promise<ProvidersResult | Error> {
-    const providerData = await this.backend.appointments.getPendingProviderData(
-        {},
-        this.keyPairs!.signing
-    )
-
-    if ("code" in providerData)
-        return {
-            status: Status.Failed,
-            error: providerData,
-        }
-
-    for (const pd of providerData) {
-        const decryptedData = await ecdhDecrypt(
-            pd.encryptedData,
-            this.keyPairs!.provider.privateKey
-        )
-        if (decryptedData === null)
-            return {
-                status: Status.Failed,
-                error: pd,
-            }
-
-        // to do: verify provider data!
-
-        pd.data = JSON.parse(decryptedData) as ProviderData
+): Promise<ProvidersResult | VanellusError> {
+    if (!this.keyPairs) {
+        return new VanellusError(ErrorCode.KeysMissing)
     }
 
+    const encryptedProviderData = await this.backend.appointments.getPendingProviderData(
+        {},
+        this.keyPairs.signing
+    )
+
+    if (encryptedProviderData instanceof VanellusError) return encryptedProviderData
+
+    const providerData = await decryptProviderData(encryptedProviderData, this.keyPairs.provider.privateKey)
+    
     return {
         status: Status.Succeeded,
         providers: providerData,
@@ -55,34 +68,20 @@ export async function pendingProviders(
 
 export async function verifiedProviders(
     this: Mediator
-): Promise<ProvidersResult | Error> {
-    const providerData =
+): Promise<ProvidersResult | VanellusError> {
+    if (!this.keyPairs) {
+        return new VanellusError(ErrorCode.KeysMissing)
+    }
+
+    const encryptedProviderData =
         await this.backend.appointments.getVerifiedProviderData(
             {},
-            this.keyPairs!.signing
+            this.keyPairs.signing
         )
 
-    if ("code" in providerData)
-        return {
-            status: Status.Failed,
-            error: providerData,
-        }
+    if (encryptedProviderData instanceof VanellusError) return encryptedProviderData
 
-    for (const pd of providerData) {
-        const decryptedData = await ecdhDecrypt(
-            pd.encryptedData,
-            this.keyPairs!.provider.privateKey
-        )
-        if (decryptedData === null)
-            return {
-                status: Status.Failed,
-                error: pd,
-            }
-
-        // to do: verify provider data!
-
-        pd.data = JSON.parse(decryptedData) as ProviderData
-    }
+    const providerData = await decryptProviderData(encryptedProviderData, this.keyPairs.provider.privateKey)
 
     return {
         status: Status.Succeeded,

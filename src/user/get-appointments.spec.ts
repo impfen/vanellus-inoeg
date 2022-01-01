@@ -13,6 +13,7 @@ import {
     verifiedProvider,
 } from "../testing/fixtures"
 import { User } from "./"
+import { VanellusError } from '../errors'
 
 describe("User.getAppointments()", function () {
     it("we should be able to get appointments", async function () {
@@ -26,7 +27,10 @@ describe("User.getAppointments()", function () {
         // we create an unverified provider
         const vp = await verifiedProvider(be, keys, med)
 
-        let date = new Date()
+        if (vp instanceof VanellusError)
+            throw new Error("cannot verify provider")
+
+        const date = new Date()
 
         // tomorrow 3 pm
 
@@ -36,7 +40,7 @@ describe("User.getAppointments()", function () {
         date.setSeconds(0)
         date.setMilliseconds(0)
 
-        var app = await vp.createAppointment(
+        const app = await vp.createAppointment(
             15,
             "moderna",
             5,
@@ -45,8 +49,8 @@ describe("User.getAppointments()", function () {
 
         const publishResult = await vp.publishAppointments([app])
 
-        if (publishResult.status !== Status.Succeeded)
-            throw new Error("cannot create appointment")
+        if (publishResult instanceof VanellusError)
+            throw new Error("cannot publish appointment")
 
         const user = new User("main", be)
         // we generate a secret etc.
@@ -66,13 +70,13 @@ describe("User.getAppointments()", function () {
         const result = await user.getAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
-            zipCode: user.queueData!.zipCode,
+            zipCode: user.queueData.zipCode,
         })
 
-        if (result.status !== Status.Succeeded)
+        if (result instanceof VanellusError)
             throw new Error("should not fail")
 
-        if (result.appointments.length !== 1)
+        if (result instanceof VanellusError)
             throw new Error("should return one appointment")
     })
 })
