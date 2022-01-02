@@ -50,7 +50,7 @@ export async function aesEncrypt(
         }
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 
@@ -87,7 +87,7 @@ export async function aesDecrypt(
         return ab2str(decryptedData)
     } catch (e) {
 		console.error(e)
-        throw new VanellusError(ErrorCode.Crypto, String(e))
+        return new VanellusError(ErrorCode.Crypto, String(e))
     }
 }
 
@@ -215,7 +215,7 @@ export async function ephemeralECDHEncrypt(
         ]
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 

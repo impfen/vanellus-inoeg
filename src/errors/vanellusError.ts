@@ -10,6 +10,8 @@ export function getErrorDescriptionForCode(code: ErrorCode): string {
       return "Backend Error"
     case ErrorCode.DataMissing:
       return "Data missing"
+    case ErrorCode.Crypto:
+      return "Cryptographic method failed"
   }
   return "";
 }

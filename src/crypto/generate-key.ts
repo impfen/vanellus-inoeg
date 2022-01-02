@@ -20,7 +20,7 @@ export async function generateSymmetricKey(): Promise<string> {
         return buf2b64(keyBytes)
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 
@@ -42,7 +42,7 @@ export async function generateECDSAKeyPair(): Promise<KeyPair> {
         return { publicKey: buf2b64(pubKey), privateKey: privKey }
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 
@@ -63,7 +63,7 @@ export async function generateECDHKeyPair(): Promise<KeyPair> {
         return { publicKey: buf2b64(pubKey), privateKey: privKey }
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
     
 }

@@ -76,7 +76,7 @@ describe("User.getAppointments()", function () {
         if (result instanceof VanellusError)
             throw new Error("should not fail")
 
-        if (result instanceof VanellusError)
+        if (result.appointments.length !== 1)
             throw new Error("should return one appointment")
     })
 })

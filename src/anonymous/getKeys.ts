@@ -2,7 +2,6 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { BackendError } from '../errors'
 import { Actor } from "../actor"
 import { PublicKeys, Result, Status } from "../interfaces"
 import { VanellusError } from "../errors"

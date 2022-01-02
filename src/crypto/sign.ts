@@ -32,6 +32,6 @@ export async function sign(
         return d
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }

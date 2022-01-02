@@ -34,6 +34,6 @@ export async function deriveSecrets(key: ArrayBuffer, len: number, n: number): P
         return secrets
     } catch (e) {
         console.error(e)
-        throw new UnexpectedError(ErrorCode.Crypto)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
