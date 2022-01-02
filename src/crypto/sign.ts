@@ -7,16 +7,16 @@ import { b642buf, buf2b64, str2ab } from "../helpers/conversion"
 import { SignedData } from "../interfaces"
 
 export async function sign(
-    keyData: JsonWebKey,
+    privateKeyData: JsonWebKey,
     rawData: string,
     publicKeyData: string
 ): Promise<SignedData> {
     const data = str2ab(rawData)
     try {
         // we import the key data
-        const key = await crypto.subtle.importKey(
+        const privateKey = await crypto.subtle.importKey(
             "jwk",
-            keyData,
+            privateKeyData,
             { name: "ECDSA", namedCurve: "P-256" },
             false,
             ["sign"]
@@ -24,12 +24,11 @@ export async function sign(
 
         const result = await crypto.subtle.sign(
             { name: "ECDSA", hash: "SHA-256" },
-            key,
+            privateKey,
             data
         )
-        const d: SignedData = { signature: buf2b64(result), data: rawData }
-        if (publicKeyData !== undefined) d.publicKey = publicKeyData
-        return d
+
+        return { signature: buf2b64(result), data: rawData, publicKey: publicKeyData }
     } catch (e) {
         console.error(e)
         throw new UnexpectedError(ErrorCode.Crypto, e)
