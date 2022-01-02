@@ -35,10 +35,7 @@ export async function getToken(
     // we hash the user data to prove it didn't change later...
     const [dataHash, nonce] = await hashContactData(this.contactData)
     const signingKeyPair = await generateECDSAKeyPair()
-    if (signingKeyPair instanceof VanellusError) return signingKeyPair
-
     const encryptionKeyPair = await generateECDHKeyPair()
-    if (encryptionKeyPair instanceof VanellusError) return encryptionKeyPair
 
     const userToken = {
         version: "0.3",

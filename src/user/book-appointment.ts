@@ -33,7 +33,6 @@ export async function bookAppointment(
         JSON.stringify(providerData),
         appointment.publicKey
     )
-    if (encryptedDataAndPublicKey instanceof VanellusError) return encryptedDataAndPublicKey
 
     // we don't care about the ephmeral key
     const [encryptedData] = encryptedDataAndPublicKey
