@@ -13,6 +13,7 @@ import {
     backend,
     verifiedProvider,
 } from "../testing/fixtures"
+import { VanellusError } from '../errors'
 
 describe("Provider.publishAppointments()", function () {
     it("we should be able to publish appointments", async function () {
@@ -22,7 +23,10 @@ describe("Provider.publishAppointments()", function () {
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
 
-        var appointments = []
+        if (vp instanceof VanellusError)
+            throw new Error("cannot verify provider")
+
+        const appointments = []
 
         let date = new Date()
 
@@ -34,8 +38,8 @@ describe("Provider.publishAppointments()", function () {
         date.setSeconds(0)
         date.setMilliseconds(0)
 
-        for (var i = 0; i < 5; i++) {
-            var app = await vp.createAppointment(
+        for (let i = 0; i < 5; i++) {
+            const app = await vp.createAppointment(
                 15,
                 "moderna",
                 5,
@@ -49,7 +53,7 @@ describe("Provider.publishAppointments()", function () {
 
         const publishResult = await vp.publishAppointments(appointments)
 
-        if (publishResult.status !== Status.Succeeded)
+        if (publishResult instanceof VanellusError)
             throw new Error("cannot publish appointments")
 
         const fromDate = new Date()
@@ -61,7 +65,7 @@ describe("Provider.publishAppointments()", function () {
             to: formatDatetime(toDate),
         })
 
-        if (getResult.status !== Status.Succeeded)
+        if (getResult instanceof VanellusError)
             throw new Error("cannot get appointments")
         if (getResult.appointments.length != 5)
             throw new Error("expected 5 appointments")

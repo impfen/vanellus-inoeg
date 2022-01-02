@@ -13,6 +13,7 @@ import {
     verifiedProvider,
 } from "../testing/fixtures"
 import { User } from "./"
+import { VanellusError } from '../errors'
 
 describe("User.bookAppointment()", function () {
     it("we should be able to book an appointment", async function () {
@@ -22,7 +23,10 @@ describe("User.bookAppointment()", function () {
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
 
-        let date = new Date()
+        if (vp instanceof VanellusError)
+            throw new Error("cannot verify provider")
+
+        const date = new Date()
 
         // tomorrow 3 pm
 
@@ -32,7 +36,7 @@ describe("User.bookAppointment()", function () {
         date.setSeconds(0)
         date.setMilliseconds(0)
 
-        var app = await vp.createAppointment(
+        const app = await vp.createAppointment(
             15,
             "moderna",
             5,
@@ -40,7 +44,7 @@ describe("User.bookAppointment()", function () {
         )
         const publishResult = await vp.publishAppointments([app])
 
-        if (publishResult.status !== Status.Succeeded)
+        if (publishResult instanceof VanellusError)
             throw new Error("cannot create appointment")
 
         const user = new User("main", be)
@@ -56,7 +60,7 @@ describe("User.bookAppointment()", function () {
         }
         const tokenResult = await user.getToken({})
 
-        if (tokenResult.status !== Status.Succeeded)
+        if (tokenResult instanceof VanellusError)
             throw new Error("cannot get token")
 
         const fromDate = new Date()
@@ -66,10 +70,10 @@ describe("User.bookAppointment()", function () {
         const getResult = await user.getAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
-            zipCode: user.queueData!.zipCode,
+            zipCode: user.queueData.zipCode,
         })
 
-        if (getResult.status !== Status.Succeeded)
+        if (getResult instanceof VanellusError)
             throw new Error("should not fail")
 
         if (getResult.appointments.length !== 1)
@@ -80,7 +84,7 @@ describe("User.bookAppointment()", function () {
             getResult.appointments[0].provider
         )
 
-        if (bookResult.status !== Status.Succeeded)
+        if (bookResult instanceof VanellusError)
             throw new Error("should not fail")
 
         let apptsResult = await vp.getAppointments({
@@ -88,12 +92,17 @@ describe("User.bookAppointment()", function () {
             to: formatDatetime(toDate),
         })
 
-        if (apptsResult.status !== Status.Succeeded)
+        if (apptsResult instanceof VanellusError)
             throw new Error("should be able to get appointments")
 
+        if (!user.secret)
+            throw new Error("user secret is null")
+
+        const d = apptsResult.appointments[0].bookings ? apptsResult.appointments[0].bookings[0].data : null
         if (
-            apptsResult.appointments[0].bookings![0].data.userToken.code !==
-            user.secret!.slice(0, 4)
+            !d ||
+            d.userToken.code !==
+            user.secret.slice(0, 4)
         )
             throw new Error("booking code does not match")
 
@@ -101,7 +110,7 @@ describe("User.bookAppointment()", function () {
             bookResult.acceptedAppointment
         )
 
-        if (cancelResult.status !== Status.Succeeded)
+        if (cancelResult instanceof VanellusError)
             throw new Error("cannot cancel appointment")
 
         apptsResult = await vp.getAppointments({
@@ -109,10 +118,10 @@ describe("User.bookAppointment()", function () {
             to: formatDatetime(toDate),
         })
 
-        if (apptsResult.status !== Status.Succeeded)
+        if (apptsResult instanceof VanellusError)
             throw new Error("should be able to get appointments")
 
-        if (apptsResult.appointments[0].bookings!.length !== 0)
+        if (apptsResult.appointments[0].bookings?.length !== 0)
             throw new Error("excepted no more bookings")
     })
 })

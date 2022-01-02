@@ -11,8 +11,8 @@ import {
     AESData,
     Status,
     Result,
-    Error,
 } from "../interfaces"
+import { VanellusError, ErrorCode } from '../errors'
 import { Provider } from "./"
 
 export interface BackupData {
@@ -41,7 +41,10 @@ interface BackupDataResult extends Result {
 
 export async function backupData(
     this: Provider
-): Promise<BackupDataResult | Error> {
+): Promise<BackupDataResult | VanellusError> {
+    if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
+
+
     const cloudData: CloudBackupData = {
         version: "0.2",
         createdAt: new Date().toISOString(),
@@ -49,7 +52,7 @@ export async function backupData(
         verifiedData: this.verifiedData,
     }
 
-    const idAndKey = await deriveSecrets(b642buf(this.keyPairs!.sync), 32, 2)
+    const idAndKey = await deriveSecrets(b642buf(this.keyPairs.sync), 32, 2)
 
     const [id, key] = idAndKey!
 
@@ -59,15 +62,12 @@ export async function backupData(
         b642buf(key)
     )
 
-    if (encryptedCloudData === null)
-        return {
-            status: Status.Failed,
-        }
-
     const result = await this.backend.storage.storeSettings({
         id: id,
         data: encryptedCloudData,
     })
+
+    if (result instanceof VanellusError) return result
 
     const localData: LocalBackupData = {
         version: "0.2",
@@ -82,6 +82,6 @@ export async function backupData(
 
     return {
         status: Status.Succeeded,
-        data: encryptedData!,
+        data: encryptedData,
     }
 }

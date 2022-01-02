@@ -17,7 +17,7 @@ export function createSlot() {
 
 /**
  * creates an initial Appointment object
- * @param duration defines the length of the appointment in minues
+ * @param duration defines the length of the appointment in minutes
  * @param vaccine defines the vaccine offered at the appointment
  * @param slotN defines the number of people that can be vaccinated
  * @param timestamp defines the time of the appointment
@@ -27,11 +27,11 @@ export async function createAppointment(
     this: Provider,
     duration: number,
     vaccine: string,
-    slots: number,
+    slotN: number,
     timestamp: string
 ) {
-    var slotData: Slot[] = []
-    for (var i = 0; i < slots; i++) {
+    const slotData: Slot[] = []
+    for (let i = 0; i < slotN; i++) {
         slotData[i] = {
             id: randomBytes(32),
             open: true,
@@ -49,5 +49,5 @@ export async function createAppointment(
         id: randomBytes(32),
         publicKey: "",
         slotData: slotData,
-    }
+    } as Appointment
 }

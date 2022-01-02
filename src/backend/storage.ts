@@ -12,15 +12,15 @@ export class StorageBackend extends JSONRPCBackend {
     }
 
     async storeSettings({ id, data }: { id: string, data: AESData }) {
-        return await this.call<OK>("storeSettings", { id, data })
+        return await this.call<OK>(this.methods.storeSettings, { id, data })
     }
 
     async getSettings({ id }: { id: string }) {
-        return await this.call<AESData>("getSettings", { id })
+        return await this.call<AESData>(this.methods.getSettings, { id })
     }
 
     // only works for test deployments
     async resetDB({}: {}, keyPair: KeyPair) {
-        return await this.call<OK>("resetDB", {}, keyPair)
+        return await this.call<OK>(this.methods.resetDB, {}, keyPair)
     }
 }

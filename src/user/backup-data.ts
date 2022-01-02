@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, VanellusError } from '../errors'
 import { aesEncrypt, deriveSecrets } from "../crypto"
 import { base322buf, b642buf } from "../helpers/conversion"
 import {
@@ -12,7 +13,6 @@ import {
     Status,
     AESData,
     Result,
-    Error,
 } from "../interfaces"
 import { User } from "./"
 
@@ -29,14 +29,16 @@ export interface CloudBackupData extends BackupData {
     acceptedAppointment: AcceptedAppointment | null
 }
 
-interface BackupDataResult extends Result {
+export interface BackupDataResult extends Result {
     data: AESData
 }
 
 // make sure the signing and encryption key pairs exist
 export async function backupData(
     this: User
-): Promise<BackupDataResult | Error> {
+): Promise<BackupDataResult | VanellusError> {
+    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "secret is missing")
+
     const cloudData: CloudBackupData = {
         version: "0.2",
         createdAt: new Date().toISOString(),
@@ -46,33 +48,24 @@ export async function backupData(
         acceptedAppointment: this.acceptedAppointment,
     }
 
-    const idAndKey = await deriveSecrets(base322buf(this.secret!), 32, 2)
+    const idAndKey = await deriveSecrets(base322buf(this.secret), 32, 2)
 
-    const [id, key] = idAndKey!
+    const [id, key] = idAndKey
 
     const encryptedData = await aesEncrypt(
         JSON.stringify(cloudData),
         b642buf(key)
     )
 
-    if (encryptedData === null)
-        return {
-            status: Status.Failed,
-        }
-
     const response = await this.backend.storage.storeSettings({
         id: id,
         data: encryptedData,
     })
 
-    if (response !== "ok")
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    if (response instanceof VanellusError) response
 
     return {
         status: Status.Succeeded,
-        data: encryptedData!,
+        data: encryptedData,
     }
 }

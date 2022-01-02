@@ -19,6 +19,7 @@ import { base322buf, b642buf } from "../helpers/conversion"
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { VanellusError } from '../errors'
 
 describe("Provider integration", function () {
     it ("create and authenticate a provider and work with appointments", async function () {
@@ -28,7 +29,7 @@ describe("Provider integration", function () {
 
         const be = backend()
         const keys = await adminKeys()
-        var result
+        let result
 
         await resetDB(be, keys)
 
@@ -39,7 +40,7 @@ describe("Provider integration", function () {
 
 
         //create provider
-        var provider = await Provider.initialize(
+        let provider = await Provider.initialize(
             "provider",
             be,
             {
@@ -60,7 +61,7 @@ describe("Provider integration", function () {
 
         result = await provider.storeData()
 
-        if (result.status === Status.Failed)
+        if (result instanceof VanellusError)
             throw new Error("cannot store provider data")
 
 
@@ -86,11 +87,12 @@ describe("Provider integration", function () {
 
         // confirm provider
         const pendingProviders = await med.pendingProviders()
-        if ("status" in pendingProviders && pendingProviders.status === Status.Failed) {
+        if (pendingProviders instanceof VanellusError || pendingProviders.providers.length == 0) {
             throw new Error("fetching provider data failed")
         }
+
         result = await med.confirmProvider(pendingProviders.providers[0])
-        if ("error" in result) throw new Error("confirmation failed")
+        if (result instanceof VanellusError) throw new Error("confirmation failed")
 
         await provider.restoreFromBackup(encryptedKeyFile)
     })

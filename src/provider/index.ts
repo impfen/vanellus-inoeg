@@ -22,6 +22,7 @@ import {
     VerifiedProviderData,
     ProviderKeyPairs,
 } from "../interfaces"
+import { ErrorCode, UnexpectedError } from '../errors'
 
 export * from "./helpers"
 
@@ -81,6 +82,10 @@ export class Provider extends Actor {
         return provider
     }
 
+    /**
+     * populate a blank provider object with data and keys.
+     * @param data The provider data
+     */
 
     public async create(
         data: ProviderData,
@@ -88,7 +93,10 @@ export class Provider extends Actor {
         this.clear()
         this.generateSecret()
         const keyPairs = await this.generateKeyPairs()
-        
+        if (!this.keyPairs) {
+            throw new UnexpectedError(ErrorCode.KeysMissing)
+        }
+
         this.data = {
             name: data.name,
             street: data.street,

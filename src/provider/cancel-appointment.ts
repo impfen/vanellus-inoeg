@@ -5,10 +5,10 @@
 import { Provider } from "./"
 import {
     Appointment,
-    Error,
     Result,
     Status,
 } from "../interfaces"
+import { VanellusError } from '../errors'
 
 /**
  * Cancles an appointment by emptying the slots of the appointment and uploading
@@ -19,7 +19,7 @@ import {
 export async function cancelAppointment(
     this: Provider,
     appointment: Appointment
-): Promise<Result | Error> {
+): Promise<Result | VanellusError> {
     appointment.slotData = []
     const result = await this.publishAppointments( [appointment] )
 

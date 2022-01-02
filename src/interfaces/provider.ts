@@ -10,7 +10,11 @@ export interface ProviderBackupReferenceData {
 
 export interface EncryptedProviderData {
     encryptedData: ECDHData
-    data?: ProviderData
+}
+
+export interface DecryptedProviderData {
+    encryptedData: ECDHData
+    data: ProviderData
 }
 
 export interface EncryptedConfirmedProviderData {

@@ -14,7 +14,13 @@ export interface ContactData {
     name?: string
 }
 
-export interface UserToken {}
+export interface UserToken {
+    version: string,
+    code: string,
+    createdAt: string,
+    publicKey: string, // the signing key to control the ID
+    encryptionPublicKey: string,
+}
 
 export interface TokenData {
     keyPairs: UserKeyPairs

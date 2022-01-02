@@ -3,6 +3,7 @@
 // README.md contains license information.
 
 import { equal } from "assert"
+import { VanellusError } from '../errors'
 import { Actor } from "../actor"
 import { Status } from "../interfaces"
 import { adminKeys, backend } from "../testing/fixtures"
@@ -16,7 +17,7 @@ describe("Anonymous.getKeys()", function () {
 
         const result = await actor.getKeys()
 
-        if (result.status === Status.Failed) throw new Error("failed")
+        if (result instanceof VanellusError) throw new Error("failed")
 
         equal(result.keys.rootKey, keys.root.publicKey)
         equal(result.keys.tokenKey, keys.token.publicKey)

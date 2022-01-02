@@ -14,6 +14,7 @@ import {
     backend,
     verifiedProvider,
 } from "../testing/fixtures"
+import { VanellusError } from '../errors'
 
 describe("Provider.backupData()", function () {
     it("we should be able to backup data", async function () {
@@ -22,20 +23,23 @@ describe("Provider.backupData()", function () {
         await resetDB(be, keys)
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
+        if (vp instanceof VanellusError)
+            throw new Error("could not verify provider")
+
         const backupResult = await vp.backupData()
 
-        if (backupResult.status === Status.Failed)
+        if (backupResult instanceof VanellusError)
             throw new Error("cannot backup data")
 
         const newProvider = new Provider("new", be)
 
         newProvider.secret = vp.secret
 
-        let restoreResult = await newProvider.restoreFromBackup(
+        const restoreResult = await newProvider.restoreFromBackup(
             backupResult.data
         )
 
-        if (restoreResult.status === Status.Failed)
+        if (restoreResult instanceof VanellusError)
             throw new Error("cannot restore data")
 
         deepEqual(newProvider.data, vp.data)

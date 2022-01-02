@@ -5,12 +5,13 @@
 import {
     Status,
     Result,
-    Error,
     Appointment,
     PublicProviderData,
+    BookedSlot,
 } from "../interfaces"
 import { verify } from "../crypto"
 import { User } from "./"
+import { VanellusError } from '../errors'
 
 async function verifyAppointment(appointment: any, item: any) {
     // to do: verify based on key chain
@@ -29,7 +30,7 @@ async function verifyAppointment(appointment: any, item: any) {
     return JSON.parse(appointment.data)
 }
 
-async function verifyProviderData(item: any) {
+async function verifyProviderData(item: any): Promise<PublicProviderData> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -60,21 +61,17 @@ interface GetAppointmentsParams {
 export async function getAppointment(
     this: User,
     { id, providerID }: GetAppointmentsParams
-): Promise<GetAppointmentResult | Error> {
+): Promise<GetAppointmentResult | VanellusError> {
     const response = await this.backend.appointments.getAppointment({
         id: id,
         providerID: providerID,
     })
 
-    if ("code" in response)
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    if (response instanceof VanellusError) return response
 
     response.provider.json = await verifyProviderData(response)
     // we copy the ID for convenience
-    response.provider.json!.id = response.provider.id
+    response.provider.json.id = response.provider.id
 
     const signedAppointment = response.appointments[0]
 
@@ -83,14 +80,16 @@ export async function getAppointment(
         response
     )
     for (const slot of appointment.slotData) {
-        if (signedAppointment.bookedSlots!.some((id: any) => id === slot.id))
+        if (signedAppointment.bookedSlots?.some((aslot: BookedSlot) => aslot.id === slot.id)) {
             slot.open = false
-        else slot.open = true
+        } else {
+            slot.open = true
+        }
     }
 
     return {
         status: Status.Succeeded,
-        provider: response.provider.json!,
+        provider: response.provider.json,
         appointment: appointment,
     }
 }

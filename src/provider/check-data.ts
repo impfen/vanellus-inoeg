@@ -2,10 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, VanellusError } from '../errors'
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 import { ecdhDecrypt } from "../crypto"
 import {
     Result,
-    Error,
     Status,
     ConfirmedProviderData,
     ProviderData,
@@ -24,31 +25,33 @@ interface CheckDataResult extends Result {
 
 export async function checkData(
     this: Provider,
-): Promise<CheckDataResult | Error> {
+): Promise<CheckDataResult | VanellusError> {
+    if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
+
     const response = await this.backend.appointments.checkProviderData(
         {},
-        this.keyPairs!.signing
+        this.keyPairs.signing
     )
 
-    if ("code" in response)
-        return {
-            status: Status.Failed,
-            error: response,
-        }
-
+    if (response instanceof VanellusError) return response
+        
     // to do: check signature
     const decryptedJSONData = await ecdhDecrypt(
         JSON.parse(response.data),
-        this.keyPairs!.data.privateKey
+        this.keyPairs.data.privateKey
     )
 
-    if (decryptedJSONData === null) {
+    if (decryptedJSONData instanceof VanellusError) {
         // can't decrypt
         this.verifiedData = null
-        return { status: Status.Failed }
+        return decryptedJSONData
     }
 
-    const decryptedData: ProviderData = JSON.parse(decryptedJSONData)
+    const decryptedData: ProviderData = parseUntrustedJSON(decryptedJSONData)
+    if (!decryptedData) {
+        this.verifiedData = null
+        return new VanellusError(ErrorCode.DataMissing, "invalid json data")
+    }
 
     this.verifiedData = decryptedData
     // to do: check signed keys as well

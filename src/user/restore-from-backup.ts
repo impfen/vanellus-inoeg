@@ -4,30 +4,31 @@
 
 import { aesDecrypt, deriveSecrets } from "../crypto"
 import { base322buf, b642buf } from "../helpers/conversion"
-import { Status, Result, Error, AESData } from "../interfaces"
+import { Status, Result} from "../interfaces"
 import { CloudBackupData } from "./backup-data"
 import { User } from "./"
+import { ErrorCode, VanellusError } from '../errors'
 
-interface RestoreFromBackupResult extends Result {
+export interface RestoreFromBackupResult extends Result {
     data: CloudBackupData
 }
 
 // make sure the signing and encryption key pairs exist
 export async function restoreFromBackup(
     this: User
-): Promise<RestoreFromBackupResult | Error> {
-    const secrets = await deriveSecrets(base322buf(this.secret!), 32, 2)
-    const [id, key] = secrets!
-    const response = await this.backend.storage.getSettings({ id: id })
+): Promise<RestoreFromBackupResult | VanellusError> {
+    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "Secret is missing")
 
-    if ("code" in response)
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    const secrets = await deriveSecrets(base322buf(this.secret), 32, 2)
+
+    const [id, key] = secrets
+    const response = await this.backend.storage.getSettings({ id: id })
+    if (response instanceof VanellusError) return response
 
     const decryptedData = await aesDecrypt(response, b642buf(key))
-    const dd: CloudBackupData = JSON.parse(decryptedData!)
+    if (decryptedData instanceof VanellusError) return decryptedData
+
+    const dd: CloudBackupData = JSON.parse(decryptedData)
 
     this.tokenData = dd.tokenData
     this.queueData = dd.queueData

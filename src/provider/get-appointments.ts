@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, VanellusError } from '../errors'
 import { randomBytes, sign, verify, ecdhDecrypt } from "../crypto"
 import {
     Status,
@@ -9,12 +10,25 @@ import {
     Slot,
     SignedAppointment,
     Result,
-    Error,
+    Booking,
 } from "../interfaces"
 import { Provider } from "./"
 
-interface GetAppointmentsResult extends Result {
+export interface GetAppointmentsResult extends Result {
     appointments: Appointment[]
+}
+
+async function decryptBookings(bookings: Booking[], privKey: JsonWebKey) {
+    for (const booking of bookings) {
+        const decryptedData = await ecdhDecrypt(
+            booking.encryptedData,
+            privKey
+        )
+        if (decryptedData instanceof VanellusError) continue
+        const dd = JSON.parse(decryptedData)
+        booking.data = dd
+    }
+    return bookings
 }
 
   /**
@@ -28,35 +42,23 @@ interface GetAppointmentsResult extends Result {
 export async function getAppointments(
     this: Provider,
     { from, to }: { from: string; to: string }
-): Promise<GetAppointmentsResult | Error> {
-    const decryptBookings = async (bookings: any) => {
-        for (const booking of bookings) {
-            const decryptedData = await ecdhDecrypt(
-                booking.encryptedData,
-                this.keyPairs!.encryption.privateKey
-            )
-            const dd = JSON.parse(decryptedData!)
-            booking.data = dd
-        }
-        return bookings
-    }
+): Promise<GetAppointmentsResult | VanellusError> {
+    if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
+
+    
 
     const response = await this.backend.appointments.getAppointments(
         { from: from, to: to },
-        this.keyPairs!.signing
+        this.keyPairs.signing
     )
 
-    if (!(response instanceof Array))
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    if (response instanceof VanellusError) return response
 
     const newAppointments: Appointment[] = []
 
     for (const appointment of response) {
         const verified = await verify(
-            [this.keyPairs!.signing.publicKey],
+            [this.keyPairs.signing.publicKey],
             appointment
         )
         if (!verified) {
@@ -76,7 +78,7 @@ export async function getAppointments(
             slotData: appData.slotData,
             publicKey: appData.publicKey,
             properties: appData.properties,
-            bookings: await decryptBookings(appointment.bookings || []),
+            bookings: await decryptBookings(appointment.bookings || [], this.keyPairs.encryption.privateKey),
             modified: false,
             id: appData.id,
         }

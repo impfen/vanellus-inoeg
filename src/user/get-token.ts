@@ -11,9 +11,8 @@ import {
 } from "../crypto"
 
 import { User } from "./"
-import { Result, Error, ContactData, Status } from "../interfaces"
-
-interface GetTokenResult extends Result {}
+import { Result, ContactData, Status } from "../interfaces"
+import { VanellusError, ErrorCode } from '../errors'
 
 async function hashContactData(data: ContactData) {
     const hashData = {
@@ -29,37 +28,40 @@ async function hashContactData(data: ContactData) {
 export async function getToken(
     this: User,
     { code }: { code?: string }
-): Promise<GetTokenResult | Error> {
+): Promise<Result | VanellusError> {
+    if (!this.contactData) return new VanellusError(ErrorCode.DataMissing, "contact data is missing")
+    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "seret is missing")
+
     // we hash the user data to prove it didn't change later...
-    const [dataHash, nonce] = await hashContactData(this.contactData!)
+    const [dataHash, nonce] = await hashContactData(this.contactData)
     const signingKeyPair = await generateECDSAKeyPair()
+    if (signingKeyPair instanceof VanellusError) return signingKeyPair
+
     const encryptionKeyPair = await generateECDHKeyPair()
+    if (encryptionKeyPair instanceof VanellusError) return encryptionKeyPair
 
     const userToken = {
         version: "0.3",
-        code: this.secret!.slice(0, 4),
+        code: this.secret.slice(0, 4),
         createdAt: new Date().toISOString(),
-        publicKey: signingKeyPair!.publicKey, // the signing key to control the ID
-        encryptionPublicKey: encryptionKeyPair!.publicKey,
+        publicKey: signingKeyPair.publicKey, // the signing key to control the ID
+        encryptionPublicKey: encryptionKeyPair.publicKey,
     }
 
     const signedToken = await this.backend.appointments.getToken({
         hash: dataHash,
-        publicKey: signingKeyPair!.publicKey,
+        publicKey: signingKeyPair.publicKey,
         code: code,
     })
 
-    if ("code" in signedToken)
-        return {
-            status: Status.Failed,
-        }
+    if (signedToken instanceof VanellusError) return signedToken
 
     const tokenData = {
         createdAt: new Date().toISOString(),
         signedToken: signedToken,
         keyPairs: {
-            signing: signingKeyPair!,
-            encryption: encryptionKeyPair!,
+            signing: signingKeyPair,
+            encryption: encryptionKeyPair,
         },
         hashNonce: nonce,
         dataHash: dataHash,

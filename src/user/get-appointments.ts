@@ -5,12 +5,14 @@
 import {
     Status,
     Result,
-    Error,
     Appointment,
     VerifiedProviderAppointments,
+    BookedSlot,
+    PublicProviderData,
 } from "../interfaces"
 import { verify } from "../crypto"
 import { User } from "./"
+import { VanellusError } from '../errors'
 
 async function verifyAppointment(appointment: any, item: any) {
     // to do: verify based on key chain
@@ -29,7 +31,7 @@ async function verifyAppointment(appointment: any, item: any) {
     return JSON.parse(appointment.data)
 }
 
-async function verifyProviderData(item: any) {
+async function verifyProviderData(item: any): Promise<PublicProviderData> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -47,11 +49,11 @@ async function verifyProviderData(item: any) {
     return JSON.parse(item.provider.data)
 }
 
-interface GetAppointmentsResult extends Result {
+export interface GetAppointmentsResult extends Result {
     appointments: VerifiedProviderAppointments[]
 }
 
-interface GetAppointmentsParams {
+export interface GetAppointmentsParams {
     from: string
     to: string
     zipCode: string
@@ -60,25 +62,20 @@ interface GetAppointmentsParams {
 export async function getAppointments(
     this: User,
     { from, to, zipCode }: GetAppointmentsParams
-): Promise<GetAppointmentsResult | Error> {
+): Promise<GetAppointmentsResult | VanellusError> {
     const response = await this.backend.appointments.getAppointmentsByZipCode({
         zipCode: zipCode,
         from: from,
         to: to,
     })
-
-    if (!(response instanceof Array))
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    if (response instanceof VanellusError) return response
 
     const verifiedAppointments: VerifiedProviderAppointments[] = []
 
     for (const item of response) {
         item.provider.json = await verifyProviderData(item)
         // we copy the ID for convenience
-        item.provider.json!.id = item.provider.id
+        item.provider.json.id = item.provider.id
         const verifiedProviderAppointments: Appointment[] = []
         for (const signedAppointment of item.appointments) {
             const appointment: Appointment = await verifyAppointment(
@@ -87,12 +84,14 @@ export async function getAppointments(
             )
             for (const slot of appointment.slotData) {
                 if (
-                    signedAppointment.bookedSlots!.some(
-                        (id: any) => id === slot.id
+                    signedAppointment.bookedSlots?.some(
+                        (aslot: BookedSlot) => aslot.id === slot.id
                     )
-                )
+                ) {
                     slot.open = false
-                else slot.open = true
+                } else {
+                    slot.open = true
+                }
             }
             verifiedProviderAppointments.push(appointment)
         }

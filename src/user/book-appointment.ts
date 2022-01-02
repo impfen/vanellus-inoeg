@@ -2,19 +2,18 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ecdhEncrypt, ephemeralECDHEncrypt } from "../crypto"
+import { ErrorCode, VanellusError } from '../errors'
+import { ephemeralECDHEncrypt } from "../crypto"
 import {
     Status,
-    OK,
     Result,
     AcceptedAppointment,
     PublicProviderData,
     Appointment,
-    Error,
 } from "../interfaces"
 import { User } from "./"
 
-interface BookAppointmentResult extends Result {
+export interface BookAppointmentResult extends Result {
     acceptedAppointment: AcceptedAppointment
 }
 
@@ -22,35 +21,33 @@ export async function bookAppointment(
     this: User,
     appointment: Appointment,
     provider: PublicProviderData
-): Promise<BookAppointmentResult | Error> {
+): Promise<BookAppointmentResult | VanellusError> {
+    if (!this.tokenData) return new VanellusError(ErrorCode.DataMissing, "token data is missing")
+
     const providerData = {
-        signedToken: this.tokenData!.signedToken,
-        userToken: this.tokenData!.userToken,
+        signedToken: this.tokenData.signedToken,
+        userToken: this.tokenData.userToken,
     }
 
     const encryptedDataAndPublicKey = await ephemeralECDHEncrypt(
         JSON.stringify(providerData),
         appointment.publicKey
     )
+    if (encryptedDataAndPublicKey instanceof VanellusError) return encryptedDataAndPublicKey
 
     // we don't care about the ephmeral key
-    const [encryptedData] = encryptedDataAndPublicKey!
+    const [encryptedData] = encryptedDataAndPublicKey
 
-    let response = await this.backend.appointments.bookAppointment(
+    const response = await this.backend.appointments.bookAppointment(
         {
             id: appointment.id,
             providerID: provider.id,
             encryptedData: encryptedData,
-            signedTokenData: this.tokenData!.signedToken,
+            signedTokenData: this.tokenData.signedToken,
         },
-        this.tokenData!.keyPairs.signing
+        this.tokenData.keyPairs.signing
     )
-
-    if ("code" in response)
-        return {
-            status: Status.Failed,
-            error: response,
-        }
+    if (response instanceof VanellusError) return response
 
     const acceptedAppointment: AcceptedAppointment = {
         appointment: appointment,

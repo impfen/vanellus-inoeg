@@ -7,11 +7,12 @@ import { b642buf, buf2b64, str2ab, ab2str } from "../helpers/conversion"
 import { AESData } from "../interfaces"
 import { salt } from "./token"
 import { KeyPair, ECDHData } from "../interfaces"
+import { ErrorCode, UnexpectedError, VanellusError } from '../errors'
 
 export async function aesEncrypt(
     rawData: string,
     secret: ArrayBuffer
-): Promise<AESData | null> {
+): Promise<AESData> {
     try {
         const data = str2ab(rawData)
 
@@ -48,14 +49,15 @@ export async function aesEncrypt(
             data: buf2b64(encryptedData),
         }
     } catch (e) {
-        return null
+        console.error(e)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 
 export async function aesDecrypt(
     data: AESData,
     secret: ArrayBuffer
-): Promise<string | null> {
+): Promise<string | VanellusError> {
     try {
         const secretKey = await crypto.subtle.importKey(
             "raw",
@@ -84,7 +86,8 @@ export async function aesDecrypt(
         )
         return ab2str(decryptedData)
     } catch (e) {
-        return null
+		console.error(e)
+        return new VanellusError(ErrorCode.Crypto, String(e))
     }
 }
 
@@ -92,7 +95,7 @@ export async function ecdhEncrypt(
     rawData: string,
     keyPair: KeyPair,
     publicKeyData: string
-): Promise<ECDHData | null> {
+): Promise<ECDHData> {
     const data = str2ab(rawData)
 
     try {
@@ -144,14 +147,15 @@ export async function ecdhEncrypt(
             publicKey: keyPair.publicKey,
         }
     } catch (e) {
-        return null
+        console.error(e)
+        throw new UnexpectedError(ErrorCode.Crypto)
     }
 }
 
 export async function ephemeralECDHEncrypt(
     rawData: string,
     publicKeyData: string
-): Promise<[ECDHData, JsonWebKey] | null> {
+): Promise<[ECDHData, JsonWebKey]> {
     const data = str2ab(rawData)
 
     try {
@@ -167,7 +171,7 @@ export async function ephemeralECDHEncrypt(
         )
         const privateKey = await crypto.subtle.importKey(
             "jwk",
-            ephemeralKeyPair!.privateKey,
+            ephemeralKeyPair.privateKey,
             { name: "ECDH", namedCurve: "P-256" },
             false,
             ["deriveKey"]
@@ -205,16 +209,17 @@ export async function ephemeralECDHEncrypt(
             {
                 iv: buf2b64(iv),
                 data: buf2b64(encryptedData),
-                publicKey: ephemeralKeyPair!.publicKey,
+                publicKey: ephemeralKeyPair.publicKey,
             },
-            ephemeralKeyPair!.privateKey,
+            ephemeralKeyPair.privateKey,
         ]
     } catch (e) {
-        return null
+        console.error(e)
+        throw new UnexpectedError(ErrorCode.Crypto, e)
     }
 }
 
-export async function ecdhDecrypt(data: ECDHData, privateKeyData: JsonWebKey) {
+export async function ecdhDecrypt(data: ECDHData, privateKeyData: JsonWebKey): Promise<string | VanellusError> {
     try {
         const privateKey = await crypto.subtle.importKey(
             "jwk",
@@ -257,6 +262,7 @@ export async function ecdhDecrypt(data: ECDHData, privateKeyData: JsonWebKey) {
         )
         return ab2str(decryptedData)
     } catch (e) {
-        return null
+        console.error(e)
+        return new VanellusError(ErrorCode.Crypto, String(e))
     }
 }

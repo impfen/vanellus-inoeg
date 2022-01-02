@@ -8,6 +8,7 @@ import { User } from "../user"
 import { ecdhDecrypt } from "../crypto"
 import { Status } from "../interfaces"
 import { adminKeys, resetDB, backend } from "../testing/fixtures"
+import { VanellusError } from '../errors'
 
 describe("User.backupData()", function () {
     it("we should be able to backup data", async function () {
@@ -31,7 +32,7 @@ describe("User.backupData()", function () {
 
         const backupResult = await user.backupData()
 
-        if (backupResult.status === Status.Failed)
+        if (backupResult instanceof VanellusError)
             throw new Error("cannot backup data")
 
         const newUser = new User("new", be)
@@ -40,7 +41,7 @@ describe("User.backupData()", function () {
 
         let restoreResult = await newUser.restoreFromBackup()
 
-        if (restoreResult.status === Status.Failed)
+        if (restoreResult instanceof VanellusError)
             throw new Error("cannot restore data")
 
         deepEqual(newUser.contactData, user.contactData)
@@ -53,7 +54,7 @@ describe("User.backupData()", function () {
 
         restoreResult = await newUser.restoreFromBackup()
 
-        if (restoreResult.status !== Status.Failed)
+        if (!(restoreResult instanceof VanellusError))
             throw new Error("should fail")
     })
 })

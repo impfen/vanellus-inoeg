@@ -16,17 +16,21 @@ import {
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { VanellusError } from '../errors'
 
 describe("Provider.cancelAppointments()", function () {
     it("we should be able to publish appointments", async function () {
         dayjs.extend(utc)
-        var result;
+        let result;
 
         const be = backend()
         const keys = await adminKeys()
         await resetDB(be, keys)
         const med = await mediator(be, keys)
         const vp = await verifiedProvider(be, keys, med)
+
+        if (vp instanceof VanellusError)
+            throw new Error("could not verify provider")
 
         // tomorrow 3 pm
 
@@ -41,7 +45,7 @@ describe("Provider.cancelAppointments()", function () {
 
         const publishResult = await vp.publishAppointments([app])
 
-        if (publishResult.status !== Status.Succeeded)
+        if (publishResult instanceof VanellusError)
             throw new Error("cannot publish appointments")
 
         const fromDate = dayjs().utc()
@@ -52,7 +56,7 @@ describe("Provider.cancelAppointments()", function () {
             to: formatDatetime(toDate),
         })
 
-        if (getResult.status !== Status.Succeeded)
+        if (getResult instanceof VanellusError)
             throw new Error("cannot get appointments")
         if (getResult.appointments.length != 1)
             throw new Error("expected 5 appointments")
@@ -69,10 +73,10 @@ describe("Provider.cancelAppointments()", function () {
         result = await user.getAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
-            zipCode: user.queueData!.zipCode,
+            zipCode: user.queueData.zipCode,
         })
 
-        if (result.status !== Status.Succeeded)
+        if (result instanceof VanellusError)
             throw new Error("should not fail")
 
         if (result.appointments.length !== 1)
@@ -85,10 +89,10 @@ describe("Provider.cancelAppointments()", function () {
         result = await user.getAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
-            zipCode: user.queueData!.zipCode,
+            zipCode: user.queueData.zipCode,
         })
 
-        if (result.status !== Status.Succeeded)
+        if (result instanceof VanellusError)
             throw new Error("should not fail")
 
         if (result.appointments.length !== 0)
