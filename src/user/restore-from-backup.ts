@@ -8,6 +8,7 @@ import { Status, Result} from "../interfaces"
 import { CloudBackupData } from "./backup-data"
 import { User } from "./"
 import { ErrorCode, VanellusError } from '../errors'
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 
 export interface RestoreFromBackupResult extends Result {
     data: CloudBackupData
@@ -28,7 +29,8 @@ export async function restoreFromBackup(
     const decryptedData = await aesDecrypt(response, b642buf(key))
     if (decryptedData instanceof VanellusError) return decryptedData
 
-    const dd: CloudBackupData = JSON.parse(decryptedData)
+    const dd = parseUntrustedJSON<CloudBackupData>(decryptedData)
+    if (!dd) return new VanellusError(ErrorCode.DataMissing, "invalid backup data")
 
     this.tokenData = dd.tokenData
     this.queueData = dd.queueData

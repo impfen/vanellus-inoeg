@@ -8,12 +8,15 @@ import {
     Appointment,
     PublicProviderData,
     BookedSlot,
+    ProviderAppointments,
 } from "../interfaces"
 import { verify } from "../crypto"
 import { User } from "./"
-import { VanellusError } from '../errors'
+import { ErrorCode, VanellusError } from '../errors'
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
+import { Optional } from '../helpers/optional'
 
-async function verifyAppointment(appointment: any, item: any) {
+async function verifyAppointment(appointment: any, item: any): Promise<Optional<Appointment>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -27,10 +30,10 @@ async function verifyAppointment(appointment: any, item: any) {
     const result = await verify([appointment.publicKey], appointment);
     if (!result) throw 'invalid signature';
     */
-    return JSON.parse(appointment.data)
+    return parseUntrustedJSON<Appointment>(appointment.data)
 }
 
-async function verifyProviderData(item: any): Promise<PublicProviderData> {
+async function verifyProviderData(item: ProviderAppointments): Promise<Optional<PublicProviderData>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -45,7 +48,7 @@ async function verifyProviderData(item: any): Promise<PublicProviderData> {
     const result = await verify([item.provider.publicKey], providerData);
     if (!result) throw 'invalid signature';
     */
-    return JSON.parse(item.provider.data)
+    return parseUntrustedJSON<PublicProviderData>(item.provider.data)
 }
 
 interface GetAppointmentResult extends Result {
@@ -69,16 +72,22 @@ export async function getAppointment(
 
     if (response instanceof VanellusError) return response
 
-    response.provider.json = await verifyProviderData(response)
+    const jsonProvider = await verifyProviderData(response)
+    if (!jsonProvider) return new VanellusError(ErrorCode.DataMissing, "invalid provider")
+
+    response.provider.json = jsonProvider
     // we copy the ID for convenience
     response.provider.json.id = response.provider.id
+    
 
     const signedAppointment = response.appointments[0]
 
-    const appointment: Appointment = await verifyAppointment(
+    const appointment = await verifyAppointment(
         signedAppointment,
         response
     )
+    if (!appointment) return new VanellusError(ErrorCode.DataMissing, "invalid appointment")
+
     for (const slot of appointment.slotData) {
         if (signedAppointment.bookedSlots?.some((aslot: BookedSlot) => aslot.id === slot.id)) {
             slot.open = false

@@ -13,8 +13,10 @@ import {
 import { verify } from "../crypto"
 import { User } from "./"
 import { VanellusError } from '../errors'
+import { Optional } from '../helpers/optional'
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 
-async function verifyAppointment(appointment: any, item: any) {
+async function verifyAppointment(appointment: any, item: any): Promise<Optional<Appointment>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -28,10 +30,10 @@ async function verifyAppointment(appointment: any, item: any) {
     const result = await verify([appointment.publicKey], appointment);
     if (!result) throw 'invalid signature';
     */
-    return JSON.parse(appointment.data)
+    return parseUntrustedJSON<Appointment>(appointment.data)
 }
 
-async function verifyProviderData(item: any): Promise<PublicProviderData> {
+async function verifyProviderData(item: any): Promise<Optional<PublicProviderData>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -46,7 +48,7 @@ async function verifyProviderData(item: any): Promise<PublicProviderData> {
     const result = await verify([item.provider.publicKey], providerData);
     if (!result) throw 'invalid signature';
     */
-    return JSON.parse(item.provider.data)
+    return parseUntrustedJSON<PublicProviderData>(item.provider.data)
 }
 
 export interface GetAppointmentsResult extends Result {
@@ -73,15 +75,19 @@ export async function getAppointments(
     const verifiedAppointments: VerifiedProviderAppointments[] = []
 
     for (const item of response) {
-        item.provider.json = await verifyProviderData(item)
+        const jsonProvider = await verifyProviderData(item)
+        if (!jsonProvider) continue
+        item.provider.json = jsonProvider
         // we copy the ID for convenience
         item.provider.json.id = item.provider.id
         const verifiedProviderAppointments: Appointment[] = []
         for (const signedAppointment of item.appointments) {
-            const appointment: Appointment = await verifyAppointment(
+            const appointment = await verifyAppointment(
                 signedAppointment,
                 item
             )
+            if (!appointment) continue
+
             for (const slot of appointment.slotData) {
                 if (
                     signedAppointment.bookedSlots?.some(
