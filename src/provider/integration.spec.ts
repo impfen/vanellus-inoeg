@@ -50,10 +50,6 @@ describe("Provider integration", function () {
                 zipCode: "10707",
                 description: "",
                 email: "max@mustermann.de",
-                publicKeys: {
-                    encryption: "",
-                    signing: "",
-                },
             }
         )
 
