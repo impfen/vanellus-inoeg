@@ -37,7 +37,8 @@ export interface ProviderPublicKeys {
     encryption: string
 }
 
-export interface ProviderData {
+export interface ProviderInput {
+    id?: string
     name: string
     street: string
     city: string
@@ -45,12 +46,16 @@ export interface ProviderData {
     description: string
     email: string
     accessible?: boolean
-    website?: string
+    website?: string    
+}
+
+export interface ProviderData extends ProviderInput {
     publicKeys: ProviderPublicKeys
     submittedAt?: string
     version?: string
     id?: string
 }
+
 
 export interface ProviderKeyPairs {
     signing: KeyPair
