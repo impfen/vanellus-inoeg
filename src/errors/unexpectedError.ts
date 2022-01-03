@@ -1,6 +1,6 @@
 import { Optional } from '../helpers/optional'
 import { ErrorCode } from './'
-import { getErrorDescriptionForCode } from './vanellusError'
+import { getErrorMessageForCode } from './vanellusError'
 
 
 export class UnexpectedError extends Error {
@@ -8,7 +8,8 @@ export class UnexpectedError extends Error {
   public readonly baseError: Optional<unknown>
 
   constructor(code: ErrorCode, baseError: Optional<unknown> = null) {
-    super(getErrorDescriptionForCode(code))
+    super(getErrorMessageForCode(code))
+    this.name = "UnexpectedError";
     this.code = code
     this.baseError = baseError
   }
