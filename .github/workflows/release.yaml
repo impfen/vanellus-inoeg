@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    uses: "kiebitz-oss/vanellus-inoeg/.github/workflows/push.yaml@${{ github.ref_name }}"
+    uses: kiebitz-oss/vanellus-inoeg/.github/workflows/push.yaml@master
 
   release:
     runs-on: ubuntu-latest
