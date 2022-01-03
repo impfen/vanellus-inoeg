@@ -11,6 +11,7 @@ import {
     SignedMediatorKeyData,
     KeyPair,
 } from "../../interfaces"
+import { VanellusError } from '../../errors'
 
 export async function mediator(
     backend: Backend,
@@ -20,8 +21,8 @@ export async function mediator(
     const encryptionKeyPair = await generateECDHKeyPair()
 
     const mediatorKeyData: MediatorKeyData = {
-        signing: signingKeyPair!.publicKey,
-        encryption: encryptionKeyPair!.publicKey,
+        signing: signingKeyPair.publicKey,
+        encryption: encryptionKeyPair.publicKey,
     }
 
     const signedData = await sign(
@@ -33,21 +34,21 @@ export async function mediator(
     const response = await backend.appointments.addMediatorPublicKeys(
         {
             signedKeyData: {
-                publicKey: signedData!.publicKey!,
-                signature: signedData!.signature,
-                data: signedData!.data,
+                publicKey: signedData.publicKey,
+                signature: signedData.signature,
+                data: signedData.data,
             },
         },
         adminKeys.root
     )
 
-    if (response != "ok") throw new Error("cannot create mediator") // this is an error
+    if (response instanceof VanellusError) throw new Error("cannot create mediator") // this is an error
 
     const mediator = new Mediator("mediator", backend)
 
     mediator.keyPairs = {
-        signing: signingKeyPair!,
-        encryption: encryptionKeyPair!,
+        signing: signingKeyPair,
+        encryption: encryptionKeyPair,
         provider: adminKeys.provider,
     }
 

@@ -18,6 +18,7 @@ import { Actor } from "../actor"
 import { Backend } from "../backend"
 
 import {
+    ProviderInput,
     ProviderData,
     VerifiedProviderData,
     ProviderKeyPairs,
@@ -62,7 +63,7 @@ export class Provider extends Actor {
     public static async initialize(
         id: string,
         backend: Backend,
-        data: ProviderData,
+        data: ProviderInput,
     ) {
         const provider = new Provider(id, backend)
         await provider.create({
@@ -74,10 +75,6 @@ export class Provider extends Actor {
             email: data.email,
             accessible: data.accessible,
             website: data.website,
-            publicKeys: {
-                encryption: "",
-                signing: "",
-            },
         })
         return provider
     }
@@ -88,11 +85,12 @@ export class Provider extends Actor {
      */
 
     public async create(
-        data: ProviderData,
+        data: ProviderInput,
     ) {
         this.clear()
         this.generateSecret()
         const keyPairs = await this.generateKeyPairs()
+
         if (!this.keyPairs) {
             throw new UnexpectedError(ErrorCode.KeysMissing)
         }

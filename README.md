@@ -13,7 +13,7 @@ To run this library in the browser you'll need the `buffer` package, which imple
 To build the distribution files, simply run
 
 ```bash
-make build
+npm run build
 ```
 
 # Formatting
@@ -21,7 +21,7 @@ make build
 To format files, simply run
 
 ```bash
-make prettier
+npm run prettier
 ```
 
 # Development
@@ -29,7 +29,7 @@ make prettier
 To continuously build files and watch for changes, simply run
 
 ```bash
-make watch
+npm run watch
 ```
 
 # Testing
@@ -37,7 +37,7 @@ make watch
 To run the unit & integration tests
 
 ```bash
-make test
+npm run test
 ```
 
 These tests require a running Kiebitz test instance with appointments and storage services, as well as a readable `002_admin.json` key file in the Kiebitz settings directory. The default directory is `../services/settings/test`. You can change the directory and service ports by setting the `KIEBITZ_SETTINGS`, `KIEBITZ_APPOINTMENTS_PORT` and `KIEBITZ_STORAGE_PORT` environment variables.

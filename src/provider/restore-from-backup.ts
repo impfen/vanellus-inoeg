@@ -29,7 +29,7 @@ export async function restoreFromBackup(
     const decryptedKeyData = await aesDecrypt(data, base322buf(this.secret))
     if (decryptedKeyData instanceof VanellusError) return decryptedKeyData
 
-    const dd: LocalBackupData = parseUntrustedJSON(decryptedKeyData)
+    const dd = parseUntrustedJSON<LocalBackupData>(decryptedKeyData)
 
     if (!dd || !dd.keyPairs) return new VanellusError(ErrorCode.DataMissing, "invalid decrypted key pairs")
 
@@ -50,7 +50,8 @@ export async function restoreFromBackup(
     const decryptedData = await aesDecrypt(response, b642buf(key))
     if (decryptedData instanceof VanellusError) return decryptedData
 
-    const ddCloud: CloudBackupData = parseUntrustedJSON(decryptedData)
+    const ddCloud = parseUntrustedJSON<CloudBackupData>(decryptedData)
+    if (!ddCloud) return new VanellusError(ErrorCode.DataMissing, "invalid decrypted settings")
 
     this.keyPairs = dd.keyPairs
     this.data = ddCloud.data

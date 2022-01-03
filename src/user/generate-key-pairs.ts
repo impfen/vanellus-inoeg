@@ -10,10 +10,7 @@ import { VanellusError } from '../errors'
 
 export async function generateKeyPairs(this: User): Promise<UserKeyPairs | VanellusError> {
     const signingKeyPair = await generateECDSAKeyPair()
-    if (signingKeyPair instanceof VanellusError) return signingKeyPair
-
     const encryptionKeyPair = await generateECDHKeyPair()
-    if (encryptionKeyPair instanceof VanellusError) return encryptionKeyPair
 
     const keyPairs = {
         signing: signingKeyPair,

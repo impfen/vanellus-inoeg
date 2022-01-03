@@ -10,6 +10,7 @@ import {
     Status,
     ConfirmedProviderData,
     ProviderData,
+    ECDHData,
 } from "../interfaces"
 import { Provider } from "./"
 
@@ -34,10 +35,13 @@ export async function checkData(
     )
 
     if (response instanceof VanellusError) return response
-        
+    
+    const json = parseUntrustedJSON<ECDHData>(response.data)
+    if (!json) return new VanellusError(ErrorCode.DataMissing, "invalid json")
+    
     // to do: check signature
     const decryptedJSONData = await ecdhDecrypt(
-        JSON.parse(response.data),
+        json,
         this.keyPairs.data.privateKey
     )
 
@@ -47,7 +51,7 @@ export async function checkData(
         return decryptedJSONData
     }
 
-    const decryptedData: ProviderData = parseUntrustedJSON(decryptedJSONData)
+    const decryptedData = parseUntrustedJSON<ProviderData>(decryptedJSONData)
     if (!decryptedData) {
         this.verifiedData = null
         return new VanellusError(ErrorCode.DataMissing, "invalid json data")

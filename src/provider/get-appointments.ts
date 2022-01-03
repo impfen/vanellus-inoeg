@@ -13,6 +13,7 @@ import {
     Booking,
 } from "../interfaces"
 import { Provider } from "./"
+import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 
 export interface GetAppointmentsResult extends Result {
     appointments: Appointment[]
@@ -25,7 +26,8 @@ async function decryptBookings(bookings: Booking[], privKey: JsonWebKey) {
             privKey
         )
         if (decryptedData instanceof VanellusError) continue
-        const dd = JSON.parse(decryptedData)
+        const dd = parseUntrustedJSON(decryptedData)
+        if (!dd) continue
         booking.data = dd
     }
     return bookings
@@ -64,10 +66,10 @@ export async function getAppointments(
         if (!verified) {
             continue
         }
-        const appData = JSON.parse(appointment.data)
+        const appData = parseUntrustedJSON<Appointment>(appointment.data)
 
         // this appointment was loaded already (should not happen)
-        if (newAppointments.find((app) => app.id === appData.id)) {
+        if (!appData || newAppointments.find((app) => app.id === appData.id)) {
             continue
         }
 

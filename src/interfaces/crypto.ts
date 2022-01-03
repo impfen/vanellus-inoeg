@@ -19,7 +19,7 @@ export interface ECDHData {
 }
 
 export interface SignedData {
-    publicKey?: string
+    publicKey: string
     signature: string
     data: string
 }
