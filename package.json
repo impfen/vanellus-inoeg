@@ -16,6 +16,7 @@
         "test": "mocha --require ts-node/register --extionsion ts src/**/*.spec.ts",
         "prettier": "prettier --write .",
         "lint": "eslint . --ext .ts",
+        "typecheck": "tsc --noEmit",
         "documentation": "npx typedoc --out ./docs src",
         "watch": "tsc -w",
         "clean": "rm -rf dist/*"
