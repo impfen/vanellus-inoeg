@@ -2,12 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Settings, Store } from "../interfaces"
-
-import fetch from "node-fetch"
-
-// @ts-ignore
-global.fetch = fetch
+import 'cross-fetch/polyfill';
+import { Settings } from "../interfaces"
 
 export const settingsPath =
     process.env.KIEBITZ_SETTINGS || "../services/settings/test"

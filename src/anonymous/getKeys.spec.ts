@@ -5,7 +5,6 @@
 import { equal } from "assert"
 import { VanellusError } from '../errors'
 import { Actor } from "../actor"
-import { Status } from "../interfaces"
 import { adminKeys, backend } from "../testing/fixtures"
 
 describe("Anonymous.getKeys()", function () {
