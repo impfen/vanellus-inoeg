@@ -4,47 +4,39 @@
 
 import { VanellusError, BackendError } from '../errors'
 import { sign } from "../crypto"
-import { Settings } from "../interfaces"
-import { KeyPair } from "../interfaces"
+import { KeyPair, NetworkBackend, NetworkMethods } from "../interfaces"
 
-enum JSONRPCMethods {
-    addMediatorPublicKeys = "addMediatorPublicKeys",
-    bookAppointment = "bookAppointment",
-    cancelAppointment = "cancelAppointment",
-    checkProviderData = "checkProviderData",
-    confirmProvider = "confirmProvider",
-    getAppointment = "getAppointment",
-    getAppointmentsByZipCode = "getAppointmentsByZipCode",
-    getBookedAppointments = "getBookedAppointments",
-    getKeys = "getKeys",
-    getPendingProviderData = "getPendingProviderData",
-    getProviderAppointments = "getProviderAppointments",
-    getSettings = "getSettings",
-    getStats = "getStats",
-    getToken = "getToken",
-    getVerifiedProviderData = "getVerifiedProviderData",
-    publishAppointments = "publishAppointments",
-    resetDB = "resetDB",
-    storeProviderData = "storeProviderData",
-    storeSettings = "storeSettings",
+class JSONRPCMethods implements NetworkMethods<string> {
+    public readonly addMediatorPublicKeys = "addMediatorPublicKeys"
+    public readonly bookAppointment = "bookAppointment"
+    public readonly cancelAppointment = "cancelAppointment"
+    public readonly checkProviderData = "checkProviderData"
+    public readonly confirmProvider = "confirmProvider"
+    public readonly getAppointment = "getAppointment"
+    public readonly getAppointmentsByZipCode = "getAppointmentsByZipCode"
+    public readonly getKeys = "getKeys"
+    public readonly getPendingProviderData = "getPendingProviderData"
+    public readonly getProviderAppointments = "getProviderAppointments"
+    public readonly getSettings = "getSettings"
+    public readonly getStats = "getStats"
+    public readonly getToken = "getToken"
+    public readonly getVerifiedProviderData = "getVerifiedProviderData"
+    public readonly publishAppointments = "publishAppointments"
+    public readonly resetDB = "resetDB"
+    public readonly storeProviderData = "storeProviderData"
+    public readonly storeSettings = "storeSettings"
 }
 
-class JSONRPCBackend {
-    public settings: Settings
-    public urlKey: "storage" | "appointments"
-    public readonly methods = JSONRPCMethods
+class JSONRPCBackend implements NetworkBackend<string> {
+    public readonly methods = new JSONRPCMethods
+    public apiUrl = ""
 
-    constructor(settings: Settings, urlKey: "storage" | "appointments") {
-        this.settings = settings
-        this.urlKey = urlKey
-    }
-
-    get apiUrl(): string {
-        return this.settings.apiUrls[this.urlKey]
+    constructor(apiUrl: string) {
+        this.apiUrl = apiUrl
     }
 
     async call<R = any>(
-        method: JSONRPCMethods,
+        method: string,
         params: Record<string, unknown>,
         keyPair?: KeyPair,
         id?: string

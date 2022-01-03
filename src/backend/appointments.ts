@@ -5,10 +5,10 @@
 import {
     OK,
     Booking,
-    Settings,
     KeyPair,
     ECDHData,
     PublicKeys,
+    NetworkBackend,
     SignedData,
     SignedToken,
     SignedAppointment,
@@ -17,12 +17,13 @@ import {
     EncryptedProviderData,
     ProviderAppointments,
 } from "../interfaces"
-import JSONRPCBackend from "./jsonrpc"
 
 // The appointments backend
-export class AppointmentsBackend extends JSONRPCBackend {
-    constructor(settings: Settings) {
-        super(settings, "appointments")
+export class AppointmentsBackend {
+    public net: NetworkBackend<unknown>
+
+    constructor(net: NetworkBackend<unknown>) {
+        this.net = net
     }
 
     async confirmProvider(
@@ -37,8 +38,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         },
         keyPair: KeyPair
     ) {
-        return await this.call<OK>(
-            this.methods.confirmProvider,
+        return await this.net.call<OK>(
+            this.net.methods.confirmProvider,
             {
                 confirmedProviderData,
                 publicProviderData,
@@ -57,25 +58,27 @@ export class AppointmentsBackend extends JSONRPCBackend {
         id: string
         providerID: string
     }) {
-        return this.call<ProviderAppointments>(this.methods.getAppointment, {
-            id,
-            providerID,
-        })
+        return this.net.call<ProviderAppointments>(
+            this.net.methods.getAppointment,
+            { id, providerID },
+        )
     }
+
     async getAppointmentsByZipCode({
         zipCode,
+        radius,
         from,
         to,
     }: {
         zipCode: string
+        radius: number
         from: string
         to: string
     }) {
-        return this.call<ProviderAppointments[]>(this.methods.getAppointmentsByZipCode, {
-            zipCode,
-            from,
-            to,
-        })
+        return this.net.call<ProviderAppointments[]>(
+            this.net.methods.getAppointmentsByZipCode,
+            { zipCode, radius, from, to },
+        )
     }
 
     async getStats({
@@ -95,7 +98,7 @@ export class AppointmentsBackend extends JSONRPCBackend {
         from?: string
         to?: string
     }) {
-        return await this.call(this.methods.getStats, {
+        return await this.net.call(this.net.methods.getStats, {
             id,
             metric,
             type,
@@ -108,22 +111,22 @@ export class AppointmentsBackend extends JSONRPCBackend {
 
     // return all public keys present in the system
     async getKeys() {
-        return this.call<PublicKeys>(this.methods.getKeys, {})
+        return this.net.call<PublicKeys>(this.net.methods.getKeys, {})
     }
 
     // root endpoints
 
     // only works for test deployments
     async resetDB({}: {}, keyPair: KeyPair) {
-        return await this.call<OK>(this.methods.resetDB, {}, keyPair)
+        return await this.net.call<OK>(this.net.methods.resetDB, {}, keyPair)
     }
 
     async addMediatorPublicKeys(
         { signedKeyData }: { signedKeyData: SignedMediatorKeyData },
         keyPair: KeyPair
     ) {
-        return this.call<OK>(
-            this.methods.addMediatorPublicKeys,
+        return this.net.call<OK>(
+            this.net.methods.addMediatorPublicKeys,
             { signedKeyData },
             keyPair
         )
@@ -139,8 +142,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         }: { providerID: string; id: string; signedTokenData: SignedData },
         keyPair: KeyPair
     ) {
-        return this.call<OK>(
-            this.methods.cancelAppointment,
+        return this.net.call<OK>(
+            this.net.methods.cancelAppointment,
             { providerID, id, signedTokenData },
             keyPair
         )
@@ -160,8 +163,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         },
         keyPair: KeyPair
     ) {
-        return this.call<Booking>(
-            this.methods.bookAppointment,
+        return this.net.call<Booking>(
+            this.net.methods.bookAppointment,
             { providerID, id, encryptedData, signedTokenData },
             keyPair
         )
@@ -177,7 +180,7 @@ export class AppointmentsBackend extends JSONRPCBackend {
         publicKey: string
         code?: string
     }) {
-        return this.call<SignedToken>(this.methods.getToken, {
+        return this.net.call<SignedToken>(this.net.methods.getToken, {
             hash: hash,
             code: code,
             publicKey: publicKey,
@@ -191,8 +194,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         { from, to }: { from: string; to: string },
         keyPair: KeyPair
     ) {
-        return this.call<SignedAppointment[]>(
-            this.methods.getProviderAppointments,
+        return this.net.call<SignedAppointment[]>(
+            this.net.methods.getProviderAppointments,
             { from, to },
             keyPair
         )
@@ -203,23 +206,27 @@ export class AppointmentsBackend extends JSONRPCBackend {
         { appointments }: { appointments: SignedData[] },
         keyPair: KeyPair
     ) {
-        return await this.call<OK>(this.methods.publishAppointments, { appointments }, keyPair)
+        return await this.net.call<OK>(
+            this.net.methods.publishAppointments,
+            { appointments },
+            keyPair
+        )
     }
 
     async storeProviderData(
         { encryptedData, code }: { encryptedData: ECDHData; code?: string },
         keyPair: KeyPair
     ) {
-        return this.call<OK>(
-            this.methods.storeProviderData,
+        return this.net.call<OK>(
+            this.net.methods.storeProviderData,
             { encryptedData, code },
             keyPair
         )
     }
 
     async checkProviderData({}, keyPair: KeyPair) {
-        return await this.call<ConfirmedProviderData>(
-            this.methods.checkProviderData,
+        return await this.net.call<ConfirmedProviderData>(
+            this.net.methods.checkProviderData,
             {},
             keyPair
         )
@@ -231,8 +238,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         { limit }: { limit?: number },
         keyPair: KeyPair
     ) {
-        return this.call<EncryptedProviderData[]>(
-            this.methods.getPendingProviderData,
+        return this.net.call<EncryptedProviderData[]>(
+            this.net.methods.getPendingProviderData,
             { limit },
             keyPair
         )
@@ -242,8 +249,8 @@ export class AppointmentsBackend extends JSONRPCBackend {
         { limit }: { limit?: number },
         keyPair: KeyPair
     ) {
-        return this.call<EncryptedProviderData[]>(
-            this.methods.getVerifiedProviderData,
+        return this.net.call<EncryptedProviderData[]>(
+            this.net.methods.getVerifiedProviderData,
             { limit },
             keyPair
         )
