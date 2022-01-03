@@ -35,6 +35,6 @@ jobs:
               uses: softprops/action-gh-release@v1
               with:              
                   name: package
-                  path: "*.tgz"
+                  files: "*.tgz"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
