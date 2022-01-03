@@ -6,7 +6,7 @@ import 'cross-fetch/polyfill';
 import { Settings } from "../interfaces"
 
 export const settingsPath =
-    process.env.KIEBITZ_SETTINGS || "../services/settings/test"
+    process.env.KIEBITZ_SETTINGS || "test_backend/keys"
 export const appointmentsPort = process.env.KIEBITZ_APPOINTMENTS_PORT || "22222"
 export const storagePort = process.env.KIEBITZ_STORAGE_PORT || "11111"
 

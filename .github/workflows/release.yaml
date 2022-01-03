@@ -1,0 +1,28 @@
+name: Make a release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  test:
+    uses: kiebitz-oss/vanellus-inoeg/.github/workflows/push.yaml@${{ github.ref_name }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Compress Artifacts
+        run: npm pack
+
+      - name: Upload binaries to release page
+        uses: softprops/action-gh-release@v1
+        with:
+            files: "*.tgz"
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
