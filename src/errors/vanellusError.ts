@@ -2,7 +2,7 @@ import { ErrorCode } from '.';
 
 
 
-export function getErrorDescriptionForCode(code: ErrorCode): string {
+export function getErrorMessageForCode(code: ErrorCode): string {
   switch(code) {
     case ErrorCode.KeysMissing:
       return "Keys are missing"
@@ -16,17 +16,13 @@ export function getErrorDescriptionForCode(code: ErrorCode): string {
   return "";
 }
 
-export class VanellusError {
+export class VanellusError extends Error {
   public readonly code: ErrorCode;
-  public readonly description: string;
 
-  constructor(code: ErrorCode, description?: string) {
+  constructor(code: ErrorCode, message?: string) {
+    super(message ? message : getErrorMessageForCode(code));
+    this.name = "VanellusError";
     this.code = code;
-
-    if (!description) {
-      description = getErrorDescriptionForCode(code)
-    }
-    this.description = description;
   }
 }
 
