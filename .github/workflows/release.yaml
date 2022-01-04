@@ -7,7 +7,7 @@ on:
 
 jobs:
     test:
-        uses: kiebitz-oss/vanellus-inoeg/.github/workflows/push.yaml@master
+        uses: kiebitz-oss/vanellus-inoeg/.github/workflows/push.yaml@main
 
     release:
         runs-on: ubuntu-latest
@@ -26,3 +26,8 @@ jobs:
                   files: "*.tgz"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  
+            - name: Push package to registry
+              run: npm publish
+              env:
+                NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
