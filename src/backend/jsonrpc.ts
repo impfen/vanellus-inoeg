@@ -30,18 +30,10 @@ enum JSONRPCMethods {
 }
 
 class JSONRPCBackend {
-    public settings: Settings
-    public urlKey: "storage" | "appointments"
     public readonly methods = JSONRPCMethods
 
-    constructor(settings: Settings, urlKey: "storage" | "appointments") {
-        this.settings = settings
-        this.urlKey = urlKey
-    }
-
-    get apiUrl(): string {
-        return this.settings.apiUrls[this.urlKey]
-    }
+    constructor(
+        protected readonly apiUrl: string) {}
 
     async call<R = any>(
         method: JSONRPCMethods,

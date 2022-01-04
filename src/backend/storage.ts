@@ -8,7 +8,7 @@ import { Settings, KeyPair, OK, AESData } from "../interfaces"
 // The storage backend
 export class StorageBackend extends JSONRPCBackend {
     constructor(settings: Settings) {
-        super(settings, "storage")
+        super(settings.apiUrls["storage"])
     }
 
     async storeSettings({ id, data }: { id: string, data: AESData }) {

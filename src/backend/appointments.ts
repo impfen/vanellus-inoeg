@@ -22,7 +22,7 @@ import JSONRPCBackend from "./jsonrpc"
 // The appointments backend
 export class AppointmentsBackend extends JSONRPCBackend {
     constructor(settings: Settings) {
-        super(settings, "appointments")
+        super(settings.apiUrls["appointments"])
     }
 
     async confirmProvider(
