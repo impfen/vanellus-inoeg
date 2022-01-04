@@ -32,10 +32,4 @@ export class Actor {
     protected clear() {
         this.backend.local.deleteAll(`${this.actor}::${this.id}`)
     }
-
-    public unlock(key: string) {}
-
-    public clearLocks() {}
-
-    public lock(key: string) {}
 }
