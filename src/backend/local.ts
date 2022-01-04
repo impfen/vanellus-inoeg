@@ -2,15 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Settings, Store } from "../interfaces"
+import { Store } from "../interfaces"
 
 // The local backend
 export class LocalBackend {
     public store: Store
-    public settings: Settings
 
-    constructor(settings: Settings, store: Store) {
-        this.settings = settings
+    constructor(store: Store) {
         this.store = store
     }
 

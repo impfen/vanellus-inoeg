@@ -90,7 +90,7 @@ class RESTMethods implements NetworkMethods<RESTMethod> {
     }
 }
 
-class RESTBackend implements NetworkBackend<RESTMethod> {
+export class RESTBackend implements NetworkBackend<RESTMethod> {
     public readonly methods = new RESTMethods
     public apiUrl = ""
 
@@ -165,4 +165,3 @@ class RESTBackend implements NetworkBackend<RESTMethod> {
     }
 }
 
-export default RESTBackend

@@ -27,7 +27,7 @@ class JSONRPCMethods implements NetworkMethods<string> {
     public readonly storeSettings = "storeSettings"
 }
 
-class JSONRPCBackend implements NetworkBackend<string> {
+export class JSONRPCBackend implements NetworkBackend<string> {
     public readonly methods = new JSONRPCMethods
     public apiUrl = ""
 
@@ -90,4 +90,3 @@ class JSONRPCBackend implements NetworkBackend<string> {
     }
 }
 
-export default JSONRPCBackend
