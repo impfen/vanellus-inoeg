@@ -6,25 +6,29 @@ import { PrefixStore } from "./store"
 import { AppointmentsBackend } from "./appointments"
 import { StorageBackend } from "./storage"
 import { LocalBackend } from "./local"
-import { Settings, Store } from "../interfaces"
+import { NetworkBackend, Store } from "../interfaces"
 
 export * from "./store"
+export * from "./jsonrpc"
+export * from "./rest"
 
 export class Backend {
+    public appointments: AppointmentsBackend
     public local: LocalBackend
     public storage: StorageBackend
     public temporary: LocalBackend
-    public settings: Settings
-    public appointments: AppointmentsBackend
 
-    constructor(settings: Settings, store: Store, temporaryStore: Store) {
-        this.settings = settings
-        this.storage = new StorageBackend(settings)
-        this.appointments = new AppointmentsBackend(settings)
-        this.local = new LocalBackend(settings, new PrefixStore(store, "local"))
+    constructor(
+      store: Store,
+      temporaryStore: Store,
+      appointmentsNetworkBackend: NetworkBackend<unknown>,
+      storageNetworkBackend: NetworkBackend<unknown>,
+    ) {
+        this.appointments = new AppointmentsBackend(appointmentsNetworkBackend)
+        this.local = new LocalBackend(new PrefixStore(store, "local"))
+        this.storage = new StorageBackend(storageNetworkBackend)
         this.temporary = new LocalBackend(
-            settings,
-            new PrefixStore(temporaryStore, "temporary")
+          new PrefixStore(temporaryStore, "temporary")
         )
     }
 }

@@ -70,6 +70,7 @@ describe("User.getAppointments()", function () {
         const result = await user.getAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
+            radius: 10,
             zipCode: user.queueData.zipCode,
         })
 

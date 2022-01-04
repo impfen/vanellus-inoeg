@@ -58,15 +58,17 @@ export interface GetAppointmentsResult extends Result {
 export interface GetAppointmentsParams {
     from: string
     to: string
+    radius: number
     zipCode: string
 }
 
 export async function getAppointments(
     this: User,
-    { from, to, zipCode }: GetAppointmentsParams
+    { from, to, radius, zipCode }: GetAppointmentsParams
 ): Promise<GetAppointmentsResult | VanellusError> {
     const response = await this.backend.appointments.getAppointmentsByZipCode({
         zipCode: zipCode,
+        radius: radius,
         from: from,
         to: to,
     })

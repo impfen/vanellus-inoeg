@@ -1,6 +1,9 @@
 // Kiebitz - Privacy-Friendly Appointments
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
+//
+import { KeyPair, Settings } from "./"
+import { VanellusError } from '../errors'
 
 export interface Store {
     get(key: string, defaultValue?: any): any
@@ -18,6 +21,38 @@ export enum Status {
 export interface Result {
     status: Status.Succeeded
     [key: string]: any
+}
+
+export interface NetworkBackend<T> {
+    apiUrl: string
+    methods: NetworkMethods<T>
+    call<R = any>(
+      method: T,
+      params: Record<string, unknown>,
+      keyPair?: KeyPair,
+      id?: string
+    ): Promise<R | VanellusError>,
+}
+
+export interface NetworkMethods<T> {
+    addMediatorPublicKeys: T,
+    bookAppointment: T,
+    cancelAppointment: T,
+    checkProviderData: T,
+    confirmProvider: T,
+    getAppointment: T,
+    getAppointmentsByZipCode: T,
+    getKeys: T,
+    getPendingProviderData: T,
+    getProviderAppointments: T,
+    getSettings: T,
+    getStats: T,
+    getToken: T,
+    getVerifiedProviderData: T,
+    publishAppointments: T,
+    resetDB: T,
+    storeProviderData: T,
+    storeSettings: T,
 }
 
 // export interface Error {
