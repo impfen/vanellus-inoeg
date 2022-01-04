@@ -11,6 +11,9 @@
     },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "scripts": {
         "build": "tsc --build",
         "test": "mocha --require ts-node/register --extension ts src/**/*.spec.ts",
