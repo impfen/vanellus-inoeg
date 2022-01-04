@@ -14,16 +14,13 @@ export class Backend {
     public local: LocalBackend
     public storage: StorageBackend
     public temporary: LocalBackend
-    public settings: Settings
     public appointments: AppointmentsBackend
 
     constructor(settings: Settings, store: Store, temporaryStore: Store) {
-        this.settings = settings
-        this.storage = new StorageBackend(settings)
-        this.appointments = new AppointmentsBackend(settings)
-        this.local = new LocalBackend(settings, new PrefixStore(store, "local"))
+        this.storage = new StorageBackend(settings.apiUrls["storage"])
+        this.appointments = new AppointmentsBackend(settings.apiUrls["appointments"])
+        this.local = new LocalBackend(new PrefixStore(store, "local"))
         this.temporary = new LocalBackend(
-            settings,
             new PrefixStore(temporaryStore, "temporary")
         )
     }

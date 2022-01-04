@@ -32,8 +32,7 @@ enum JSONRPCMethods {
 class JSONRPCBackend {
     public readonly methods = JSONRPCMethods
 
-    constructor(
-        protected readonly apiUrl: string) {}
+    constructor(protected readonly apiUrl: string) {}
 
     async call<R = any>(
         method: JSONRPCMethods,

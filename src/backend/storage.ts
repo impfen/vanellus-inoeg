@@ -3,12 +3,12 @@
 // README.md contains license information.
 
 import JSONRPCBackend from "./jsonrpc"
-import { Settings, KeyPair, OK, AESData } from "../interfaces"
+import { KeyPair, OK, AESData } from "../interfaces"
 
 // The storage backend
 export class StorageBackend extends JSONRPCBackend {
-    constructor(settings: Settings) {
-        super(settings.apiUrls["storage"])
+    constructor(apiUrl: string) {
+        super(apiUrl)
     }
 
     async storeSettings({ id, data }: { id: string, data: AESData }) {

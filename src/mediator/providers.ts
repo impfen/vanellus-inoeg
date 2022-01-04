@@ -2,14 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { BackendError, ErrorCode, VanellusError } from '../errors'
+import { ErrorCode, VanellusError } from '../errors'
 import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
-import { verify, ecdhDecrypt } from "../crypto"
+import { ecdhDecrypt } from "../crypto"
 import {
     Result,
     Status,
     EncryptedProviderData,
-    KeyPair,
     ProviderData,
     DecryptedProviderData,
 } from "../interfaces"

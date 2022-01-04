@@ -5,7 +5,6 @@
 import {
     OK,
     Booking,
-    Settings,
     KeyPair,
     ECDHData,
     PublicKeys,
@@ -21,8 +20,8 @@ import JSONRPCBackend from "./jsonrpc"
 
 // The appointments backend
 export class AppointmentsBackend extends JSONRPCBackend {
-    constructor(settings: Settings) {
-        super(settings.apiUrls["appointments"])
+    constructor(apiUrl: string) {
+        super(apiUrl)
     }
 
     async confirmProvider(
