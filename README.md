@@ -6,7 +6,8 @@ the Kiebitz API and data models.
 
 # Requirements
 
-To run this library in the browser you'll need the `buffer` package, which implement the `Buffer` object from Node.js.
+To run this library in the browser you'll need the `buffer` package, which
+implement the `Buffer` object from Node.js.
 
 # Building
 
@@ -40,4 +41,11 @@ To run the unit & integration tests
 npm run test
 ```
 
-These tests require a running Kiebitz test instance with appointments and storage services, as well as a readable `002_admin.json` key file in the Kiebitz settings directory. The default directory is `../services/settings/test`. You can change the directory and service ports by setting the `KIEBITZ_SETTINGS`, `KIEBITZ_APPOINTMENTS_PORT` and `KIEBITZ_STORAGE_PORT` environment variables.
+These tests require a running Kiebitz test instance with appointments and
+storage services, as well as a readable `002_admin.json` key file in the Kiebitz
+settings directory. The default directory is `test_backend/keys`. You can change
+the directory and service ports by setting the `KIEBITZ_SETTINGS`,
+`KIEBITZ_APPOINTMENTS_PORT` and `KIEBITZ_STORAGE_PORT` environment variables.
+
+If you want to test with the REST insted of the JSONRPC protocol, you can do
+that by setting the `KIEBITZ_USE_REST` envionment variable to `true`.
