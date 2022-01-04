@@ -13,7 +13,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsc --build",
-        "test": "mocha --require ts-node/register --extionsion ts src/**/*.spec.ts",
+        "test": "mocha --require ts-node/register --extension ts src/**/*.spec.ts",
         "prettier": "prettier --write .",
         "lint": "eslint . --ext .ts",
         "typecheck": "tsc --noEmit",
