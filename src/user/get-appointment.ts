@@ -2,21 +2,23 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, VanellusError } from "../errors"
+import { Optional } from "../helpers/optional"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
 import {
-    Status,
-    Result,
     Appointment,
-    PublicProviderData,
     BookedSlot,
     ProviderAppointments,
+    PublicProviderData,
+    Result,
+    Status,
 } from "../interfaces"
-import { verify } from "../crypto"
 import { User } from "./"
-import { ErrorCode, VanellusError } from '../errors'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
-import { Optional } from '../helpers/optional'
 
-async function verifyAppointment(appointment: any, item: any): Promise<Optional<Appointment>> {
+async function verifyAppointment(
+    appointment: any,
+    item: any
+): Promise<Optional<Appointment>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -33,7 +35,9 @@ async function verifyAppointment(appointment: any, item: any): Promise<Optional<
     return parseUntrustedJSON<Appointment>(appointment.data)
 }
 
-async function verifyProviderData(item: ProviderAppointments): Promise<Optional<PublicProviderData>> {
+async function verifyProviderData(
+    item: ProviderAppointments
+): Promise<Optional<PublicProviderData>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -73,23 +77,25 @@ export async function getAppointment(
     if (response instanceof VanellusError) return response
 
     const jsonProvider = await verifyProviderData(response)
-    if (!jsonProvider) return new VanellusError(ErrorCode.DataMissing, "invalid provider")
+    if (!jsonProvider)
+        return new VanellusError(ErrorCode.DataMissing, "invalid provider")
 
     response.provider.json = jsonProvider
     // we copy the ID for convenience
     response.provider.json.id = response.provider.id
-    
 
     const signedAppointment = response.appointments[0]
 
-    const appointment = await verifyAppointment(
-        signedAppointment,
-        response
-    )
-    if (!appointment) return new VanellusError(ErrorCode.DataMissing, "invalid appointment")
+    const appointment = await verifyAppointment(signedAppointment, response)
+    if (!appointment)
+        return new VanellusError(ErrorCode.DataMissing, "invalid appointment")
 
     for (const slot of appointment.slotData) {
-        if (signedAppointment.bookedSlots?.some((aslot: BookedSlot) => aslot.id === slot.id)) {
+        if (
+            signedAppointment.bookedSlots?.some(
+                (aslot: BookedSlot) => aslot.id === slot.id
+            )
+        ) {
             slot.open = false
         } else {
             slot.open = true

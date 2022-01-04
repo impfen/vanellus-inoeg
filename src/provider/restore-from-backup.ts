@@ -3,12 +3,12 @@
 // README.md contains license information.
 
 import { aesDecrypt, deriveSecrets } from "../crypto"
-import { base322buf, b642buf } from "../helpers/conversion"
-import { Provider } from "./"
-import { LocalBackupData, CloudBackupData } from "./backup-data"
+import { ErrorCode, VanellusError } from "../errors"
+import { b642buf, base322buf } from "../helpers/conversion"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
 import { AESData, Result, Status } from "../interfaces"
-import { ErrorCode, VanellusError } from '../errors'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
+import { Provider } from "./"
+import { CloudBackupData, LocalBackupData } from "./backup-data"
 
 interface RestoreFromBackupResult extends Result {
     data: { [Key: string]: any } | null
@@ -31,13 +31,13 @@ export async function restoreFromBackup(
 
     const dd = parseUntrustedJSON<LocalBackupData>(decryptedKeyData)
 
-    if (!dd || !dd.keyPairs) return new VanellusError(ErrorCode.DataMissing, "invalid decrypted key pairs")
+    if (!dd || !dd.keyPairs)
+        return new VanellusError(
+            ErrorCode.DataMissing,
+            "invalid decrypted key pairs"
+        )
 
-    const derivedSecrets = await deriveSecrets(
-        b642buf(dd.keyPairs.sync),
-        32,
-        2
-    )
+    const derivedSecrets = await deriveSecrets(b642buf(dd.keyPairs.sync), 32, 2)
 
     const [id, key] = derivedSecrets
 
@@ -51,7 +51,11 @@ export async function restoreFromBackup(
     if (decryptedData instanceof VanellusError) return decryptedData
 
     const ddCloud = parseUntrustedJSON<CloudBackupData>(decryptedData)
-    if (!ddCloud) return new VanellusError(ErrorCode.DataMissing, "invalid decrypted settings")
+    if (!ddCloud)
+        return new VanellusError(
+            ErrorCode.DataMissing,
+            "invalid decrypted settings"
+        )
 
     this.keyPairs = dd.keyPairs
     this.data = ddCloud.data

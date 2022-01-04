@@ -2,16 +2,16 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
-import { ecdhEncrypt, generateECDHKeyPair, sign } from "../crypto"
-import { ProviderData, PublicKeys, Result, Status, OK } from "../interfaces"
+import { ecdhEncrypt } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
+import { Result, Status } from "../interfaces"
 import { Provider } from "./"
 
-  /**
-   * Store data of a new provider in the backend for approval of a mediator
-   * @param code an optional registration code. Necessary if configured to be
-   * in the backend.
-   */
+/**
+ * Store data of a new provider in the backend for approval of a mediator
+ * @param code an optional registration code. Necessary if configured to be
+ * in the backend.
+ */
 
 export async function storeData(
     this: Provider,

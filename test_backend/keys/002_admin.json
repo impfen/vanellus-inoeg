@@ -1,49 +1,41 @@
 {
-  "admin": {
-    "signing": {
-      "keys": [
-        {
-          "name": "root",
-          "type": "ecdsa",
-          "format": "spki-pkcs8",
-          "params": {
-            "curve": "p-256"
-          },
-          "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkJXQcq+YnVI17R0ezu2cEpSeFNRCz3dYKNpRItYiYqyFcX7+qCCD4ATRDLhhUXe98lgT+0A5q/Ahr6nMSjDAaw==",
-          "purposes": [
-            "sign",
-            "verify"
-          ],
-          "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgzSjODMiUnf654fM1wqPk8o5aYt9x5omNW+GS8q8U5FShRANCAASQldByr5idUjXtHR7O7ZwSlJ4U1ELPd1go2lEi1iJirIVxfv6oIIPgBNEMuGFRd73yWBP7QDmr8CGvqcxKMMBr"
-        },
-        {
-          "name": "token",
-          "type": "ecdsa",
-          "format": "spki-pkcs8",
-          "params": {
-            "curve": "p-256"
-          },
-          "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/blZZVFaPalOduUlmKlvjIeWbzUjHNXAjKhAFa/yROWXPYZifCwNosZLN7wetnmbWm41jYpBCM1Wc3kPtOzSmQ==",
-          "purposes": [
-            "sign",
-            "verify"
-          ],
-          "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgqCC1iKSdQhL4Mzbr+dT0bdk1gRVtPoZiLWSuyOX/9IKhRANCAAT9uVllUVo9qU525SWYqW+Mh5ZvNSMc1cCMqEAVr/JE5Zc9hmJ8LA2ixks3vB62eZtabjWNikEIzVZzeQ+07NKZ"
-        },
-        {
-          "name": "provider",
-          "type": "ecdh",
-          "format": "spki-pkcs8",
-          "params": {
-            "curve": "p-256"
-          },
-          "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpFUiNtYUw8ePzgwzssTmSWCe+I6++YUyrBaRTtUmu5aEh6zxl69deit4gHiP/XntxzTHoxSlMF+zA6DCuG3twQ==",
-          "purposes": [
-            "deriveKey"
-          ],
-          "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgA7po7jgfkxKJ/vBt2BLd2RjEkMQM737us3qfiSHW1vKhRANCAASkVSI21hTDx4/ODDOyxOZJYJ74jr75hTKsFpFO1Sa7loSHrPGXr116K3iAeI/9ee3HNMejFKUwX7MDoMK4be3B"
+    "admin": {
+        "signing": {
+            "keys": [
+                {
+                    "name": "root",
+                    "type": "ecdsa",
+                    "format": "spki-pkcs8",
+                    "params": {
+                        "curve": "p-256"
+                    },
+                    "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkJXQcq+YnVI17R0ezu2cEpSeFNRCz3dYKNpRItYiYqyFcX7+qCCD4ATRDLhhUXe98lgT+0A5q/Ahr6nMSjDAaw==",
+                    "purposes": ["sign", "verify"],
+                    "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgzSjODMiUnf654fM1wqPk8o5aYt9x5omNW+GS8q8U5FShRANCAASQldByr5idUjXtHR7O7ZwSlJ4U1ELPd1go2lEi1iJirIVxfv6oIIPgBNEMuGFRd73yWBP7QDmr8CGvqcxKMMBr"
+                },
+                {
+                    "name": "token",
+                    "type": "ecdsa",
+                    "format": "spki-pkcs8",
+                    "params": {
+                        "curve": "p-256"
+                    },
+                    "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/blZZVFaPalOduUlmKlvjIeWbzUjHNXAjKhAFa/yROWXPYZifCwNosZLN7wetnmbWm41jYpBCM1Wc3kPtOzSmQ==",
+                    "purposes": ["sign", "verify"],
+                    "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgqCC1iKSdQhL4Mzbr+dT0bdk1gRVtPoZiLWSuyOX/9IKhRANCAAT9uVllUVo9qU525SWYqW+Mh5ZvNSMc1cCMqEAVr/JE5Zc9hmJ8LA2ixks3vB62eZtabjWNikEIzVZzeQ+07NKZ"
+                },
+                {
+                    "name": "provider",
+                    "type": "ecdh",
+                    "format": "spki-pkcs8",
+                    "params": {
+                        "curve": "p-256"
+                    },
+                    "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpFUiNtYUw8ePzgwzssTmSWCe+I6++YUyrBaRTtUmu5aEh6zxl69deit4gHiP/XntxzTHoxSlMF+zA6DCuG3twQ==",
+                    "purposes": ["deriveKey"],
+                    "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgA7po7jgfkxKJ/vBt2BLd2RjEkMQM737us3qfiSHW1vKhRANCAASkVSI21hTDx4/ODDOyxOZJYJ74jr75hTKsFpFO1Sa7loSHrPGXr116K3iAeI/9ee3HNMejFKUwX7MDoMK4be3B"
+                }
+            ]
         }
-      ]
     }
-  }
 }

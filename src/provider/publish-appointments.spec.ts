@@ -3,17 +3,15 @@
 // README.md contains license information.
 
 import { equal } from "assert"
+import { VanellusError } from "../errors"
 import { formatDatetime } from "../helpers/time"
-import { ecdhDecrypt } from "../crypto"
-import { Status } from "../interfaces"
 import {
     adminKeys,
-    resetDB,
-    mediator,
     backend,
+    mediator,
+    resetDB,
     verifiedProvider,
 } from "../testing/fixtures"
-import { VanellusError } from '../errors'
 
 describe("Provider.publishAppointments()", function () {
     it("we should be able to publish appointments", async function () {

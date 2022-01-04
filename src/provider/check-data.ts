@@ -2,16 +2,10 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 import { ecdhDecrypt } from "../crypto"
-import {
-    Result,
-    Status,
-    ConfirmedProviderData,
-    ProviderData,
-    ECDHData,
-} from "../interfaces"
+import { ErrorCode, VanellusError } from "../errors"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
+import { ECDHData, ProviderData, Result, Status } from "../interfaces"
 import { Provider } from "./"
 
 interface CheckDataResult extends Result {
@@ -25,7 +19,7 @@ interface CheckDataResult extends Result {
  */
 
 export async function checkData(
-    this: Provider,
+    this: Provider
 ): Promise<CheckDataResult | VanellusError> {
     if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
 
@@ -35,10 +29,10 @@ export async function checkData(
     )
 
     if (response instanceof VanellusError) return response
-    
+
     const json = parseUntrustedJSON<ECDHData>(response.data)
     if (!json) return new VanellusError(ErrorCode.DataMissing, "invalid json")
-    
+
     // to do: check signature
     const decryptedJSONData = await ecdhDecrypt(
         json,

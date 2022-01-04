@@ -3,10 +3,10 @@
 // README.md contains license information.
 
 export * from "./appointments"
-export * from "./settings"
-export * from "./provider"
-export * from "./mediator"
 export * from "./backend"
 export * from "./crypto"
-export * from "./user"
+export * from "./mediator"
+export * from "./provider"
 export * from "./rpc"
+export * from "./settings"
+export * from "./user"

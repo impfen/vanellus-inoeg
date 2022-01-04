@@ -2,7 +2,6 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Buffer } from "buffer"
 import { b642buf, buf2b64, str2ab } from "../helpers/conversion"
 
 // salt for the key derivation (public information)

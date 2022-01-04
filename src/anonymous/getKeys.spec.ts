@@ -3,8 +3,8 @@
 // README.md contains license information.
 
 import { equal } from "assert"
-import { VanellusError } from '../errors'
 import { Actor } from "../actor"
+import { VanellusError } from "../errors"
 import { adminKeys, backend } from "../testing/fixtures"
 
 describe("Anonymous.getKeys()", function () {

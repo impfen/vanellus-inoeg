@@ -3,16 +3,14 @@
 // README.md contains license information.
 
 import {
-    generateECDSAKeyPair,
     generateECDHKeyPair,
-    ephemeralECDHEncrypt,
-    randomBytes,
+    generateECDSAKeyPair,
     hashString,
+    randomBytes,
 } from "../crypto"
-
+import { ErrorCode, VanellusError } from "../errors"
+import { ContactData, Result, Status } from "../interfaces"
 import { User } from "./"
-import { Result, ContactData, Status } from "../interfaces"
-import { VanellusError, ErrorCode } from '../errors'
 
 async function hashContactData(data: ContactData) {
     const hashData = {
@@ -29,8 +27,13 @@ export async function getToken(
     this: User,
     { code }: { code?: string }
 ): Promise<Result | VanellusError> {
-    if (!this.contactData) return new VanellusError(ErrorCode.DataMissing, "contact data is missing")
-    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "seret is missing")
+    if (!this.contactData)
+        return new VanellusError(
+            ErrorCode.DataMissing,
+            "contact data is missing"
+        )
+    if (!this.secret)
+        return new VanellusError(ErrorCode.DataMissing, "seret is missing")
 
     // we hash the user data to prove it didn't change later...
     const [dataHash, nonce] = await hashContactData(this.contactData)

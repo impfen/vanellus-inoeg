@@ -1,17 +1,17 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  redis:
-    image: "redis"
+    redis:
+        image: "redis"
 
-  backend:
-    image: "ghcr.io/kiebitz-oss/services-inoeg:master"
-    depends_on: 
-      - redis
-    environment:
-      - KIEBITZ_SETTINGS=/settings/test
-    volumes:
-      - "./keys:/settings/test"
-    ports:
-      - 11111:11111
-      - 22222:22222
+    backend:
+        image: "ghcr.io/kiebitz-oss/services-inoeg:master"
+        depends_on:
+            - redis
+        environment:
+            - KIEBITZ_SETTINGS=/settings/test
+        volumes:
+            - "./keys:/settings/test"
+        ports:
+            - 11111:11111
+            - 22222:22222

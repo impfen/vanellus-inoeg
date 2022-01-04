@@ -2,12 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ErrorCode, UnexpectedError, VanellusError } from "../errors"
+import { ab2str, b642buf, buf2b64, str2ab } from "../helpers/conversion"
+import { AESData, ECDHData, KeyPair } from "../interfaces"
 import { generateECDHKeyPair } from "./generate-key"
-import { b642buf, buf2b64, str2ab, ab2str } from "../helpers/conversion"
-import { AESData } from "../interfaces"
 import { salt } from "./token"
-import { KeyPair, ECDHData } from "../interfaces"
-import { ErrorCode, UnexpectedError, VanellusError } from '../errors'
 
 export async function aesEncrypt(
     rawData: string,
@@ -86,7 +85,7 @@ export async function aesDecrypt(
         )
         return ab2str(decryptedData)
     } catch (e) {
-		console.error(e)
+        console.error(e)
         return new VanellusError(ErrorCode.Crypto, String(e))
     }
 }
@@ -219,7 +218,10 @@ export async function ephemeralECDHEncrypt(
     }
 }
 
-export async function ecdhDecrypt(data: ECDHData, privateKeyData: JsonWebKey): Promise<string | VanellusError> {
+export async function ecdhDecrypt(
+    data: ECDHData,
+    privateKeyData: JsonWebKey
+): Promise<string | VanellusError> {
     try {
         const privateKey = await crypto.subtle.importKey(
             "jwk",

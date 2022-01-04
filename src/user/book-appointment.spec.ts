@@ -2,18 +2,16 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Status } from "../interfaces"
-import { equal } from "assert"
-import { formatDatetime, formatDate } from "../helpers/time"
+import { VanellusError } from "../errors"
+import { formatDatetime } from "../helpers/time"
 import {
-    backend,
     adminKeys,
-    resetDB,
+    backend,
     mediator,
+    resetDB,
     verifiedProvider,
 } from "../testing/fixtures"
 import { User } from "./"
-import { VanellusError } from '../errors'
 
 describe("User.bookAppointment()", function () {
     it("we should be able to book an appointment", async function () {
@@ -96,15 +94,12 @@ describe("User.bookAppointment()", function () {
         if (apptsResult instanceof VanellusError)
             throw new Error("should be able to get appointments")
 
-        if (!user.secret)
-            throw new Error("user secret is null")
+        if (!user.secret) throw new Error("user secret is null")
 
-        const d = apptsResult.appointments[0].bookings ? apptsResult.appointments[0].bookings[0].data : null
-        if (
-            !d ||
-            d.userToken.code !==
-            user.secret.slice(0, 4)
-        )
+        const d = apptsResult.appointments[0].bookings
+            ? apptsResult.appointments[0].bookings[0].data
+            : null
+        if (!d || d.userToken.code !== user.secret.slice(0, 4))
             throw new Error("booking code does not match")
 
         const cancelResult = await user.cancelAppointment(

@@ -2,17 +2,17 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
 import { aesEncrypt, deriveSecrets } from "../crypto"
-import { base322buf, b642buf } from "../helpers/conversion"
+import { ErrorCode, VanellusError } from "../errors"
+import { b642buf, base322buf } from "../helpers/conversion"
 import {
-    TokenData,
-    QueueData,
-    ContactData,
     AcceptedAppointment,
-    Status,
     AESData,
+    ContactData,
+    QueueData,
     Result,
+    Status,
+    TokenData,
 } from "../interfaces"
 import { User } from "./"
 
@@ -37,7 +37,8 @@ export interface BackupDataResult extends Result {
 export async function backupData(
     this: User
 ): Promise<BackupDataResult | VanellusError> {
-    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "secret is missing")
+    if (!this.secret)
+        return new VanellusError(ErrorCode.DataMissing, "secret is missing")
 
     const cloudData: CloudBackupData = {
         version: "0.2",

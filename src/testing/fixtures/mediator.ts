@@ -2,16 +2,12 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { AdminKeys } from "./"
 import { Backend } from "../../backend"
+import { generateECDHKeyPair, generateECDSAKeyPair, sign } from "../../crypto"
+import { VanellusError } from "../../errors"
+import { MediatorKeyData } from "../../interfaces"
 import { Mediator } from "../../mediator"
-import { generateECDSAKeyPair, generateECDHKeyPair, sign } from "../../crypto"
-import {
-    MediatorKeyData,
-    SignedMediatorKeyData,
-    KeyPair,
-} from "../../interfaces"
-import { VanellusError } from '../../errors'
+import { AdminKeys } from "./"
 
 export async function mediator(
     backend: Backend,
@@ -42,7 +38,8 @@ export async function mediator(
         adminKeys.root
     )
 
-    if (response instanceof VanellusError) throw new Error("cannot create mediator") // this is an error
+    if (response instanceof VanellusError)
+        throw new Error("cannot create mediator") // this is an error
 
     const mediator = new Mediator("mediator", backend)
 

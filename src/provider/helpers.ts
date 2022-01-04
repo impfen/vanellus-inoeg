@@ -3,16 +3,16 @@
 // README.md contains license information.
 
 import { randomBytes } from "../crypto"
-import { Slot, Appointment } from "../interfaces"
+import { Appointment, Slot } from "../interfaces"
 
-  /**
-   * Creates a new appointment object.
-   * @param duration the duration of the appointment in minutes
-   * @param properties additional properties for the appointment like the
-   * vaccine offered
-   * @param slots the number of bookable slots
-   * @param timestamp the time of the appointment as an ISO string
-   */
+/**
+ * Creates a new appointment object.
+ * @param duration the duration of the appointment in minutes
+ * @param properties additional properties for the appointment like the
+ * vaccine offered
+ * @param slots the number of bookable slots
+ * @param timestamp the time of the appointment as an ISO string
+ */
 
 export function createAppointment(
     duration: number,
@@ -20,8 +20,8 @@ export function createAppointment(
     slots: number,
     timestamp: string
 ): Appointment {
-    var slotData: Slot[] = []
-    for (var i = 0; i < slots; i++) {
+    const slotData: Slot[] = []
+    for (let i = 0; i < slots; i++) {
         slotData[i] = {
             id: randomBytes(32),
             open: true,

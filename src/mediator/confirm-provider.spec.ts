@@ -3,13 +3,12 @@
 // README.md contains license information.
 
 import { equal } from "assert"
-import { VanellusError } from '../errors'
-import { Status } from "../interfaces"
+import { VanellusError } from "../errors"
 import {
     adminKeys,
-    resetDB,
-    mediator,
     backend,
+    mediator,
+    resetDB,
     unverifiedProvider,
 } from "../testing/fixtures"
 

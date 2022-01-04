@@ -3,12 +3,9 @@
 // README.md contains license information.
 
 import { deepEqual } from "assert"
-import { formatDate } from "../helpers/time"
+import { VanellusError } from "../errors"
+import { adminKeys, backend, resetDB } from "../testing/fixtures"
 import { User } from "../user"
-import { ecdhDecrypt } from "../crypto"
-import { Status } from "../interfaces"
-import { adminKeys, resetDB, backend } from "../testing/fixtures"
-import { VanellusError } from '../errors'
 
 describe("User.backupData()", function () {
     it("we should be able to backup data", async function () {

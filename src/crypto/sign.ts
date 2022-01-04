@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, UnexpectedError, VanellusError } from '../errors'
-import { b642buf, buf2b64, str2ab } from "../helpers/conversion"
+import { ErrorCode, UnexpectedError } from "../errors"
+import { buf2b64, str2ab } from "../helpers/conversion"
 import { SignedData } from "../interfaces"
 
 export async function sign(
@@ -28,7 +28,11 @@ export async function sign(
             data
         )
 
-        return { signature: buf2b64(result), data: rawData, publicKey: publicKeyData }
+        return {
+            signature: buf2b64(result),
+            data: rawData,
+            publicKey: publicKeyData,
+        }
     } catch (e) {
         console.error(e)
         throw new UnexpectedError(ErrorCode.Crypto, e)

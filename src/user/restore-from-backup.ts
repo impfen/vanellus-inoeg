@@ -3,12 +3,12 @@
 // README.md contains license information.
 
 import { aesDecrypt, deriveSecrets } from "../crypto"
-import { base322buf, b642buf } from "../helpers/conversion"
-import { Status, Result} from "../interfaces"
-import { CloudBackupData } from "./backup-data"
+import { ErrorCode, VanellusError } from "../errors"
+import { b642buf, base322buf } from "../helpers/conversion"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
+import { Result, Status } from "../interfaces"
 import { User } from "./"
-import { ErrorCode, VanellusError } from '../errors'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
+import { CloudBackupData } from "./backup-data"
 
 export interface RestoreFromBackupResult extends Result {
     data: CloudBackupData
@@ -18,7 +18,8 @@ export interface RestoreFromBackupResult extends Result {
 export async function restoreFromBackup(
     this: User
 ): Promise<RestoreFromBackupResult | VanellusError> {
-    if (!this.secret) return new VanellusError(ErrorCode.DataMissing, "Secret is missing")
+    if (!this.secret)
+        return new VanellusError(ErrorCode.DataMissing, "Secret is missing")
 
     const secrets = await deriveSecrets(base322buf(this.secret), 32, 2)
 
@@ -30,7 +31,8 @@ export async function restoreFromBackup(
     if (decryptedData instanceof VanellusError) return decryptedData
 
     const dd = parseUntrustedJSON<CloudBackupData>(decryptedData)
-    if (!dd) return new VanellusError(ErrorCode.DataMissing, "invalid backup data")
+    if (!dd)
+        return new VanellusError(ErrorCode.DataMissing, "invalid backup data")
 
     this.tokenData = dd.tokenData
     this.queueData = dd.queueData

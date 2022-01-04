@@ -2,15 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { PrefixStore } from "./store"
-import { AppointmentsBackend } from "./appointments"
-import { StorageBackend } from "./storage"
-import { LocalBackend } from "./local"
 import { NetworkBackend, Store } from "../interfaces"
+import { AppointmentsBackend } from "./appointments"
+import { LocalBackend } from "./local"
+import { StorageBackend } from "./storage"
+import { PrefixStore } from "./store"
 
-export * from "./store"
 export * from "./jsonrpc"
 export * from "./rest"
+export * from "./store"
 
 export class Backend {
     public appointments: AppointmentsBackend
@@ -19,16 +19,16 @@ export class Backend {
     public temporary: LocalBackend
 
     constructor(
-      store: Store,
-      temporaryStore: Store,
-      appointmentsNetworkBackend: NetworkBackend<unknown>,
-      storageNetworkBackend: NetworkBackend<unknown>,
+        store: Store,
+        temporaryStore: Store,
+        appointmentsNetworkBackend: NetworkBackend<unknown>,
+        storageNetworkBackend: NetworkBackend<unknown>
     ) {
         this.appointments = new AppointmentsBackend(appointmentsNetworkBackend)
         this.local = new LocalBackend(new PrefixStore(store, "local"))
         this.storage = new StorageBackend(storageNetworkBackend)
         this.temporary = new LocalBackend(
-          new PrefixStore(temporaryStore, "temporary")
+            new PrefixStore(temporaryStore, "temporary")
         )
     }
 }

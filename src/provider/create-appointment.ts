@@ -2,9 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Provider } from "./"
 import { randomBytes } from "../crypto"
 import { Appointment, Slot } from "../interfaces"
+import { Provider } from "./"
 
 export function createSlot() {
     return {

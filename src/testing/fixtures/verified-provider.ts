@@ -2,13 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { AdminKeys } from "./"
 import { Backend } from "../../backend"
+import { VanellusError } from "../../errors"
+import { DecryptedProviderData } from "../../interfaces"
 import { Mediator } from "../../mediator"
 import { Provider } from "../../provider"
+import { AdminKeys } from "./"
 import { unverifiedProvider } from "./unverified-provider"
-import { DecryptedProviderData, EncryptedProviderData, ProviderData, Status } from "../../interfaces"
-import { ErrorCode, VanellusError } from '../../errors'
 
 export async function verifiedProvider(
     backend: Backend,
@@ -19,7 +19,7 @@ export async function verifiedProvider(
     if (provider instanceof VanellusError) return provider
 
     const pendingProviders = await mediator.pendingProviders()
-    if (pendingProviders instanceof VanellusError) return pendingProviders;
+    if (pendingProviders instanceof VanellusError) return pendingProviders
 
     const pendingProvider = pendingProviders.providers.find(
         (pr: DecryptedProviderData) =>

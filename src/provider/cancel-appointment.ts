@@ -2,13 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { VanellusError } from "../errors"
+import { Appointment, Result } from "../interfaces"
 import { Provider } from "./"
-import {
-    Appointment,
-    Result,
-    Status,
-} from "../interfaces"
-import { VanellusError } from '../errors'
 
 /**
  * Cancles an appointment by emptying the slots of the appointment and uploading
@@ -21,7 +17,7 @@ export async function cancelAppointment(
     appointment: Appointment
 ): Promise<Result | VanellusError> {
     appointment.slotData = []
-    const result = await this.publishAppointments( [appointment] )
+    const result = await this.publishAppointments([appointment])
 
     return result
 }

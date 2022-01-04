@@ -3,16 +3,16 @@
 // README.md contains license information.
 
 import { aesEncrypt, deriveSecrets } from "../crypto"
-import { base322buf, b642buf } from "../helpers/conversion"
+import { ErrorCode, VanellusError } from "../errors"
+import { b642buf, base322buf } from "../helpers/conversion"
 import {
-    ProviderKeyPairs,
-    ProviderData,
-    VerifiedProviderData,
     AESData,
-    Status,
+    ProviderData,
+    ProviderKeyPairs,
     Result,
+    Status,
+    VerifiedProviderData,
 } from "../interfaces"
-import { VanellusError, ErrorCode } from '../errors'
 import { Provider } from "./"
 
 export interface BackupData {
@@ -34,16 +34,15 @@ interface BackupDataResult extends Result {
     data: AESData
 }
 
-  /**
-   * Upload data to the backend. Only successfull if the provider has a sync
-   * key.
-   */
+/**
+ * Upload data to the backend. Only successfull if the provider has a sync
+ * key.
+ */
 
 export async function backupData(
     this: Provider
 ): Promise<BackupDataResult | VanellusError> {
     if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
-
 
     const cloudData: CloudBackupData = {
         version: "0.2",

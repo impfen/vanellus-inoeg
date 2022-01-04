@@ -2,18 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
-import { randomBytes, sign, verify, ecdhDecrypt } from "../crypto"
-import {
-    Status,
-    Appointment,
-    Slot,
-    SignedAppointment,
-    Result,
-    Booking,
-} from "../interfaces"
+import { ecdhDecrypt, verify } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
+import { Appointment, Booking, Result, Status } from "../interfaces"
 import { Provider } from "./"
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 
 export interface GetAppointmentsResult extends Result {
     appointments: Appointment[]
@@ -21,10 +14,7 @@ export interface GetAppointmentsResult extends Result {
 
 async function decryptBookings(bookings: Booking[], privKey: JsonWebKey) {
     for (const booking of bookings) {
-        const decryptedData = await ecdhDecrypt(
-            booking.encryptedData,
-            privKey
-        )
+        const decryptedData = await ecdhDecrypt(booking.encryptedData, privKey)
         if (decryptedData instanceof VanellusError) continue
         const dd = parseUntrustedJSON(decryptedData)
         if (!dd) continue
@@ -33,21 +23,19 @@ async function decryptBookings(bookings: Booking[], privKey: JsonWebKey) {
     return bookings
 }
 
-  /**
-   * Retrieves the appointments that belong to the provider from the backend
-   * @param from earliest timestamp for the returned appointments as an ISO
-   * string
-   * @param to time latest timestamp for the returned appointments as an ISO
-   * string
-   */
+/**
+ * Retrieves the appointments that belong to the provider from the backend
+ * @param from earliest timestamp for the returned appointments as an ISO
+ * string
+ * @param to time latest timestamp for the returned appointments as an ISO
+ * string
+ */
 
 export async function getAppointments(
     this: Provider,
     { from, to }: { from: string; to: string }
 ): Promise<GetAppointmentsResult | VanellusError> {
     if (!this.keyPairs) return new VanellusError(ErrorCode.KeysMissing)
-
-    
 
     const response = await this.backend.appointments.getAppointments(
         { from: from, to: to },
@@ -80,7 +68,10 @@ export async function getAppointments(
             slotData: appData.slotData,
             publicKey: appData.publicKey,
             properties: appData.properties,
-            bookings: await decryptBookings(appointment.bookings || [], this.keyPairs.encryption.privateKey),
+            bookings: await decryptBookings(
+                appointment.bookings || [],
+                this.keyPairs.encryption.privateKey
+            ),
             modified: false,
             id: appData.id,
         }

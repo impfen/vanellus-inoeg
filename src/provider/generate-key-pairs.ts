@@ -7,14 +7,13 @@ import {
     generateECDSAKeyPair,
     generateSymmetricKey,
 } from "../crypto"
-
-import { Provider } from "./"
 import { ProviderKeyPairs } from "../interfaces"
+import { Provider } from "./"
 
-  /**
-   * Generates all needed key pairs for the provider and stores them in the
-   * provider object
-   */
+/**
+ * Generates all needed key pairs for the provider and stores them in the
+ * provider object
+ */
 
 export async function generateKeyPairs(
     this: Provider

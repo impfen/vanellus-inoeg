@@ -3,8 +3,8 @@
 // README.md contains license information.
 
 import { Actor } from "../actor"
-import { PublicKeys, Result, Status } from "../interfaces"
 import { VanellusError } from "../errors"
+import { PublicKeys, Result, Status } from "../interfaces"
 
 /**
  * Fetch public keys from the server
@@ -14,7 +14,9 @@ interface PublicKeysResult extends Result {
     keys: PublicKeys
 }
 
-export async function getKeys(this: Actor): Promise<PublicKeysResult | VanellusError> {
+export async function getKeys(
+    this: Actor
+): Promise<PublicKeysResult | VanellusError> {
     const result = await this.backend.appointments.getKeys()
 
     if (result instanceof VanellusError) {

@@ -5,11 +5,7 @@
 import { Mediator } from "./"
 
 // make sure the signing and encryption key pairs exist
-export async function getStats(
-    this: Mediator,
-    params: any
-) {
-    
+export async function getStats(this: Mediator, params: any) {
     try {
         const stats = await this.backend.appointments.getStats(params)
 

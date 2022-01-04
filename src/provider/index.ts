@@ -2,28 +2,26 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { backupData } from "./backup-data"
-import { checkData } from "./check-data"
-import { generateKeyPairs } from "./generate-key-pairs"
-import { storeData } from "./store-data"
-import { cancelAppointment } from "./cancel-appointment"
-import { createAppointment } from "./create-appointment"
-import { restoreFromBackup } from "./restore-from-backup"
-import { publishAppointments } from "./publish-appointments"
-import { getAppointments } from "./get-appointments"
-
-import { buf2base32, b642buf } from "../helpers/conversion"
-import { randomBytes } from "../crypto"
 import { Actor } from "../actor"
 import { Backend } from "../backend"
-
+import { randomBytes } from "../crypto"
+import { ErrorCode, UnexpectedError } from "../errors"
+import { b642buf, buf2base32 } from "../helpers/conversion"
 import {
-    ProviderInput,
     ProviderData,
-    VerifiedProviderData,
+    ProviderInput,
     ProviderKeyPairs,
+    VerifiedProviderData,
 } from "../interfaces"
-import { ErrorCode, UnexpectedError } from '../errors'
+import { backupData } from "./backup-data"
+import { cancelAppointment } from "./cancel-appointment"
+import { checkData } from "./check-data"
+import { createAppointment } from "./create-appointment"
+import { generateKeyPairs } from "./generate-key-pairs"
+import { getAppointments } from "./get-appointments"
+import { publishAppointments } from "./publish-appointments"
+import { restoreFromBackup } from "./restore-from-backup"
+import { storeData } from "./store-data"
 
 export * from "./helpers"
 
@@ -63,7 +61,7 @@ export class Provider extends Actor {
     public static async initialize(
         id: string,
         backend: Backend,
-        data: ProviderInput,
+        data: ProviderInput
     ) {
         const provider = new Provider(id, backend)
         await provider.create({
@@ -84,9 +82,7 @@ export class Provider extends Actor {
      * @param data The provider data
      */
 
-    public async create(
-        data: ProviderInput,
-    ) {
+    public async create(data: ProviderInput) {
         this.clear()
         this.generateSecret()
         const keyPairs = await this.generateKeyPairs()
