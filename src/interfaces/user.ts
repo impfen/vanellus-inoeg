@@ -2,24 +2,24 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { KeyPair, ECDHData, SignedData } from "./"
+import { KeyPair, SignedData } from "./"
 
 export interface QueueData {
     zipCode: string
 }
 
-export interface SignedToken extends SignedData {}
+export type SignedToken = SignedData
 
 export interface ContactData {
     name?: string
 }
 
 export interface UserToken {
-    version: string,
-    code: string,
-    createdAt: string,
-    publicKey: string, // the signing key to control the ID
-    encryptionPublicKey: string,
+    version: string
+    code: string
+    createdAt: string
+    publicKey: string // the signing key to control the ID
+    encryptionPublicKey: string
 }
 
 export interface TokenData {

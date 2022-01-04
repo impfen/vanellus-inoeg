@@ -2,16 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 import { ecdhDecrypt } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
 import {
+    DecryptedProviderData,
+    EncryptedProviderData,
+    ProviderData,
     Result,
     Status,
-    EncryptedProviderData,
-    KeyPair,
-    ProviderData,
-    DecryptedProviderData,
 } from "../interfaces"
 import { Mediator } from "./"
 
@@ -19,28 +18,26 @@ export interface ProvidersResult extends Result {
     providers: DecryptedProviderData[]
 }
 
-async function decryptProviderData(encData: EncryptedProviderData[], privKey: JsonWebKey): Promise<DecryptedProviderData[]> {
+async function decryptProviderData(
+    encData: EncryptedProviderData[],
+    privKey: JsonWebKey
+): Promise<DecryptedProviderData[]> {
     const providerData: DecryptedProviderData[] = []
     for (const pd of encData) {
-        const decryptedData = await ecdhDecrypt(
-            pd.encryptedData,
-            privKey
-        )
+        const decryptedData = await ecdhDecrypt(pd.encryptedData, privKey)
         if (decryptedData instanceof VanellusError) continue
 
         // to do: verify provider data!
         const parsedData: DecryptedProviderData = {
             encryptedData: pd.encryptedData,
-            data: parseUntrustedJSON(decryptedData) as ProviderData
+            data: parseUntrustedJSON(decryptedData) as ProviderData,
         }
-            
-        if (parsedData)
-            providerData.push(parsedData)
+
+        if (parsedData) providerData.push(parsedData)
     }
 
     return providerData
 }
-
 
 export async function pendingProviders(
     this: Mediator
@@ -49,15 +46,20 @@ export async function pendingProviders(
         return new VanellusError(ErrorCode.KeysMissing)
     }
 
-    const encryptedProviderData = await this.backend.appointments.getPendingProviderData(
-        {},
-        this.keyPairs.signing
+    const encryptedProviderData =
+        await this.backend.appointments.getPendingProviderData(
+            {},
+            this.keyPairs.signing
+        )
+
+    if (encryptedProviderData instanceof VanellusError)
+        return encryptedProviderData
+
+    const providerData = await decryptProviderData(
+        encryptedProviderData,
+        this.keyPairs.provider.privateKey
     )
 
-    if (encryptedProviderData instanceof VanellusError) return encryptedProviderData
-
-    const providerData = await decryptProviderData(encryptedProviderData, this.keyPairs.provider.privateKey)
-    
     return {
         status: Status.Succeeded,
         providers: providerData,
@@ -77,9 +79,13 @@ export async function verifiedProviders(
             this.keyPairs.signing
         )
 
-    if (encryptedProviderData instanceof VanellusError) return encryptedProviderData
+    if (encryptedProviderData instanceof VanellusError)
+        return encryptedProviderData
 
-    const providerData = await decryptProviderData(encryptedProviderData, this.keyPairs.provider.privateKey)
+    const providerData = await decryptProviderData(
+        encryptedProviderData,
+        this.keyPairs.provider.privateKey
+    )
 
     return {
         status: Status.Succeeded,

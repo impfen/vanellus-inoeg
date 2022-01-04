@@ -3,12 +3,13 @@
 // README.md contains license information.
 
 import { generateECDHKeyPair, generateECDSAKeyPair } from "../crypto"
-
-import { User } from "./"
+import { VanellusError } from "../errors"
 import { UserKeyPairs } from "../interfaces"
-import { VanellusError } from '../errors'
+import { User } from "./"
 
-export async function generateKeyPairs(this: User): Promise<UserKeyPairs | VanellusError> {
+export async function generateKeyPairs(
+    this: User
+): Promise<UserKeyPairs | VanellusError> {
     const signingKeyPair = await generateECDSAKeyPair()
     const encryptionKeyPair = await generateECDHKeyPair()
 

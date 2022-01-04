@@ -2,13 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { confirmProvider } from "./confirm-provider"
-import { pendingProviders, verifiedProviders } from "./providers"
-import { getStats } from "./get-stats"
-import { MediatorKeyPairs } from "../interfaces"
 import { Actor } from "../actor"
 import { Backend } from "../backend"
-import { Optional } from '../helpers/optional'
+import { Optional } from "../helpers/optional"
+import { MediatorKeyPairs } from "../interfaces"
+import { confirmProvider } from "./confirm-provider"
+import { getStats } from "./get-stats"
+import { pendingProviders, verifiedProviders } from "./providers"
 
 export class Mediator extends Actor {
     public confirmProvider = confirmProvider

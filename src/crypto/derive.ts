@@ -2,12 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { generateECDHKeyPair } from "./generate-key"
-import { b642buf, buf2b64, str2ab, ab2str } from "../helpers/conversion"
+import { ErrorCode, UnexpectedError } from "../errors"
+import { buf2b64, str2ab } from "../helpers/conversion"
 import { salt } from "./token"
-import { ErrorCode, UnexpectedError } from '../errors'
 
-export async function deriveSecrets(key: ArrayBuffer, len: number, n: number): Promise<string[]> {
+export async function deriveSecrets(
+    key: ArrayBuffer,
+    len: number,
+    n: number
+): Promise<string[]> {
     try {
         const baseKey = await crypto.subtle.importKey(
             "raw",

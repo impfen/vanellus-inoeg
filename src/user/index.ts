@@ -2,28 +2,26 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { restoreFromBackup } from "./restore-from-backup"
-import { getToken } from "./get-token"
-import { backupData } from "./backup-data"
-import { generateKeyPairs } from "./generate-key-pairs"
-import { bookAppointment } from "./book-appointment"
-import { cancelAppointment } from "./cancel-appointment"
-import { getAppointment } from "./get-appointment"
-import { getAppointments } from "./get-appointments"
-import { buf2base32, b642buf } from "../helpers/conversion"
-import { randomBytes } from "../crypto"
+import { Actor } from "../actor"
 import { Backend } from "../backend"
-
+import { randomBytes } from "../crypto"
+import { b642buf, buf2base32 } from "../helpers/conversion"
 import {
+    AcceptedAppointment,
+    ContactData,
+    ProviderAppointments,
     QueueData,
     TokenData,
-    ContactData,
     UserKeyPairs,
-    AcceptedAppointment,
-    ProviderAppointments,
 } from "../interfaces"
-
-import { Actor } from "../actor"
+import { backupData } from "./backup-data"
+import { bookAppointment } from "./book-appointment"
+import { cancelAppointment } from "./cancel-appointment"
+import { generateKeyPairs } from "./generate-key-pairs"
+import { getAppointment } from "./get-appointment"
+import { getAppointments } from "./get-appointments"
+import { getToken } from "./get-token"
+import { restoreFromBackup } from "./restore-from-backup"
 
 export class User extends Actor {
     public restoreFromBackup = restoreFromBackup

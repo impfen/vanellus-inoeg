@@ -2,14 +2,14 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
 import { ephemeralECDHEncrypt } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
 import {
-    Status,
-    Result,
     AcceptedAppointment,
-    PublicProviderData,
     Appointment,
+    PublicProviderData,
+    Result,
+    Status,
 } from "../interfaces"
 import { User } from "./"
 
@@ -22,7 +22,8 @@ export async function bookAppointment(
     appointment: Appointment,
     provider: PublicProviderData
 ): Promise<BookAppointmentResult | VanellusError> {
-    if (!this.tokenData) return new VanellusError(ErrorCode.DataMissing, "token data is missing")
+    if (!this.tokenData)
+        return new VanellusError(ErrorCode.DataMissing, "token data is missing")
 
     const providerData = {
         signedToken: this.tokenData.signedToken,

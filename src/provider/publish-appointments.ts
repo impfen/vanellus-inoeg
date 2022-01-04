@@ -2,9 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, VanellusError } from '../errors'
-import { randomBytes, sign } from "../crypto"
-import { Appointment, SignedData, Result, Status, Slot } from "../interfaces"
+import { sign } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
+import { Appointment, Result, SignedData, Slot, Status } from "../interfaces"
 import { Provider } from "./"
 
 /**
@@ -62,7 +62,6 @@ export async function publishAppointments(
     )
 
     if (result instanceof VanellusError) return result
-
 
     return {
         status: Status.Succeeded,

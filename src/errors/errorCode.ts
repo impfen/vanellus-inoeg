@@ -1,7 +1,6 @@
-
 export enum ErrorCode {
-  KeysMissing,
-  BackendError,
-  DataMissing,
-  Crypto
+    KeysMissing,
+    BackendError,
+    DataMissing,
+    Crypto,
 }

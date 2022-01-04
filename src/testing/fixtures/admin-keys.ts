@@ -3,11 +3,9 @@
 // README.md contains license information.
 
 import fs from "fs"
-
-import { generateECDSAKeyPair } from "../../crypto"
-import { settingsPath } from "../settings"
+import { b642buf } from "../../helpers/conversion"
 import { KeyPair } from "../../interfaces"
-import { b642buf, buf2b64 } from "../../helpers/conversion"
+import { settingsPath } from "../settings"
 
 export interface AdminKeys {
     root: KeyPair
@@ -36,7 +34,7 @@ export async function adminKeys(): Promise<AdminKeys> {
         )
 
         // we reexport as JWK as that's the format that the library expects...
-        let privateKey = await crypto.subtle.exportKey("jwk", importedKey)
+        const privateKey = await crypto.subtle.exportKey("jwk", importedKey)
 
         return {
             publicKey: keyData.publicKey,

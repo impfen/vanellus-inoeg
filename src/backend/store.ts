@@ -54,19 +54,19 @@ export class StorageStore implements Store {
     }
 
     deleteAll(prefix: string) {
-        var keys: string[] = [];
-        for (var i = 0; i < this.storage.length; i++) {
+        const keys: string[] = []
+        for (let i = 0; i < this.storage.length; i++) {
             const key = this.storage.key(i)
             if (key !== null && key.startsWith(prefix)) keys.push(key)
         }
-        keys.forEach(key => this.storage.removeItem(key))
+        keys.forEach((key) => this.storage.removeItem(key))
     }
 }
 
-  /**
-   * Implements the Storage interface for local testing. Frontends running in a
-   * browser should use localStorage
-   */
+/**
+ * Implements the Storage interface for local testing. Frontends running in a
+ * browser should use localStorage
+ */
 
 export class InMemoryStorage implements Storage {
     private _data: { [Key: string]: any }
@@ -75,7 +75,7 @@ export class InMemoryStorage implements Storage {
         this.length = Object.keys(this._data).length
     }
 
-    public length: number = 0
+    public length = 0
 
     constructor() {
         this._data = {}
@@ -96,7 +96,7 @@ export class InMemoryStorage implements Storage {
     }
 
     clear() {
-      Object.keys(this._data).forEach( key => this.removeItem(key) )
+        Object.keys(this._data).forEach((key) => this.removeItem(key))
     }
 
     removeItem(key: string): void {

@@ -2,12 +2,12 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ECDHData, SignedToken, UserToken } from '.';
+import { ECDHData, SignedToken, UserToken } from "."
 
 export interface Booking {
-    id: string,
-    publicKey: string,
-    token: string,
+    id: string
+    publicKey: string
+    token: string
     encryptedData: ECDHData
     data?: {
         userToken: UserToken

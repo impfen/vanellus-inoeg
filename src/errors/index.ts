@@ -1,6 +1,4 @@
-
-
-export {VanellusError} from './vanellusError'
-export * from './errorCode'
-export * from './unexpectedError'
-export * from './backendError' 
+export * from "./backendError"
+export * from "./errorCode"
+export * from "./unexpectedError"
+export { VanellusError } from "./vanellusError"

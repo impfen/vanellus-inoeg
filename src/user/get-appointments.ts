@@ -2,21 +2,23 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { VanellusError } from "../errors"
+import { Optional } from "../helpers/optional"
+import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
 import {
-    Status,
-    Result,
     Appointment,
-    VerifiedProviderAppointments,
     BookedSlot,
     PublicProviderData,
+    Result,
+    Status,
+    VerifiedProviderAppointments,
 } from "../interfaces"
-import { verify } from "../crypto"
 import { User } from "./"
-import { VanellusError } from '../errors'
-import { Optional } from '../helpers/optional'
-import { parseUntrustedJSON } from '../helpers/parseUntrustedJSON'
 
-async function verifyAppointment(appointment: any, item: any): Promise<Optional<Appointment>> {
+async function verifyAppointment(
+    appointment: any,
+    item: any
+): Promise<Optional<Appointment>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -33,7 +35,9 @@ async function verifyAppointment(appointment: any, item: any): Promise<Optional<
     return parseUntrustedJSON<Appointment>(appointment.data)
 }
 
-async function verifyProviderData(item: any): Promise<Optional<PublicProviderData>> {
+async function verifyProviderData(
+    item: any
+): Promise<Optional<PublicProviderData>> {
     // to do: verify based on key chain
     /*
     let found = false;
@@ -84,10 +88,7 @@ export async function getAppointments(
         item.provider.json.id = item.provider.id
         const verifiedProviderAppointments: Appointment[] = []
         for (const signedAppointment of item.appointments) {
-            const appointment = await verifyAppointment(
-                signedAppointment,
-                item
-            )
+            const appointment = await verifyAppointment(signedAppointment, item)
             if (!appointment) continue
 
             for (const slot of appointment.slotData) {

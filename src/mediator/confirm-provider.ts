@@ -2,9 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { sign, ecdhDecrypt, ephemeralECDHEncrypt } from "../crypto"
-import { DecryptedProviderData, EncryptedProviderData, Result, Status } from "../interfaces"
-import { VanellusError, ErrorCode } from "../errors"
+import { ephemeralECDHEncrypt, sign } from "../crypto"
+import { ErrorCode, VanellusError } from "../errors"
+import { DecryptedProviderData, Result, Status } from "../interfaces"
 import { Mediator } from "./"
 
 export async function confirmProvider(
@@ -16,7 +16,10 @@ export async function confirmProvider(
     }
 
     if (!providerData.data) {
-        return new VanellusError(ErrorCode.DataMissing, "Provider data is missing")
+        return new VanellusError(
+            ErrorCode.DataMissing,
+            "Provider data is missing"
+        )
     }
 
     const data = providerData.data

@@ -2,10 +2,10 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { equal } from "assert"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import { VanellusError } from "../errors"
 import { formatDatetime } from "../helpers/time"
-import { Status } from "../interfaces"
-import { User } from "../user"
 import {
     adminKeys,
     backend,
@@ -13,15 +13,12 @@ import {
     resetDB,
     verifiedProvider,
 } from "../testing/fixtures"
-
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { VanellusError } from '../errors'
+import { User } from "../user"
 
 describe("Provider.cancelAppointments()", function () {
     it("we should be able to publish appointments", async function () {
         dayjs.extend(utc)
-        let result;
+        let result
 
         const be = backend()
         const keys = await adminKeys()
@@ -34,7 +31,7 @@ describe("Provider.cancelAppointments()", function () {
 
         // tomorrow 3 pm
 
-        const date = dayjs().utc().add(1, 'day').hour(15).minute(0).second(0)
+        const date = dayjs().utc().add(1, "day").hour(15).minute(0).second(0)
 
         const app = await vp.createAppointment(
             15,
@@ -49,7 +46,7 @@ describe("Provider.cancelAppointments()", function () {
             throw new Error("cannot publish appointments")
 
         const fromDate = dayjs().utc()
-        const toDate = dayjs().utc().add(1, 'day')
+        const toDate = dayjs().utc().add(1, "day")
 
         const getResult = await vp.getAppointments({
             from: formatDatetime(fromDate),
@@ -77,15 +74,12 @@ describe("Provider.cancelAppointments()", function () {
             zipCode: user.queueData.zipCode,
         })
 
-        if (result instanceof VanellusError)
-            throw new Error("should not fail")
+        if (result instanceof VanellusError) throw new Error("should not fail")
 
         if (result.appointments.length !== 1)
             throw new Error("should return one appointment")
 
-
-        await vp.cancelAppointment(app) 
-
+        await vp.cancelAppointment(app)
 
         result = await user.getAppointments({
             from: formatDatetime(fromDate),
@@ -94,12 +88,9 @@ describe("Provider.cancelAppointments()", function () {
             zipCode: user.queueData.zipCode,
         })
 
-        if (result instanceof VanellusError)
-            throw new Error("should not fail")
+        if (result instanceof VanellusError) throw new Error("should not fail")
 
         if (result.appointments.length !== 0)
             throw new Error("should return no appointments")
-
     })
 })
-

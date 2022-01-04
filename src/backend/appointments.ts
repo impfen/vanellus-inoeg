@@ -3,19 +3,19 @@
 // README.md contains license information.
 
 import {
-    OK,
     Booking,
-    KeyPair,
-    ECDHData,
-    PublicKeys,
-    NetworkBackend,
-    SignedData,
-    SignedToken,
-    SignedAppointment,
     ConfirmedProviderData,
-    SignedMediatorKeyData,
+    ECDHData,
     EncryptedProviderData,
+    KeyPair,
+    NetworkBackend,
+    OK,
     ProviderAppointments,
+    PublicKeys,
+    SignedAppointment,
+    SignedData,
+    SignedMediatorKeyData,
+    SignedToken,
 } from "../interfaces"
 
 // The appointments backend
@@ -60,7 +60,7 @@ export class AppointmentsBackend {
     }) {
         return this.net.call<ProviderAppointments>(
             this.net.methods.getAppointment,
-            { id, providerID },
+            { id, providerID }
         )
     }
 
@@ -77,7 +77,7 @@ export class AppointmentsBackend {
     }) {
         return this.net.call<ProviderAppointments[]>(
             this.net.methods.getAppointmentsByZipCode,
-            { zipCode, radius, from, to },
+            { zipCode, radius, from, to }
         )
     }
 

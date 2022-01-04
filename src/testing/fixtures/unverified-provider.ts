@@ -2,15 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { AdminKeys } from "./"
-import { ecdhEncrypt, ecdhDecrypt } from "../../crypto"
 import { Backend } from "../../backend"
+import { VanellusError } from "../../errors/vanellusError"
+import { ProviderData } from "../../interfaces"
 import { Provider } from "../../provider"
-import { ProviderData, KeyPair, Status } from "../../interfaces"
-import { VanellusError } from '../../errors/vanellusError'
 
 export async function unverifiedProvider(
-    backend: Backend,
+    backend: Backend
 ): Promise<Provider | VanellusError> {
     const providerData: ProviderData = {
         name: "Max Mustermann",
@@ -22,19 +20,18 @@ export async function unverifiedProvider(
         publicKeys: {
             encryption: "",
             signing: "",
-        }
+        },
     }
 
     const provider = await Provider.initialize(
         "provider",
         backend,
-        providerData,
+        providerData
     )
 
     const result = await provider.storeData()
 
-    if (result instanceof VanellusError)
-        return result
+    if (result instanceof VanellusError) return result
 
     return provider
 }

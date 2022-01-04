@@ -3,8 +3,8 @@
 // README.md contains license information.
 
 import { equal } from "assert"
-import { randomBytes, deriveSecrets } from "./"
 import { b642buf } from "../helpers/conversion"
+import { deriveSecrets, randomBytes } from "./"
 
 describe("Crypto.deriveSecrets()", function () {
     it("should be able to derive secrets", async function () {

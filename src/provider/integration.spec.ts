@@ -3,27 +3,14 @@
 // README.md contains license information.
 
 import { equal } from "assert"
-import { Status } from "../interfaces"
-import { User } from "../user"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import { VanellusError } from "../errors"
+import { adminKeys, backend, mediator, resetDB } from "../testing/fixtures"
 import { Provider } from "./"
-import {
-    adminKeys,
-    backend,
-    mediator,
-    resetDB,
-    unverifiedProvider,
-} from "../testing/fixtures"
-
-import { aesDecrypt, aesEncrypt, deriveSecrets } from "../crypto"
-import { base322buf, b642buf } from "../helpers/conversion"
-
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { VanellusError } from '../errors'
 
 describe("Provider integration", function () {
-    it ("create and authenticate a provider and work with appointments", async function () {
-
+    it("create and authenticate a provider and work with appointments", async function () {
         // set up utc timezone so tests work reliably
         dayjs.extend(utc)
 
@@ -33,25 +20,19 @@ describe("Provider integration", function () {
 
         await resetDB(be, keys)
 
-
         // create mediator
         const med = await mediator(be, keys)
         if ("code" in med) throw new Error("creating mediator failed")
 
-
         //create provider
-        let provider = await Provider.initialize(
-            "provider",
-            be,
-            {
-                name: "Max Mustermann",
-                street: "Musterstr. 23",
-                city: "Berlin",
-                zipCode: "10707",
-                description: "",
-                email: "max@mustermann.de",
-            }
-        )
+        let provider = await Provider.initialize("provider", be, {
+            name: "Max Mustermann",
+            street: "Musterstr. 23",
+            city: "Berlin",
+            zipCode: "10707",
+            description: "",
+            email: "max@mustermann.de",
+        })
 
         equal(provider.secret.length, 24)
 
@@ -59,7 +40,6 @@ describe("Provider integration", function () {
 
         if (result instanceof VanellusError)
             throw new Error("cannot store provider data")
-
 
         // provider backup and recovery
 
@@ -83,12 +63,16 @@ describe("Provider integration", function () {
 
         // confirm provider
         const pendingProviders = await med.pendingProviders()
-        if (pendingProviders instanceof VanellusError || pendingProviders.providers.length == 0) {
+        if (
+            pendingProviders instanceof VanellusError ||
+            pendingProviders.providers.length == 0
+        ) {
             throw new Error("fetching provider data failed")
         }
 
         result = await med.confirmProvider(pendingProviders.providers[0])
-        if (result instanceof VanellusError) throw new Error("confirmation failed")
+        if (result instanceof VanellusError)
+            throw new Error("confirmation failed")
 
         await provider.restoreFromBackup(encryptedKeyFile)
     })

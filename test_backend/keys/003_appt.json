@@ -1,46 +1,38 @@
 {
-  "appointments": {
-    "keys": [
-      {
-        "name": "root",
-        "type": "ecdsa",
-        "format": "spki-pkcs8",
-        "params": {
-          "curve": "p-256"
-        },
-        "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkJXQcq+YnVI17R0ezu2cEpSeFNRCz3dYKNpRItYiYqyFcX7+qCCD4ATRDLhhUXe98lgT+0A5q/Ahr6nMSjDAaw==",
-        "purposes": [
-          "sign",
-          "verify"
-        ]
-      },
-      {
-        "name": "token",
-        "type": "ecdsa",
-        "format": "spki-pkcs8",
-        "params": {
-          "curve": "p-256"
-        },
-        "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/blZZVFaPalOduUlmKlvjIeWbzUjHNXAjKhAFa/yROWXPYZifCwNosZLN7wetnmbWm41jYpBCM1Wc3kPtOzSmQ==",
-        "purposes": [
-          "sign",
-          "verify"
+    "appointments": {
+        "keys": [
+            {
+                "name": "root",
+                "type": "ecdsa",
+                "format": "spki-pkcs8",
+                "params": {
+                    "curve": "p-256"
+                },
+                "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEkJXQcq+YnVI17R0ezu2cEpSeFNRCz3dYKNpRItYiYqyFcX7+qCCD4ATRDLhhUXe98lgT+0A5q/Ahr6nMSjDAaw==",
+                "purposes": ["sign", "verify"]
+            },
+            {
+                "name": "token",
+                "type": "ecdsa",
+                "format": "spki-pkcs8",
+                "params": {
+                    "curve": "p-256"
+                },
+                "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/blZZVFaPalOduUlmKlvjIeWbzUjHNXAjKhAFa/yROWXPYZifCwNosZLN7wetnmbWm41jYpBCM1Wc3kPtOzSmQ==",
+                "purposes": ["sign", "verify"],
+                "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgqCC1iKSdQhL4Mzbr+dT0bdk1gRVtPoZiLWSuyOX/9IKhRANCAAT9uVllUVo9qU525SWYqW+Mh5ZvNSMc1cCMqEAVr/JE5Zc9hmJ8LA2ixks3vB62eZtabjWNikEIzVZzeQ+07NKZ"
+            },
+            {
+                "name": "provider",
+                "type": "ecdh",
+                "format": "spki-pkcs8",
+                "params": {
+                    "curve": "p-256"
+                },
+                "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpFUiNtYUw8ePzgwzssTmSWCe+I6++YUyrBaRTtUmu5aEh6zxl69deit4gHiP/XntxzTHoxSlMF+zA6DCuG3twQ==",
+                "purposes": ["deriveKey"]
+            }
         ],
-        "privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgqCC1iKSdQhL4Mzbr+dT0bdk1gRVtPoZiLWSuyOX/9IKhRANCAAT9uVllUVo9qU525SWYqW+Mh5ZvNSMc1cCMqEAVr/JE5Zc9hmJ8LA2ixks3vB62eZtabjWNikEIzVZzeQ+07NKZ"
-      },
-      {
-        "name": "provider",
-        "type": "ecdh",
-        "format": "spki-pkcs8",
-        "params": {
-          "curve": "p-256"
-        },
-        "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpFUiNtYUw8ePzgwzssTmSWCe+I6++YUyrBaRTtUmu5aEh6zxl69deit4gHiP/XntxzTHoxSlMF+zA6DCuG3twQ==",
-        "purposes": [
-          "deriveKey"
-        ]
-      }
-    ],
-    "secret": "rN3NMWF5DSkB3hPHyN1etPWVgekXfS0QJuGV4/ngiZM="
-  }
+        "secret": "rN3NMWF5DSkB3hPHyN1etPWVgekXfS0QJuGV4/ngiZM="
+    }
 }

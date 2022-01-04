@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { NetworkBackend, KeyPair, OK, AESData } from "../interfaces"
+import { AESData, KeyPair, NetworkBackend, OK } from "../interfaces"
 
 // The storage backend
 export class StorageBackend {
@@ -12,12 +12,17 @@ export class StorageBackend {
         this.net = net
     }
 
-    async storeSettings({ id, data }: { id: string, data: AESData }) {
-        return await this.net.call<OK>(this.net.methods.storeSettings, { id, data })
+    async storeSettings({ id, data }: { id: string; data: AESData }) {
+        return await this.net.call<OK>(this.net.methods.storeSettings, {
+            id,
+            data,
+        })
     }
 
     async getSettings({ id }: { id: string }) {
-        return await this.net.call<AESData>(this.net.methods.getSettings, { id })
+        return await this.net.call<AESData>(this.net.methods.getSettings, {
+            id,
+        })
     }
 
     // only works for test deployments

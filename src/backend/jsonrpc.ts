@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { VanellusError, BackendError } from '../errors'
 import { sign } from "../crypto"
+import { BackendError, VanellusError } from "../errors"
 import { KeyPair, NetworkBackend, NetworkMethods } from "../interfaces"
 
 class JSONRPCMethods implements NetworkMethods<string> {
@@ -28,7 +28,7 @@ class JSONRPCMethods implements NetworkMethods<string> {
 }
 
 export class JSONRPCBackend implements NetworkBackend<string> {
-    public readonly methods = new JSONRPCMethods
+    public readonly methods = new JSONRPCMethods()
     public apiUrl = ""
 
     constructor(apiUrl: string) {
@@ -75,10 +75,9 @@ export class JSONRPCBackend implements NetworkBackend<string> {
 
             if (!response.ok) {
                 return new BackendError({
-                        error: response.statusText,
-                        data: await response.json(),
-                    }
-                )
+                    error: response.statusText,
+                    data: await response.json(),
+                })
             }
 
             return (await response.json()).result as R
@@ -89,4 +88,3 @@ export class JSONRPCBackend implements NetworkBackend<string> {
         }
     }
 }
-

@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ErrorCode, UnexpectedError, VanellusError } from '../errors'
-import { b642buf, buf2b64, str2ab } from "../helpers/conversion"
+import { ErrorCode, UnexpectedError } from "../errors"
+import { buf2b64 } from "../helpers/conversion"
 import { KeyPair } from "../interfaces"
 
 export async function generateSymmetricKey(): Promise<string> {
@@ -65,5 +65,4 @@ export async function generateECDHKeyPair(): Promise<KeyPair> {
         console.error(e)
         throw new UnexpectedError(ErrorCode.Crypto, e)
     }
-    
 }

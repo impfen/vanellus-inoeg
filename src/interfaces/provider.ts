@@ -46,7 +46,7 @@ export interface ProviderInput {
     description: string
     email: string
     accessible?: boolean
-    website?: string    
+    website?: string
 }
 
 export interface ProviderData extends ProviderInput {
@@ -55,7 +55,6 @@ export interface ProviderData extends ProviderInput {
     version?: string
     id?: string
 }
-
 
 export interface ProviderKeyPairs {
     signing: KeyPair
