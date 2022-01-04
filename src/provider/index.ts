@@ -18,7 +18,7 @@ import { cancelAppointment } from "./cancel-appointment"
 import { checkData } from "./check-data"
 import { createAppointment } from "./create-appointment"
 import { generateKeyPairs } from "./generate-key-pairs"
-import { getAppointments } from "./get-appointments"
+import { getProviderAppointments } from "./get-provider-appointments"
 import { publishAppointments } from "./publish-appointments"
 import { restoreFromBackup } from "./restore-from-backup"
 import { storeData } from "./store-data"
@@ -28,13 +28,13 @@ export * from "./helpers"
 export class Provider extends Actor {
     public backupData = backupData
     public checkData = checkData
-    public storeData = storeData
     public cancelAppointment = cancelAppointment
     public createAppointment = createAppointment
-    public restoreFromBackup = restoreFromBackup
-    public publishAppointments = publishAppointments
-    public getAppointments = getAppointments
+    public getProviderAppointments = getProviderAppointments
     public generateKeyPairs = generateKeyPairs
+    public publishAppointments = publishAppointments
+    public restoreFromBackup = restoreFromBackup
+    public storeData = storeData
 
     /**
      * create a new blank provider object

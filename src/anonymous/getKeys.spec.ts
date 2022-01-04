@@ -12,7 +12,7 @@ describe("Anonymous.getKeys()", function () {
         const be = backend()
         const keys = await adminKeys()
 
-        const actor = new Actor("anonymous", "anonymous", be)
+        const actor = new Actor("anon", "anon", be)
 
         const result = await actor.getKeys()
 

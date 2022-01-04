@@ -24,7 +24,7 @@ describe("Provider.getAppointments()", function () {
 
         const fromDate = new Date()
         const toDate = new Date(fromDate.getTime() + 60 * 60 * 24 * 1000)
-        const result = await vp.getAppointments({
+        const result = await vp.getProviderAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
         })

@@ -48,7 +48,7 @@ describe("Provider.cancelAppointments()", function () {
         const fromDate = dayjs().utc()
         const toDate = dayjs().utc().add(1, "day")
 
-        const getResult = await vp.getAppointments({
+        const getResult = await vp.getProviderAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
         })

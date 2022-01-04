@@ -18,8 +18,6 @@ import { backupData } from "./backup-data"
 import { bookAppointment } from "./book-appointment"
 import { cancelAppointment } from "./cancel-appointment"
 import { generateKeyPairs } from "./generate-key-pairs"
-import { getAppointment } from "./get-appointment"
-import { getAppointments } from "./get-appointments"
 import { getToken } from "./get-token"
 import { restoreFromBackup } from "./restore-from-backup"
 
@@ -28,8 +26,6 @@ export class User extends Actor {
     public cancelAppointment = cancelAppointment
     public generateKeyPairs = generateKeyPairs
     public bookAppointment = bookAppointment
-    public getAppointments = getAppointments
-    public getAppointment = getAppointment
     public backupData = backupData
     public getToken = getToken
 

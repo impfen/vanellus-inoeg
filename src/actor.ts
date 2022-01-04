@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { getAppointment } from "./anonymous/get-appointment"
+import { getAppointments } from "./anonymous/get-appointments"
 import { getKeys } from "./anonymous/getKeys"
 import { Backend } from "./backend"
 
@@ -10,6 +12,8 @@ export class Actor {
     public actor: string
     public id: string
 
+    public getAppointment = getAppointment
+    public getAppointments = getAppointments
     public getKeys = getKeys
 
     constructor(actor: string, id: string, backend: Backend) {
