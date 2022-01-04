@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Actor } from "../actor"
 import { VanellusError } from "../errors"
 import { Optional } from "../helpers/optional"
 import { parseUntrustedJSON } from "../helpers/parseUntrustedJSON"
@@ -13,7 +14,6 @@ import {
     Status,
     VerifiedProviderAppointments,
 } from "../interfaces"
-import { User } from "./"
 
 async function verifyAppointment(
     appointment: any,
@@ -67,7 +67,7 @@ export interface GetAppointmentsParams {
 }
 
 export async function getAppointments(
-    this: User,
+    this: Actor,
     { from, to, radius, zipCode }: GetAppointmentsParams
 ): Promise<GetAppointmentsResult | VanellusError> {
     const response = await this.backend.appointments.getAppointmentsByZipCode({

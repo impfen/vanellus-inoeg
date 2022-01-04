@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Actor } from "../actor"
 import { VanellusError } from "../errors"
 import { formatDatetime } from "../helpers/time"
 import {
@@ -11,9 +12,8 @@ import {
     resetDB,
     verifiedProvider,
 } from "../testing/fixtures"
-import { User } from "./"
 
-describe("User.getAppointment()", function () {
+describe("Anonymous.getAppointments()", function () {
     it("we should be able to get appointments", async function () {
         const be = backend()
 
@@ -26,7 +26,7 @@ describe("User.getAppointment()", function () {
         const vp = await verifiedProvider(be, keys, med)
 
         if (vp instanceof VanellusError)
-            throw new Error("cannot verify appointment")
+            throw new Error("cannot verify provider")
 
         const date = new Date()
 
@@ -48,19 +48,9 @@ describe("User.getAppointment()", function () {
         const publishResult = await vp.publishAppointments([app])
 
         if (publishResult instanceof VanellusError)
-            throw new Error("cannot create appointment")
+            throw new Error("cannot publish appointment")
 
-        const user = new User("main", be)
-        // we generate a secret etc.
-        user.initialize()
-        // we set the queue data
-        user.queueData = {
-            zipCode: "10707",
-        }
-        // we set the contact data
-        user.contactData = {
-            name: "Max Mustermann",
-        }
+        const user = new Actor("anon", "anon", be)
 
         const fromDate = new Date()
         // 24 hours in the future
@@ -69,23 +59,12 @@ describe("User.getAppointment()", function () {
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
             radius: 10,
-            zipCode: user.queueData.zipCode,
+            zipCode: "10707"
         })
 
         if (result instanceof VanellusError) throw new Error("should not fail")
 
         if (result.appointments.length !== 1)
             throw new Error("should return one appointment")
-
-        const getResult = await user.getAppointment({
-            id: result.appointments[0].appointments[0].id,
-            providerID: result.appointments[0].provider.id,
-        })
-
-        if (getResult instanceof VanellusError)
-            throw new Error("should be able to get appointment")
-
-        if (getResult.appointment.id !== app.id)
-            throw new Error("IDs should match")
     })
 })

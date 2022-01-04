@@ -31,7 +31,7 @@ async function decryptBookings(bookings: Booking[], privKey: JsonWebKey) {
  * string
  */
 
-export async function getAppointments(
+export async function getProviderAppointments(
     this: Provider,
     { from, to }: { from: string; to: string }
 ): Promise<GetAppointmentsResult | VanellusError> {

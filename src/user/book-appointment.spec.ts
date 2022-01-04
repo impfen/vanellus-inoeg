@@ -86,7 +86,7 @@ describe("User.bookAppointment()", function () {
         if (bookResult instanceof VanellusError)
             throw new Error("should not fail")
 
-        let apptsResult = await vp.getAppointments({
+        let apptsResult = await vp.getProviderAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
         })
@@ -109,7 +109,7 @@ describe("User.bookAppointment()", function () {
         if (cancelResult instanceof VanellusError)
             throw new Error("cannot cancel appointment")
 
-        apptsResult = await vp.getAppointments({
+        apptsResult = await vp.getProviderAppointments({
             from: formatDatetime(fromDate),
             to: formatDatetime(toDate),
         })
