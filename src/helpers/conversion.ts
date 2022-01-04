@@ -100,7 +100,7 @@ export function buf2b64(buffer: ArrayBuffer) {
     for (let i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i])
     }
-    return btoa(binary)
+    return Buffer.from(binary, "binary").toString("base64")
 }
 
 // https://stackoverflow.com/questions/21797299/convert-base64-string-to-arraybuffer
