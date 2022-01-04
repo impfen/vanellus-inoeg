@@ -5,6 +5,11 @@
 import 'cross-fetch/polyfill';
 import { Settings } from "../interfaces"
 
+import crypto from "crypto"
+
+// @ts-expect-error setup webcrypto api in node-env
+global.crypto = crypto.webcrypto
+
 export const settingsPath =
     process.env.KIEBITZ_SETTINGS || "test_backend/keys"
 export const appointmentsPort = process.env.KIEBITZ_APPOINTMENTS_PORT || "22222"

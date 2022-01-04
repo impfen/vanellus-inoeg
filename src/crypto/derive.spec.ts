@@ -6,11 +6,6 @@ import { equal } from "assert"
 import { randomBytes, deriveSecrets } from "./"
 import { b642buf } from "../helpers/conversion"
 
-import crypto from "crypto"
-
-// @ts-ignore
-global.crypto = crypto.webcrypto
-
 describe("Crypto.deriveSecrets()", function () {
     it("should be able to derive secrets", async function () {
         const passcode = randomBytes(16)
