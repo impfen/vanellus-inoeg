@@ -9,13 +9,21 @@
         "type": "git",
         "url": "https://github.com/kiebitz-oss/vanellus.git"
     },
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "require": "./dist/index.js",
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"      
+      }
+    },
     "engines": {
         "node": ">=16.0.0"
     },
     "scripts": {
-        "build": "tsc --build",
+        "build": "tsup",
         "test": "mocha --require ts-node/register --extension ts src/**/*.spec.ts",
         "prettier": "prettier --write .",
         "lint": "eslint . --ext .ts",
@@ -29,16 +37,26 @@
     },
     "devDependencies": {
         "@types/mocha": "^9.0.0",
-        "cross-fetch": "^3.1.4",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
+        "cross-fetch": "^3.1.4",
         "eslint": "^8.4.1",
         "mocha": "^9.1.3",
         "prettier": "^2.5.1",
         "ts-node": "^10.4.0",
+        "tsup": "^5.11.10",
         "typescript": "^4.5.3"
     },
     "peerDependencies": {
         "buffer": "^6"
+    },
+    "tsup": {
+        "entry": ["src/index.ts"],
+        "splitting": true,
+        "sourcemap": true,
+        "dts": true,
+        "minify": true,
+        "clean": true,
+        "format": ["esm", "cjs"]
     }
 }
