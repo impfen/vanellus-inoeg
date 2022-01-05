@@ -42,6 +42,7 @@ export async function confirmProvider(
         zipCode: data.zipCode,
         website: data.website,
         description: data.description,
+        accessible: data.accessible,
     }
 
     const publicProviderJSONData = JSON.stringify(publicProviderData)

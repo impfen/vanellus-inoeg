@@ -17,6 +17,7 @@ export async function unverifiedProvider(
         zipCode: "10707",
         description: "",
         email: "max@mustermann.de",
+        accessible: true,
         publicKeys: {
             encryption: "",
             signing: "",

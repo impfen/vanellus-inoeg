@@ -32,6 +32,7 @@ describe("Provider integration", function () {
             zipCode: "10707",
             description: "",
             email: "max@mustermann.de",
+            accessible: true,
         })
 
         equal(provider.secret.length, 24)

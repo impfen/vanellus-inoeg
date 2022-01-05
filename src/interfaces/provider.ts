@@ -38,14 +38,13 @@ export interface ProviderPublicKeys {
 }
 
 export interface ProviderInput {
-    id?: string
     name: string
     street: string
     city: string
     zipCode: string
     description: string
     email: string
-    accessible?: boolean
+    accessible: boolean
     website?: string
 }
 

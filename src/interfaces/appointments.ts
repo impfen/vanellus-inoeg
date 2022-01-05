@@ -66,6 +66,7 @@ export interface PublicProviderData {
     city: string
     zipCode: string
     description: string
+    accessible: boolean
 }
 
 export interface PublicKeys {
