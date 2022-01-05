@@ -5,7 +5,7 @@ services:
         image: "redis"
 
     backend:
-        image: "ghcr.io/kiebitz-oss/services-inoeg:master"
+        image: "ghcr.io/kiebitz-oss/services-inoeg:main"
         depends_on:
             - redis
         environment:
