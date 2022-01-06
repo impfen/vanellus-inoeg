@@ -4,6 +4,7 @@
 
 import { getAppointment } from "./anonymous/get-appointment"
 import { getAppointments } from "./anonymous/get-appointments"
+import { getProvidersByZipCode } from "./anonymous/get-providers-by-zip-code"
 import { getKeys } from "./anonymous/getKeys"
 import { Backend } from "./backend"
 
@@ -14,6 +15,7 @@ export class Actor {
 
     public getAppointment = getAppointment
     public getAppointments = getAppointments
+    public getProvidersByZipCode = getProvidersByZipCode
     public getKeys = getKeys
 
     constructor(actor: string, id: string, backend: Backend) {

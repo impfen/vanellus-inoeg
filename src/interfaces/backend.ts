@@ -44,6 +44,7 @@ export interface NetworkMethods<T> {
     getAppointmentsByZipCode: T
     getKeys: T
     getPendingProviderData: T
+    getProvidersByZipCode: T
     getProviderAppointments: T
     getSettings: T
     getStats: T

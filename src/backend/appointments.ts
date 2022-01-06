@@ -15,6 +15,7 @@ import {
     SignedAppointment,
     SignedData,
     SignedMediatorKeyData,
+    SignedProviderData,
     SignedToken,
 } from "../interfaces"
 
@@ -78,6 +79,15 @@ export class AppointmentsBackend {
         return this.net.call<ProviderAppointments[]>(
             this.net.methods.getAppointmentsByZipCode,
             { zipCode, radius, from, to }
+        )
+    }
+
+    async getProvidersByZipCode(
+      { zipFrom, zipTo }: { zipFrom: string, zipTo: string }
+    ) {
+        return this.net.call<SignedProviderData[]>(
+            this.net.methods.getProvidersByZipCode,
+            { zipFrom, zipTo }
         )
     }
 

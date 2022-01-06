@@ -16,6 +16,7 @@ class JSONRPCMethods implements NetworkMethods<string> {
     public readonly getAppointmentsByZipCode = "getAppointmentsByZipCode"
     public readonly getKeys = "getKeys"
     public readonly getPendingProviderData = "getPendingProviderData"
+    public readonly getProvidersByZipCode = "getProvidersByZipCode"
     public readonly getProviderAppointments = "getProviderAppointments"
     public readonly getSettings = "getSettings"
     public readonly getStats = "getStats"

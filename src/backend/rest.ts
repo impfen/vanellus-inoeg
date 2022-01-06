@@ -59,6 +59,13 @@ class RESTMethods implements NetworkMethods<RESTMethod> {
         toUri: (p: P) => "providers/pending",
         httpMethod: "POST",
     }
+    public readonly getProvidersByZipCode = {
+        toUri: (p: P) =>
+            ["providers", "zipCode", <string>p.zipFrom, <string>p.zipTo]
+                .map(encodeURIComponent)
+                .join('/'),
+        httpMethod: "GET",
+    }
     public readonly getProviderAppointments = {
         toUri: (p: P) => "appointments",
         httpMethod: "POST",
