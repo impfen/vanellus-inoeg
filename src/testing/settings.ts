@@ -2,12 +2,12 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import "cross-fetch/polyfill"
-import crypto from "crypto"
+// import "cross-fetch/polyfill"
+// import crypto from "crypto"
 import { Settings } from "../interfaces"
 
-// @ts-expect-error setup webcrypto api in node-env
-global.crypto = crypto.webcrypto
+// ts-expect-error setup webcrypto api in node-env
+// global.crypto = crypto.webcrypto
 
 export const settingsPath = process.env.KIEBITZ_SETTINGS || "test_backend/keys"
 export const appointmentsPort = process.env.KIEBITZ_APPOINTMENTS_PORT || "22222"

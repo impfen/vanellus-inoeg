@@ -3,7 +3,8 @@
     "compilerOptions": {
         "target": "ES2015",
         "lib": ["es2020", "dom", "dom.iterable"],
-        "module": "commonjs",
+        "module": "ESNext",
+        "moduleResolution": "Node",
         "strict": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
