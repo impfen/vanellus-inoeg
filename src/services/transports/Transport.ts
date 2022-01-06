@@ -24,9 +24,9 @@ export interface Transport<TMethods> {
      *
      * @throws VanellusError
      */
-    call<K extends keyof TMethods, TError = any>(
+    call<K extends keyof TMethods>(
         method: K,
         params: MethodParamsIfExists<TMethods, K>,
         keyPair?: KeyPair
-    ): Promise<ReturnTypeOfMethodIfExists<TMethods, K> | TError>
+    ): Promise<ReturnTypeOfMethodIfExists<TMethods, K>>
 }

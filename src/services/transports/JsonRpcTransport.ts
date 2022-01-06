@@ -6,7 +6,7 @@ import type {
     ReturnTypeOfMethodIfExists,
 } from "./Transport"
 
-export interface RpcResponseError<TErrorData = unknown> {
+export interface RpcResponseError<TErrorData = any> {
     code: number
 
     message: string
@@ -14,7 +14,7 @@ export interface RpcResponseError<TErrorData = unknown> {
     data?: TErrorData
 }
 
-export interface RpcResponse<TResult, TErrorData = unknown> {
+export interface RpcResponse<TResult, TErrorData = any> {
     jsonrpc: "2.0"
 
     result?: TResult
