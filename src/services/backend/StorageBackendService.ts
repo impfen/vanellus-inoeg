@@ -1,9 +1,9 @@
 import { AESData, KeyPair } from "../../interfaces"
 
 export interface StorageBackendService {
-    storeSettings: (id: string, data: AESData) => Promise<boolean>
-    getSettings: (id: string) => Promise<AESData>
+    storeSettings: (id: string, data: AESData) => boolean
+    getSettings: (id: string) => AESData
 
     // only works for test deployments
-    resetDB: (keyPair: KeyPair) => Promise<boolean>
+    resetDB: (keyPair: KeyPair) => boolean
 }

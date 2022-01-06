@@ -12,7 +12,7 @@ export interface AnonymousBackendService extends StorageBackendService {
     }: {
         id: string
         providerID: string
-    }) => Promise<ProviderAppointments>
+    }) => ProviderAppointments
 
     getAppointmentsByZipCode: ({
         zipCode,
@@ -24,7 +24,7 @@ export interface AnonymousBackendService extends StorageBackendService {
         radius: number
         from: string
         to: string
-    }) => Promise<ProviderAppointments[]>
+    }) => ProviderAppointments[]
 
     getProvidersByZipCode: ({
         zipFrom,
@@ -32,10 +32,10 @@ export interface AnonymousBackendService extends StorageBackendService {
     }: {
         zipFrom: string
         zipTo: string
-    }) => Promise<SignedProviderData[]>
+    }) => SignedProviderData[]
 
     // return all public keys present in the system
-    getKeys: () => Promise<PublicKeys>
+    getKeys: () => PublicKeys
 
     // getStats: (
     //     type: string,
