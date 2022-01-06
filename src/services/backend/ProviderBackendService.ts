@@ -18,9 +18,9 @@ export interface ProviderBackendService extends AnonymousBackendService {
 
     // publish all local appointments to the backend
     publishAppointments: ({
-        appointments,
+        signedAppointments,
     }: {
-        appointments: SignedData[]
+        signedAppointments: SignedData[]
     }) => boolean
 
     storeProviderData: ({
