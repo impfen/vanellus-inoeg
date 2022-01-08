@@ -6,8 +6,8 @@ import {
     Booking,
     BookingData,
     ECDHData,
+    Provider,
     ProviderData,
-    ProviderInput,
     ProviderKeyPairs,
     ProviderSignedData,
     PublicProviderData,
@@ -206,7 +206,7 @@ export class ProviderApi extends AbstractApi<
     }
 
     public async storeProvider(
-        provider: ProviderInput,
+        provider: Provider,
         keyPairs: ProviderKeyPairs,
         code?: string
     ) {

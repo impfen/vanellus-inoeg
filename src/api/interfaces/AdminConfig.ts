@@ -1,12 +1,3 @@
-import { ActorKeyPairs } from ".";
-import { KeyPair } from "./crypto";
-
-export interface AdminKeyPairs extends ActorKeyPairs {
-    signing: KeyPair;
-    provider: KeyPair;
-    token: KeyPair;
-}
-
 export interface AdminConfig {
     admin: {
         signing: {

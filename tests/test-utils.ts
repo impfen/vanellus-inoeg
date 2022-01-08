@@ -4,13 +4,13 @@ import {
     AdminConfig,
     AdminKeyPairs,
     MediatorKeyPairs,
-    ProviderInput,
+    Provider,
     ProviderKeyPairs,
     UserKeyPairs,
 } from "../src/api/interfaces";
 import { JsonRpcTransport } from "../src/api/transports";
 
-const defaultProviderData: ProviderInput = {
+const defaultProviderData: Provider = {
     name: "Max Mustermann",
     street: "Musterstr. 23",
     city: "Berlin",
@@ -112,7 +112,7 @@ export const getMediatorApi = async ({
 
 export const createUnverifiedProvider = async (
     providerKeyPairs: ProviderKeyPairs,
-    providerData: ProviderInput = defaultProviderData
+    providerData: Provider = defaultProviderData
 ) => {
     const { providerApi } = await getProviderApi(providerKeyPairs);
 

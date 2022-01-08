@@ -2,8 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ActorKeyPairs, SignedData } from ".";
-import { ECDHData, KeyPair } from "./crypto";
+import { ECDHData, SignedData } from "./crypto";
 
 export type ProviderBackupReferenceData = Record<string, unknown>;
 
@@ -43,10 +42,6 @@ export interface PublicProvider {
     website?: string;
 }
 
-export interface ProviderInput extends PublicProvider {
-    email: string;
-}
-
 export interface Provider extends PublicProvider {
     email: string;
 }
@@ -66,12 +61,6 @@ export interface ProviderData extends Provider {
     submittedAt?: string;
     version?: string;
     id: string;
-}
-
-export interface ProviderKeyPairs extends ActorKeyPairs {
-    encryption: KeyPair;
-    data: KeyPair;
-    sync: string;
 }
 
 export interface ProviderSignedData {

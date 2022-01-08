@@ -2,13 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import {
-    ApiSignedPublicProvider,
-    PublicProviderData,
-    SignedQueueToken,
-} from ".";
 import { ECDHData, SignedData } from "./crypto";
-import { UserToken } from "./user";
+import { ApiSignedPublicProvider, PublicProviderData } from "./Provider";
+import { SignedQueueToken, UserToken } from "./QueueData";
 
 export interface BookingData {
     userToken: UserToken;

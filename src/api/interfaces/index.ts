@@ -2,11 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-export * from "./admin";
-export * from "./appointments";
+export * from "./ActorKeyPairs";
+export * from "./AdminConfig";
+export * from "./AdminKeyPairs";
+export * from "./Appointments";
 export * from "./Configurables";
 export * from "./crypto";
-export * from "./mediator";
-export * from "./provider";
-export * from "./settings";
-export * from "./user";
+export * from "./MediatorKeyPairs";
+export * from "./Provider";
+export * from "./ProviderKeyPairs";
+export * from "./QueueData";
+export * from "./Settings";
+export * from "./UserKeyPairs";
