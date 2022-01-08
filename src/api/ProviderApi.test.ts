@@ -55,7 +55,7 @@ describe("ProviderApi", () => {
             providerKeyPairs
         );
 
-        expect(publishResult).toBeTruthy();
+        expect(publishResult).toHaveLength(1);
 
         const from = dayjs().utc().toDate();
         const to = dayjs().utc().add(1, "day").toDate();
@@ -76,7 +76,12 @@ describe("ProviderApi", () => {
 
         expect(appointments2).toHaveLength(1);
 
-        await providerApi.cancelAppointment(app, providerKeyPairs);
+        if (publishResult?.[0]) {
+            await providerApi.cancelAppointment(
+                publishResult[0],
+                providerKeyPairs
+            );
+        }
 
         const appointments3 = await anonymousApi.getAppointmentsByZipCode(
             "10707",

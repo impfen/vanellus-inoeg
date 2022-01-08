@@ -12,6 +12,8 @@ import {
     Appointment,
     ProviderKeyPairs,
     PublicProviderData,
+    QueueToken,
+    UnpublishedAppointment,
 } from "./interfaces";
 import { UserApi } from "./UserApi";
 
@@ -44,12 +46,13 @@ beforeAll(async () => {
         adminKeyPairs,
     });
 
-    provider = await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
+    await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
 });
 
 describe("UserApi", () => {
+    let unpublishedAppointment: UnpublishedAppointment;
     let appointment: Appointment;
-    let tokenData: any;
+    let queueToken: QueueToken;
     const from = dayjs().utc().toDate();
 
     // 24 hours in the future
@@ -65,20 +68,29 @@ describe("UserApi", () => {
             .second(0)
             .toDate();
 
-        appointment = providerApi.createAppointment(15, "moderna", 5, date);
+        unpublishedAppointment = providerApi.createAppointment(
+            15,
+            "moderna",
+            5,
+            date
+        );
     });
 
     it("should be able to publish an appointment", async () => {
-        const publishResult = await providerApi.publishAppointments(
-            [appointment],
+        const appointments = await providerApi.publishAppointments(
+            [unpublishedAppointment],
             providerKeyPairs
         );
 
-        expect(publishResult).toBeTruthy();
+        expect(appointments).toHaveLength(1);
+
+        if (appointments?.[0]) {
+            appointment = appointments[0];
+        }
     });
 
     it("should be able to get a user-token", async () => {
-        tokenData = await userApi.getToken({}, secret);
+        queueToken = await userApi.getQueueToken({}, secret);
     });
 
     it("should be able to fetch the published appointment", async () => {
@@ -90,13 +102,17 @@ describe("UserApi", () => {
         );
 
         expect(appointments1).toHaveLength(1);
+
+        if (appointments1[0].provider) {
+            provider = appointments1[0].provider;
+        }
     });
 
     it("should be able to book an appointment", async () => {
         const booking = await userApi.bookAppointment(
             appointment,
             provider,
-            tokenData
+            queueToken
         );
 
         expect(booking).toHaveProperty("token");
@@ -118,7 +134,7 @@ describe("UserApi", () => {
         const cancelResult = await userApi.cancelAppointment(
             appointment,
             provider,
-            tokenData
+            queueToken
         );
 
         expect(cancelResult).toBeTruthy();
@@ -135,8 +151,8 @@ describe("UserApi", () => {
     });
 
     it("should be able to get a token", async function () {
-        const tokenData = await userApi.getToken({}, secret);
+        const queueToken = await userApi.getQueueToken({}, secret);
 
-        expect(tokenData.userToken.version).toEqual("0.3");
+        expect(queueToken.userToken.version).toEqual("0.3");
     });
 });

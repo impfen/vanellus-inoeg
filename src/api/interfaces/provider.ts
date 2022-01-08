@@ -24,30 +24,31 @@ export interface ApiConfirmedProviderData extends SignedData {
 
 export type VerifiedProviderData = Record<string, string>;
 
-export interface SignedPublicProvider extends SignedData {
+export interface ApiSignedPublicProvider extends SignedData {
     id: string;
     json?: PublicProviderData;
 }
 
-export interface PublicProviderData {
-    id: string;
+export interface PublicProvider {
     name: string;
     street: string;
     city: string;
     zipCode: string;
     description: string;
-    accessible: boolean;
-}
-
-export interface ProviderInput {
-    name: string;
-    street: string;
-    city: string;
-    zipCode: string;
-    description: string;
-    email: string;
     accessible: boolean;
     website?: string;
+}
+
+export interface ProviderInput extends PublicProvider {
+    email: string;
+}
+
+export interface Provider extends PublicProvider {
+    email: string;
+}
+
+export interface PublicProviderData extends PublicProvider {
+    id: string;
 }
 
 export interface ProviderPublicKeys {
@@ -56,7 +57,7 @@ export interface ProviderPublicKeys {
     data: string;
 }
 
-export interface ProviderData extends ProviderInput {
+export interface ProviderData extends Provider {
     publicKeys: ProviderPublicKeys;
     submittedAt?: string;
     version?: string;

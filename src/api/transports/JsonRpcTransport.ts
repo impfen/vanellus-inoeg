@@ -27,9 +27,7 @@ export interface RpcResponse<TResult, TErrorData = unknown> {
 /**
  * @todo JsonRpcErrors need to be handled properly
  */
-export class JsonRpcTransport<
-    TMethods = any
-> extends AbstractTransport<TMethods> {
+export class JsonRpcTransport<TMethods> extends AbstractTransport<TMethods> {
     public async call<K extends keyof TMethods, TError = unknown>(
         method: K,
         params?: MethodParamsIfExists<TMethods, K>,

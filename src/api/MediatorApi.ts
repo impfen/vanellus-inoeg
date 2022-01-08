@@ -6,6 +6,7 @@ import {
     MediatorKeyPairs,
     ProviderData,
     ProviderSignedData,
+    PublicProvider,
 } from "./interfaces";
 import { MediatorApiInterface } from "./MediatorApiInterface";
 import { ecdhDecrypt, ephemeralECDHEncrypt, sign } from "./utils";
@@ -39,7 +40,7 @@ export class MediatorApi extends AbstractApi<
 
         const keysJSONData = JSON.stringify(keyHashesData);
 
-        const publicProviderData = {
+        const publicProvider: PublicProvider = {
             name: providerData.name,
             street: providerData.street,
             city: providerData.city,
@@ -49,7 +50,7 @@ export class MediatorApi extends AbstractApi<
             accessible: providerData.accessible,
         };
 
-        const publicProviderJSONData = JSON.stringify(publicProviderData);
+        const publicProviderJSONData = JSON.stringify(publicProvider);
 
         const signedKeyData = await sign(
             keysJSONData,
@@ -98,7 +99,22 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing
         );
 
-        return publicProviderData;
+        // @todo remove, its only here to get the provider.id
+        // const pendingProviders = await this.getPendingProviders(
+        //     mediatorKeyPairs
+        // );
+
+        // console.log(pendingProviders);
+
+        // const provider = pendingProviders.find(
+        //     (pr) => pr.publicKeys.signing === providerData.publicKeys.signing
+        // );
+
+        // if (!provider) {
+        //     throw new Error("Could not confirm provider");
+        // }
+
+        return providerData;
     }
 
     /**

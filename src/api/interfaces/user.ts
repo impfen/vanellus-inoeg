@@ -12,8 +12,6 @@ export interface UserKeyPairs extends ActorKeyPairs {
     encryption: KeyPair;
 }
 
-export type SignedUserToken = SignedData;
-
 export interface QueueData {
     zipCode: string;
 }
@@ -30,8 +28,12 @@ export interface UserToken {
     encryptionPublicKey: string;
 }
 
-export interface UserTokenData {
+export type SignedQueueToken = SignedData;
+export interface QueueToken {
     keyPairs: UserKeyPairs;
-    signedToken: SignedUserToken;
+    signedToken: SignedQueueToken;
     userToken: UserToken;
+    createdAt: string;
+    hashNonce: string;
+    dataHash: string;
 }

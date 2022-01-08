@@ -6,13 +6,13 @@ import {
     Booking,
     BookingData,
     ECDHData,
-    ProviderData,
     ProviderInput,
     ProviderKeyPairs,
     ProviderSignedData,
     PublicProviderData,
     SignedData,
     Slot,
+    UnpublishedAppointment,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import {
@@ -56,7 +56,7 @@ export class ProviderApi extends AbstractApi<
 
         const now = dayjs().utc().toISOString();
 
-        const appointment: Appointment = {
+        const appointment: UnpublishedAppointment = {
             bookings: [],
             updatedAt: now,
             modified: true,
@@ -64,7 +64,6 @@ export class ProviderApi extends AbstractApi<
             duration: duration,
             properties: { vaccine: vaccine },
             id: randomBytes(32),
-            publicKey: "",
             slotData: slotData,
         };
 
@@ -82,7 +81,7 @@ export class ProviderApi extends AbstractApi<
         to: Date,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const appointments = await this.transport.call(
+        const signedAppointments = await this.transport.call(
             "getProviderAppointments",
             { from: dayjs(from).toISOString(), to: dayjs(to).toISOString() },
             providerKeyPairs.signing
@@ -90,43 +89,38 @@ export class ProviderApi extends AbstractApi<
 
         const newAppointments: Appointment[] = [];
 
-        for (const appointment of appointments) {
-            const verified = await verify(
+        for (const signedAppointment of signedAppointments) {
+            const isVerified = await verify(
                 [providerKeyPairs.signing.publicKey],
-                appointment
+                signedAppointment
             );
 
-            if (!verified) {
+            if (!isVerified) {
                 continue;
             }
 
-            const appointmentData = parseUntrustedJSON<Appointment>(
-                appointment.data
+            const appointment = parseUntrustedJSON<Appointment>(
+                signedAppointment.data
             );
 
-            // this appointment was loaded already (should not happen)
-            if (
-                !appointmentData ||
-                newAppointments.find(
-                    (appointment) => appointment.id === appointmentData.id
-                )
-            ) {
-                continue;
-            }
+            // ???
+            // // this appointment was loaded already (should not happen)
+            // if (
+            //     !appointment ||
+            //     newAppointments.find(
+            //         (appointment) => appointment.id === appointment.id
+            //     )
+            // ) {
+            //     continue;
+            // }
 
             const newAppointment: Appointment = {
-                updatedAt: appointmentData.updatedAt,
-                timestamp: appointmentData.timestamp,
-                duration: appointmentData.duration,
-                slotData: appointmentData.slotData,
-                publicKey: appointmentData.publicKey,
-                properties: appointmentData.properties,
+                ...appointment,
                 bookings: await this.decryptBookings(
-                    appointment.bookings || [],
+                    signedAppointment.bookings || [],
                     providerKeyPairs
                 ),
                 modified: false,
-                id: appointmentData.id,
             };
 
             newAppointments.push(newAppointment);
@@ -139,22 +133,24 @@ export class ProviderApi extends AbstractApi<
      * Publish appointments to the backend
      */
     public async publishAppointments(
-        unpublishedAppointments: Appointment[],
+        unpublishedAppointments: UnpublishedAppointment[],
         providerKeyPairs: ProviderKeyPairs
     ) {
         const signedAppointments: SignedData[] = [];
+        const publishedAppointments: Appointment[] = [];
 
         // to be relevant, an appointment:
         const relevantAppointments = unpublishedAppointments.filter(
             (oa) =>
-                // begin of appointment has to be at least 4 hours in the future
-                dayjs(oa.timestamp).isAfter(dayjs().add(4, "hours")) &&
-                // and be modified/new
-                oa.modified
+                // begins at least 4 hours in the future
+                dayjs(oa.timestamp).isAfter(dayjs().add(4, "hours"))
+            // &&
+            // // and needs to be modified/new
+            // oa.modified
         );
 
         for (const appointment of relevantAppointments) {
-            const convertedAppointment = {
+            const convertedAppointment: Appointment = {
                 id: appointment.id,
                 duration: appointment.duration,
                 timestamp: appointment.timestamp,
@@ -174,6 +170,7 @@ export class ProviderApi extends AbstractApi<
                 providerKeyPairs.signing.publicKey
             );
 
+            publishedAppointments.push(convertedAppointment);
             signedAppointments.push(signedAppointment);
         }
 
@@ -181,13 +178,15 @@ export class ProviderApi extends AbstractApi<
             return null;
         }
 
-        return this.transport.call(
+        await this.transport.call(
             "publishAppointments",
             {
                 appointments: signedAppointments,
             },
             providerKeyPairs.signing
         );
+
+        return publishedAppointments;
     }
 
     /**
@@ -212,7 +211,7 @@ export class ProviderApi extends AbstractApi<
     ) {
         const keys = await this.transport.call("getKeys");
 
-        const providerData: ProviderData = Object.assign({}, provider, {
+        const providerData = Object.assign({}, provider, {
             publicKeys: {
                 data: keyPairs.data.publicKey,
                 signing: keyPairs.signing.publicKey,
@@ -224,6 +223,15 @@ export class ProviderApi extends AbstractApi<
             JSON.stringify(providerData),
             keyPairs.data,
             keys.providerData
+        );
+
+        await this.transport.call(
+            "storeProviderData",
+            {
+                encryptedData: encryptedData,
+                code: code,
+            },
+            keyPairs.signing
         );
 
         await this.transport.call(
@@ -301,14 +309,15 @@ export class ProviderApi extends AbstractApi<
         return buf2base32(b642buf(randomBytes(15)));
     }
 
-    public createSlot() {
-        return {
-            open: true,
-            id: randomBytes(32), // where the user can submit his confirmation
-            status: randomBytes(32), // where the user can get the appointment status
-            cancel: randomBytes(32), // where the user can cancel his confirmation
-        };
-    }
+    // Unused?
+    // public createSlot() {
+    //     return {
+    //         open: true,
+    //         id: randomBytes(32), // where the user can submit his confirmation
+    //         status: randomBytes(32), // where the user can get the appointment status
+    //         cancel: randomBytes(32), // where the user can cancel his confirmation
+    //     };
+    // }
 
     /**
      * De

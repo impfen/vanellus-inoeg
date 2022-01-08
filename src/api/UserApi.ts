@@ -5,8 +5,8 @@ import {
     Appointment,
     ContactData,
     PublicProviderData,
+    QueueToken,
     UserKeyPairs,
-    UserTokenData,
 } from "./interfaces";
 import { UserApiInterface } from "./UserApiInterface";
 import {
@@ -26,16 +26,16 @@ export class UserApi extends AbstractApi<
     public async cancelAppointment(
         appointment: Appointment,
         provider: PublicProviderData,
-        tokenData: UserTokenData
+        queueToken: QueueToken
     ) {
         return this.transport.call(
             "cancelAppointment",
             {
                 id: appointment.id,
                 providerID: provider.id,
-                signedTokenData: tokenData.signedToken,
+                signedTokenData: queueToken.signedToken,
             },
-            tokenData.keyPairs.signing
+            queueToken.keyPairs.signing
         );
     }
 
@@ -58,11 +58,11 @@ export class UserApi extends AbstractApi<
     public async bookAppointment(
         appointment: Appointment,
         provider: PublicProviderData,
-        tokenData: UserTokenData
+        queueToken: QueueToken
     ) {
         const providerData = {
-            signedToken: tokenData.signedToken,
-            userToken: tokenData.userToken,
+            signedToken: queueToken.signedToken,
+            userToken: queueToken.userToken,
         };
 
         const encryptedDataAndPublicKey = await ephemeralECDHEncrypt(
@@ -79,9 +79,9 @@ export class UserApi extends AbstractApi<
                 id: appointment.id,
                 providerID: provider.id,
                 encryptedData: encryptedData,
-                signedTokenData: tokenData.signedToken,
+                signedTokenData: queueToken.signedToken,
             },
-            tokenData.keyPairs.signing
+            queueToken.keyPairs.signing
         );
 
         // we store the information about the offer which we've accepted
@@ -89,7 +89,7 @@ export class UserApi extends AbstractApi<
     }
 
     // get a token for a given queue
-    public async getToken(
+    public async getQueueToken(
         contactData: ContactData,
         secret: string,
         code?: string
@@ -113,7 +113,7 @@ export class UserApi extends AbstractApi<
             code: code,
         });
 
-        return {
+        const queueToken: QueueToken = {
             createdAt: dayjs().utc().toISOString(),
             signedToken: signedToken,
             keyPairs: {
@@ -124,6 +124,8 @@ export class UserApi extends AbstractApi<
             dataHash: dataHash,
             userToken: userToken,
         };
+
+        return queueToken;
     }
 
     protected async hashContactData(data: ContactData) {

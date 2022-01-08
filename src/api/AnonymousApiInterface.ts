@@ -1,8 +1,8 @@
 import {
     ApiSignedProviderAppointments,
+    ApiSignedPublicProvider,
     Configurables,
     PublicKeys,
-    SignedPublicProvider,
 } from "./interfaces";
 import { StorageApiInterface } from "./StorageApiInterface";
 
@@ -33,7 +33,7 @@ export interface AnonymousApiInterface extends StorageApiInterface {
     }: {
         zipFrom: string;
         zipTo: string;
-    }) => SignedPublicProvider[];
+    }) => ApiSignedPublicProvider[];
 
     // return all public keys present in the system
     getKeys: () => PublicKeys;

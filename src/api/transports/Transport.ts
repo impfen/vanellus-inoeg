@@ -1,5 +1,6 @@
 import { ActorKeyPairs } from "../interfaces";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReturnTypeOfMethod<T> = T extends (...args: Array<any>) => any
     ? ReturnType<T>
     : unknown;
@@ -9,6 +10,7 @@ export type ReturnTypeOfMethodIfExists<Methods, MethodName> =
         ? ReturnTypeOfMethod<Methods[MethodName]>
         : unknown;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MethodParams<T> = T extends (...args: infer Param) => any
     ? Param[0]
     : T;

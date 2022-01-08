@@ -8,13 +8,13 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { MediatorKeyPairs, ProviderKeyPairs } from "./interfaces";
+import { MediatorKeyPairs, Provider, ProviderKeyPairs } from "./interfaces";
 import { MediatorApi } from "./MediatorApi";
 
 let mediatorApi: MediatorApi;
 let mediatorApiKeyPairs: MediatorKeyPairs;
-// let providerApi: ProviderApi;
 let providerKeyPairs: ProviderKeyPairs;
+let provider: Provider;
 
 beforeEach(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
@@ -31,27 +31,28 @@ beforeEach(async () => {
 
     const providerResult = await getProviderApi();
 
-    // providerApi = providerResult.providerApi;
     providerKeyPairs = providerResult.providerKeyPairs;
+
+    provider = await createUnverifiedProvider(providerKeyPairs);
 });
 
 describe("MediatorService", () => {
     it("should be able to confirm a provider", async () => {
-        const up = await createUnverifiedProvider(providerKeyPairs);
+        expect(provider).toHaveProperty("name");
 
         let pendingProviders = await mediatorApi.getPendingProviders(
             mediatorApiKeyPairs
         );
 
         expect(pendingProviders).toHaveLength(1);
-        expect(pendingProviders[0].name).toEqual(up.name);
+        expect(pendingProviders[0].name).toEqual(provider.name);
 
-        const result = await mediatorApi.confirmProvider(
+        provider = await mediatorApi.confirmProvider(
             pendingProviders[0],
             mediatorApiKeyPairs
         );
 
-        expect(result).toHaveProperty("name");
+        expect(provider).toHaveProperty("name");
 
         pendingProviders = await mediatorApi.getPendingProviders(
             mediatorApiKeyPairs

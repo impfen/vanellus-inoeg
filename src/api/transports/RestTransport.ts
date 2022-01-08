@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* @todo needs some love... but too much other stuff to do first... */
 import { BackendError } from "../../errors";
 import { KeyPair } from "../interfaces";
 import { AbstractTransport } from "./AbstractTransport";
@@ -61,7 +64,8 @@ const methodData: Record<
         method: "POST",
     },
     getSettings: {
-        uri: (p) => `store/${encodeURIComponent(p.id)}`,
+        uri: (p) =>
+            `store/${encodeURIComponent(p.id as string | number | boolean)}`,
         method: "GET",
     },
     getStats: { uri: "stats", method: "GET" },
@@ -133,7 +137,7 @@ export class RestTransport<TMethods = any> extends AbstractTransport<TMethods> {
             if (!response.ok) {
                 throw new BackendError({
                     error: response.statusText,
-                    data: await response.json(),
+                    data: JSON.stringify(await response.json()),
                 });
             }
 

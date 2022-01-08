@@ -1,6 +1,7 @@
 import { AnonymousApi, MediatorApi, ProviderApi, UserApi } from "../src";
 import { AdminApi } from "../src/api/AdminApi";
 import {
+    AdminConfig,
     AdminKeyPairs,
     MediatorKeyPairs,
     ProviderInput,
@@ -35,7 +36,7 @@ export const getAnonymousApi = () => {
 
 export const getAdminApi = async (adminKeyPairs?: AdminKeyPairs) => {
     if (!adminKeyPairs) {
-        const jsonData = await import(adminJsonPath);
+        const jsonData = (await import(adminJsonPath)) as AdminConfig;
 
         adminKeyPairs = await AdminApi.generateAdminKeys(jsonData);
     }
@@ -137,5 +138,7 @@ export const createVerifiedProvider = async (
         throw new Error("Could not find pending provider");
     }
 
-    return mediatorApi.confirmProvider(providerData, mediatorKeyPairs);
+    await mediatorApi.confirmProvider(providerData, mediatorKeyPairs);
+
+    return providerData;
 };

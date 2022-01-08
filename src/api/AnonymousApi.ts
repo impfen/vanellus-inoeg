@@ -29,10 +29,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
         providerAppointments.provider.json = jsonProvider;
 
-        // we copy the ID for convenience
-        providerAppointments.provider.json.id =
-            providerAppointments.provider.id;
-
         const signedAppointment = providerAppointments.appointments[0];
 
         const appointment = this.verifyAppointment(
@@ -55,6 +51,10 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 slot.open = true;
             }
         }
+
+        // we copy the ID for convenience
+        providerAppointments.provider.json.id =
+            providerAppointments.provider.id;
 
         return {
             provider: providerAppointments.provider.json,
@@ -89,10 +89,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
             providerAppointment.provider.json = jsonProvider;
 
-            // we copy the ID for convenience
-            providerAppointment.provider.json.id =
-                providerAppointment.provider.id;
-
             const appointments: Appointment[] = [];
 
             for (const signedAppointment of providerAppointment.appointments) {
@@ -107,16 +103,22 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
                 for (const slot of appointment.slotData) {
                     if (
-                        !signedAppointment.bookedSlots?.some(
+                        signedAppointment.bookedSlots?.some(
                             (aslot: Slot) => aslot.id === slot.id
                         )
                     ) {
+                        slot.open = false;
+                    } else {
                         slot.open = true;
                     }
                 }
 
                 appointments.push(appointment);
             }
+
+            // we copy the ID for convenience
+            providerAppointment.provider.json.id =
+                providerAppointment.provider.id;
 
             providerAppointments.push({
                 provider: providerAppointment.provider.json,

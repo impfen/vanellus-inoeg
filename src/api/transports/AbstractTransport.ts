@@ -7,7 +7,7 @@ import {
     Transport,
 } from "./Transport";
 
-export abstract class AbstractTransport<TMethods = any>
+export abstract class AbstractTransport<TMethods>
     implements Transport<TMethods>
 {
     constructor(protected readonly apiUrl: string) {}

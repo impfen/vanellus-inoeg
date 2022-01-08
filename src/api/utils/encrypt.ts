@@ -152,6 +152,7 @@ export async function ephemeralECDHEncrypt(
         true,
         []
     );
+
     const privateKey = await crypto.subtle.importKey(
         "jwk",
         ephemeralKeyPair.privateKey,
