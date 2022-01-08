@@ -1,8 +1,8 @@
-import { ErrorCode, VanellusError } from "."
+import { VanellusError } from "./VanellusError";
 
 export class AuthError extends VanellusError {
-    constructor() {
-        super(ErrorCode.KeysMissing)
-        this.name = "AuthError"
+    constructor(message = "Not authorized", parentError?: Error) {
+        super(message, parentError);
+        this.name = "AuthError";
     }
 }

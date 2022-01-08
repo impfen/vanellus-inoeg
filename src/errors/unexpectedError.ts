@@ -1,15 +1,9 @@
-import { Optional } from "../helpers/optional"
-import { ErrorCode } from "./"
-import { getErrorMessageForCode } from "./vanellusError"
+import { VanellusError } from "./VanellusError";
 
-export class UnexpectedError extends Error {
-    public readonly code: ErrorCode
-    public readonly baseError: Optional<unknown>
+export class UnexpectedError extends VanellusError {
+    constructor(message: string, parentError?: Error) {
+        super(message, parentError);
 
-    constructor(code: ErrorCode, baseError: Optional<unknown> = null) {
-        super(getErrorMessageForCode(code))
-        this.name = "UnexpectedError"
-        this.code = code
-        this.baseError = baseError
+        this.name = "UnexpectedError";
     }
 }

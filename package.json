@@ -4,10 +4,10 @@
     "version": "0.7.0",
     "license": "AGPL-3.0",
     "author": "KIProtect GmbH",
-    "homepage": "https://github.com/kiebitz-oss/vanellus",
+    "homepage": "https://github.com/kiebitz-oss/vanellus-inoeg",
     "repository": {
         "type": "git",
-        "url": "https://github.com/kiebitz-oss/vanellus.git"
+        "url": "https://github.com/kiebitz-oss/vanellus-inoeg.git"
     },
     "type": "module",
     "main": "./dist/index.cjs",
@@ -25,32 +25,47 @@
     },
     "scripts": {
         "build": "tsup",
+        "build:docs": "typedoc --out ./docs src",
         "test": "jest --runInBand",
-        "prettier": "prettier --write .",
-        "lint": "eslint . --ext .ts",
-        "typecheck": "tsc --noEmit",
-        "documentation": "npx typedoc --out ./docs src",
-        "clean": "rm -rf dist/*"
-        
+        "lint": "eslint . --ext .ts --ignore-path .gitignore",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@ctrl/ts-base32": "^1.2.6",
         "dayjs": "^1.10.7"
     },
     "devDependencies": {
+        "@swc/core": "^1.2.127",
         "@types/jest": "^27.4.0",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
         "eslint": "^8.4.1",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-jest": "^25.3.4",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-promise": "^6.0.0",
         "jest": "^27.4.7",
         "jest-environment-jsdom": "^27.4.6",
+        "jest-extended": "^1.2.0",
         "node-fetch": "^3.1.0",
         "prettier": "^2.5.1",
         "ts-jest": "^27.1.2",
         "tsup": "^5.11.10",
+        "typedoc": "^0.22.10",
         "typescript": "^4.5.3"
     },
     "peerDependencies": {
         "buffer": "^6"
+    },
+    "jest": {
+        "preset": "ts-jest/presets/default-esm",
+        "testEnvironment": "./tests/jest.env.js",
+        "testMatch": [
+            "**/?(*.)+(test).[tj]s?(x)"
+        ],
+        "setupFilesAfterEnv": [
+            "jest-extended/all"
+        ]
     },
     "eslintConfig": {
         "env": {
@@ -58,12 +73,47 @@
             "es2020": true
         },
         "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "project": [
+                "./tsconfig.json"
+            ]
+        },
         "plugins": [
             "@typescript-eslint"
         ],
         "extends": [
             "eslint:recommended",
-            "plugin:@typescript-eslint/recommended"
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking",
+            "plugin:promise/recommended",
+            "plugin:prettier/recommended"
+        ],
+        "rules": {
+            "@typescript-eslint/no-unsafe-assignment": "off",
+            "@typescript-eslint/no-unsafe-call": "off",
+            "@typescript-eslint/no-unsafe-member-access": "off",
+            "@typescript-eslint/no-unsafe-argument": "off",
+            "@typescript-eslint/no-explicit-any": "off"
+        },
+        "overrides": [
+            {
+                "files": [
+                    "**/*.test.js"
+                ],
+                "env": {
+                    "jest": true
+                },
+                "plugins": [
+                    "jest"
+                ],
+                "extends": [
+                    "eslint:recommended",
+                    "plugin:@typescript-eslint/recommended",
+                    "plugin:prettier/recommended",
+                    "plugin:promise/recommended",
+                    "plugin:jest/all"
+                ]
+            }
         ]
     },
     "tsup": {
