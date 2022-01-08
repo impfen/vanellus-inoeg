@@ -99,21 +99,6 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing
         );
 
-        // @todo remove, its only here to get the provider.id
-        // const pendingProviders = await this.getPendingProviders(
-        //     mediatorKeyPairs
-        // );
-
-        // console.log(pendingProviders);
-
-        // const provider = pendingProviders.find(
-        //     (pr) => pr.publicKeys.signing === providerData.publicKeys.signing
-        // );
-
-        // if (!provider) {
-        //     throw new Error("Could not confirm provider");
-        // }
-
         return providerData;
     }
 
@@ -141,14 +126,14 @@ export class MediatorApi extends AbstractApi<
      *
      */
     public async getVerifiedProviders(keyPairs: MediatorKeyPairs) {
-        const encryptedProviderData = await this.transport.call(
+        const encryptedProviders = await this.transport.call(
             "getVerifiedProviderData",
             { limit: undefined },
             keyPairs.signing
         );
 
         return Promise.all(
-            encryptedProviderData.map(({ encryptedData }) =>
+            encryptedProviders.map(({ encryptedData }) =>
                 this.decryptProviderData(
                     encryptedData,
                     keyPairs.provider.privateKey

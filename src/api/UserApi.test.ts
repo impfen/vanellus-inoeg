@@ -58,7 +58,7 @@ describe("UserApi", () => {
     // 24 hours in the future
     const to = dayjs().utc().add(2, "days").toDate();
 
-    it("should be able to create an appointment", () => {
+    it("should create an appointment", () => {
         // tomorrow 3 pm
         const date = dayjs()
             .utc()
@@ -76,7 +76,7 @@ describe("UserApi", () => {
         );
     });
 
-    it("should be able to publish an appointment", async () => {
+    it("should publish an appointment", async () => {
         const appointments = await providerApi.publishAppointments(
             [unpublishedAppointment],
             providerKeyPairs
@@ -89,11 +89,11 @@ describe("UserApi", () => {
         }
     });
 
-    it("should be able to get a user-token", async () => {
+    it("should get a user-token", async () => {
         queueToken = await userApi.getQueueToken({}, secret);
     });
 
-    it("should be able to fetch the published appointment", async () => {
+    it("should fetch the published appointment", async () => {
         const appointments1 = await anonApi.getAppointmentsByZipCode(
             "10707",
             10,
@@ -104,7 +104,7 @@ describe("UserApi", () => {
         expect(appointments1).toHaveLength(1);
     });
 
-    it("should be able to book an appointment", async () => {
+    it("should book an appointment", async () => {
         const booking = await userApi.bookAppointment(
             appointment,
             provider,
@@ -114,7 +114,7 @@ describe("UserApi", () => {
         expect(booking).toHaveProperty("token");
     });
 
-    it("should have the saved the booking in the appointment", async () => {
+    it("should save the booking into the appointment", async () => {
         const providerAppointments = await providerApi.getAppointments(
             from,
             to,
@@ -126,7 +126,7 @@ describe("UserApi", () => {
         ).toEqual(secret.slice(0, 4));
     });
 
-    it("should be able to cancel the booking", async () => {
+    it("should cancel the booking", async () => {
         const cancelResult = await userApi.cancelAppointment(
             appointment,
             provider,
@@ -136,7 +136,7 @@ describe("UserApi", () => {
         expect(cancelResult).toBeTruthy();
     });
 
-    it("should be no bookings after cancelation", async () => {
+    it("should have no bookings after cancelation", async () => {
         const appointments = await providerApi.getAppointments(
             from,
             to,
@@ -146,7 +146,7 @@ describe("UserApi", () => {
         expect(appointments[0].bookings).toHaveLength(0);
     });
 
-    it("should be able to get a token", async function () {
+    it("should get a token", async function () {
         const queueToken = await userApi.getQueueToken({}, secret);
 
         expect(queueToken.userToken.version).toEqual("0.3");

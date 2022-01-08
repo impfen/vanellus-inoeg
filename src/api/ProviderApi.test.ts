@@ -8,7 +8,13 @@ import {
     getProviderApi,
 } from "../../tests/test-utils";
 import { dayjs } from "../utils";
-import { MediatorKeyPairs, ProviderKeyPairs } from "./interfaces";
+import {
+    Appointment,
+    MediatorKeyPairs,
+    ProviderData,
+    ProviderKeyPairs,
+    UnpublishedAppointment,
+} from "./interfaces";
 import { ProviderApi } from "./ProviderApi";
 
 let mediatorApi: MediatorApi;
@@ -38,96 +44,105 @@ beforeAll(async () => {
 });
 
 describe("ProviderApi", () => {
-    it("should be able to cancel appointments", async () => {
-        // tomorrow 3 pm
-        const date = dayjs()
-            .utc()
-            .add(1, "day")
-            .hour(15)
-            .minute(0)
-            .second(0)
-            .toDate();
-
-        const app = providerApi.createAppointment(15, "moderna", 5, date);
-
-        const publishResult = await providerApi.publishAppointments(
-            [app],
-            providerKeyPairs
-        );
-
-        expect(publishResult).toHaveLength(1);
-
+    describe("cancel appointments", () => {
+        let unpublishedAppointment: UnpublishedAppointment;
+        let appointment: Appointment;
         const from = dayjs().utc().toDate();
         const to = dayjs().utc().add(1, "day").toDate();
 
-        const appointments1 = await providerApi.getAppointments(
-            from,
-            to,
-            providerKeyPairs
-        );
+        it("should create appointments", () => {
+            // tomorrow 3 pm
+            const date = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(15)
+                .minute(0)
+                .second(0)
+                .toDate();
 
-        expect(appointments1).toHaveLength(1);
+            unpublishedAppointment = providerApi.createAppointment(
+                15,
+                "moderna",
+                5,
+                date
+            );
+        });
 
-        const appointments2 = await providerApi.getAppointments(
-            from,
-            to,
-            providerKeyPairs
-        );
-
-        expect(appointments2).toHaveLength(1);
-
-        if (publishResult?.[0]) {
-            await providerApi.cancelAppointment(
-                publishResult[0],
+        it("should publish appointments", async () => {
+            const publishResult = await providerApi.publishAppointments(
+                [unpublishedAppointment],
                 providerKeyPairs
             );
-        }
 
-        const appointments3 = await anonymousApi.getAppointmentsByZipCode(
-            "10707",
-            10,
-            from,
-            to
-        );
+            expect(publishResult).toHaveLength(1);
 
-        expect(appointments3).toHaveLength(0);
+            if (publishResult?.[0]) {
+                appointment = publishResult[0];
+            }
+        });
+
+        it("should retrieve published appointments", async () => {
+            const appointments1 = await providerApi.getAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
+
+            expect(appointments1).toHaveLength(1);
+        });
+
+        it("should cancel appointments", async () => {
+            await providerApi.cancelAppointment(appointment, providerKeyPairs);
+        });
+
+        it("should not retrieve canceled appointments", async () => {
+            const appointments3 = await anonymousApi.getAppointmentsByZipCode(
+                "10707",
+                10,
+                from,
+                to
+            );
+
+            expect(appointments3).toHaveLength(0);
+        });
     });
 
-    it("should be able to retrieve confirmed provider data", async function () {
-        const k = await providerApi.generateKeyPairs();
-        await createUnverifiedProvider(k);
-        const result = await providerApi.checkData(k);
+    describe("confirming a provider", () => {
+        let provider2: ProviderData;
+        let providerKeyPairs2: ProviderKeyPairs;
 
-        expect(result).toBeNull();
+        it("should create new provider", async () => {
+            providerKeyPairs2 = await providerApi.generateKeyPairs();
+            provider2 = await createUnverifiedProvider(providerKeyPairs2);
+        });
 
-        const providerDatas = await mediatorApi.getPendingProviders(
-            mediatorKeyPairs
-        );
+        it("should retrieve no data while provider is pending", async () => {
+            const checkResult = await providerApi.checkData(providerKeyPairs2);
 
-        expect(providerDatas).toHaveLength(1);
+            expect(checkResult).toBeNull();
+        });
 
-        const result2 = await mediatorApi.confirmProvider(
-            providerDatas[0],
-            mediatorKeyPairs
-        );
+        it("should get pending providers", async () => {
+            const providerDatas = await mediatorApi.getPendingProviders(
+                mediatorKeyPairs
+            );
 
-        expect(result2).toHaveProperty("name");
+            expect(providerDatas).toHaveLength(1);
+        });
 
-        const result3 = await providerApi.checkData(k);
+        it("should confirm provider", async () => {
+            const result2 = await mediatorApi.confirmProvider(
+                provider2,
+                mediatorKeyPairs
+            );
 
-        expect(result3).toHaveProperty("name");
-    });
+            expect(result2).toHaveProperty("name");
+        });
 
-    it("should be able to get provider appointments", async function () {
-        const from = dayjs().utc().toDate();
-        const to = dayjs().utc().add(1, "day").toDate();
+        it("should get data for confirmed provider", async () => {
+            const result3 = await providerApi.checkData(providerKeyPairs2);
 
-        const appointments = await providerApi.getAppointments(
-            from,
-            to,
-            providerKeyPairs
-        );
-
-        expect(appointments).toHaveLength(1);
+            expect(result3).toHaveProperty("name");
+        });
     });
 });
