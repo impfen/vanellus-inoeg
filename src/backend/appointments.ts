@@ -227,7 +227,7 @@ export class AppointmentsBackend {
         { encryptedData, code }: { encryptedData: ECDHData; code?: string },
         keyPair: KeyPair
     ) {
-        return this.net.call<OK>(
+        return this.net.call<EncryptedProviderData>(
             this.net.methods.storeProviderData,
             { encryptedData, code },
             keyPair
