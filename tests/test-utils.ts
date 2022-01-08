@@ -25,7 +25,7 @@ const apiUrl =
     "http://localhost:22222/jsonrpc";
 
 const adminJsonPath = `${
-    process.env.KIEBITZ_SETTINGS || "../../tests/fixtures"
+    process.env.KIEBITZ_SETTINGS || "./fixtures"
 }/002_admin.json`;
 
 export const getAnonymousApi = () => {
