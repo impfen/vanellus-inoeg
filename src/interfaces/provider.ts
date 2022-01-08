@@ -9,6 +9,7 @@ export interface ProviderBackupReferenceData {
 }
 
 export interface EncryptedProviderData {
+    id: string
     encryptedData: ECDHData
 }
 
