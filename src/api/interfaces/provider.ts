@@ -53,6 +53,7 @@ export interface ProviderInput {
 export interface ProviderPublicKeys {
     signing: string;
     encryption: string;
+    data: string;
 }
 
 export interface ProviderData extends ProviderInput {

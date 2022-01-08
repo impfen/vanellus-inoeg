@@ -79,7 +79,7 @@ export class MediatorApi extends AbstractApi<
         // we encrypt the data with the public key supplied by the provider
         const [confirmedProviderData] = await ephemeralECDHEncrypt(
             JSON.stringify(fullData),
-            providerData.publicKeys.signing
+            providerData.publicKeys.data
         );
 
         const signedConfirmedProviderData = await sign(

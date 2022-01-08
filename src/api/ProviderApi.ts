@@ -214,6 +214,7 @@ export class ProviderApi extends AbstractApi<
 
         const providerData: ProviderData = Object.assign({}, provider, {
             publicKeys: {
+                data: keyPairs.data.publicKey,
                 signing: keyPairs.signing.publicKey,
                 encryption: keyPairs.encryption.publicKey,
             },
@@ -245,17 +246,20 @@ export class ProviderApi extends AbstractApi<
      */
     public async checkData(keyPairs: ProviderKeyPairs) {
         try {
-            const response = await this.transport.call(
-                "checkProviderData",
-                undefined,
-                keyPairs.signing
-            );
+            const encryptedConfirmedProviderECDAData =
+                await this.transport.call(
+                    "checkProviderData",
+                    undefined,
+                    keyPairs.signing
+                );
 
-            const ecdhData = parseUntrustedJSON<ECDHData>(response.data);
+            const encryptedConfirmedProvider = parseUntrustedJSON<ECDHData>(
+                encryptedConfirmedProviderECDAData.data
+            );
 
             // decrypt retrieved data, if any, with the providers private key
             const decryptedProviderDataString = await ecdhDecrypt(
-                ecdhData,
+                encryptedConfirmedProvider,
                 keyPairs.data.privateKey
             );
 
@@ -270,8 +274,6 @@ export class ProviderApi extends AbstractApi<
 
             return providerData;
         } catch (error) {
-            console.error(error);
-
             return null;
         }
     }
