@@ -163,7 +163,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     }
 
     public async getConfigurables() {
-        return this.transport.call("configurables");
+        return this.transport.call("getConfigurables");
     }
 
     /**

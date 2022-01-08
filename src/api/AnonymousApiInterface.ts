@@ -38,7 +38,7 @@ export interface AnonymousApiInterface extends StorageApiInterface {
     // return all public keys present in the system
     getKeys: () => PublicKeys;
 
-    configurables: () => Configurables;
+    getConfigurables: () => Configurables;
 
     // getStats: (
     //     type: string,
