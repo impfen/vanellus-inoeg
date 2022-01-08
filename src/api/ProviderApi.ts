@@ -6,6 +6,7 @@ import {
     Booking,
     BookingData,
     ECDHData,
+    ProviderData,
     ProviderInput,
     ProviderKeyPairs,
     ProviderSignedData,
@@ -211,7 +212,7 @@ export class ProviderApi extends AbstractApi<
     ) {
         const keys = await this.transport.call("getKeys");
 
-        const providerData = Object.assign({}, provider, {
+        const providerDataWithoutId = Object.assign({}, provider, {
             publicKeys: {
                 data: keyPairs.data.publicKey,
                 signing: keyPairs.signing.publicKey,
@@ -220,7 +221,7 @@ export class ProviderApi extends AbstractApi<
         });
 
         const encryptedData = await ecdhEncrypt(
-            JSON.stringify(providerData),
+            JSON.stringify(providerDataWithoutId),
             keyPairs.data,
             keys.providerData
         );
@@ -234,7 +235,7 @@ export class ProviderApi extends AbstractApi<
             keyPairs.signing
         );
 
-        await this.transport.call(
+        const { id } = await this.transport.call(
             "storeProviderData",
             {
                 encryptedData: encryptedData,
@@ -242,6 +243,11 @@ export class ProviderApi extends AbstractApi<
             },
             keyPairs.signing
         );
+
+        const providerData: ProviderData = {
+            ...providerDataWithoutId,
+            id,
+        };
 
         return providerData;
     }

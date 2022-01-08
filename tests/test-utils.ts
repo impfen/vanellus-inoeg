@@ -126,19 +126,7 @@ export const createVerifiedProvider = async (
     const { mediatorApi } = await getMediatorApi({ mediatorKeyPairs });
     const provider = await createUnverifiedProvider(providerKeyPairs);
 
-    const providerDatas = await mediatorApi.getPendingProviders(
-        mediatorKeyPairs
-    );
+    await mediatorApi.confirmProvider(provider, mediatorKeyPairs);
 
-    const providerData = providerDatas.find(
-        (pr) => pr.publicKeys.signing === provider.publicKeys.signing
-    );
-
-    if (!providerData) {
-        throw new Error("Could not find pending provider");
-    }
-
-    await mediatorApi.confirmProvider(providerData, mediatorKeyPairs);
-
-    return providerData;
+    return provider;
 };

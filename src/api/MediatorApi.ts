@@ -2,7 +2,7 @@ import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    EncryptedProviderData,
+    ECDHData,
     MediatorKeyPairs,
     ProviderData,
     ProviderSignedData,
@@ -173,7 +173,7 @@ export class MediatorApi extends AbstractApi<
      * @throws if json is invalid
      */
     protected async decryptProviderData(
-        encryptedProviderData: EncryptedProviderData,
+        encryptedProviderData: ECDHData,
         privateKey: JsonWebKey
     ) {
         const decryptedProviderDataString = await ecdhDecrypt(

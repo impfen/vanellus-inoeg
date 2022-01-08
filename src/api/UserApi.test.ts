@@ -10,8 +10,8 @@ import {
 import { dayjs } from "../utils";
 import {
     Appointment,
+    ProviderData,
     ProviderKeyPairs,
-    PublicProviderData,
     QueueToken,
     UnpublishedAppointment,
 } from "./interfaces";
@@ -22,7 +22,7 @@ let secret: string;
 let anonApi: AnonymousApi;
 let providerApi: ProviderApi;
 let providerKeyPairs: ProviderKeyPairs;
-let provider: PublicProviderData;
+let provider: ProviderData;
 
 beforeAll(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
@@ -46,7 +46,7 @@ beforeAll(async () => {
         adminKeyPairs,
     });
 
-    await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
+    provider = await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
 });
 
 describe("UserApi", () => {
@@ -102,10 +102,6 @@ describe("UserApi", () => {
         );
 
         expect(appointments1).toHaveLength(1);
-
-        if (appointments1[0].provider) {
-            provider = appointments1[0].provider;
-        }
     });
 
     it("should be able to book an appointment", async () => {

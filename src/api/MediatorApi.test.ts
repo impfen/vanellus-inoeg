@@ -8,13 +8,13 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { MediatorKeyPairs, Provider, ProviderKeyPairs } from "./interfaces";
+import { MediatorKeyPairs, ProviderData, ProviderKeyPairs } from "./interfaces";
 import { MediatorApi } from "./MediatorApi";
 
 let mediatorApi: MediatorApi;
 let mediatorApiKeyPairs: MediatorKeyPairs;
 let providerKeyPairs: ProviderKeyPairs;
-let provider: Provider;
+let provider: ProviderData;
 
 beforeEach(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
@@ -38,7 +38,7 @@ beforeEach(async () => {
 
 describe("MediatorService", () => {
     it("should be able to confirm a provider", async () => {
-        expect(provider).toHaveProperty("name");
+        expect(provider).toHaveProperty("id");
 
         let pendingProviders = await mediatorApi.getPendingProviders(
             mediatorApiKeyPairs
@@ -47,7 +47,7 @@ describe("MediatorService", () => {
         expect(pendingProviders).toHaveLength(1);
         expect(pendingProviders[0].name).toEqual(provider.name);
 
-        provider = await mediatorApi.confirmProvider(
+        await mediatorApi.confirmProvider(
             pendingProviders[0],
             mediatorApiKeyPairs
         );

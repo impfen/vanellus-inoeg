@@ -7,9 +7,13 @@ import { ECDHData, KeyPair } from "./crypto";
 
 export type ProviderBackupReferenceData = Record<string, unknown>;
 
-export type EncryptedProviderData = ECDHData;
+export interface EncryptedProviderData {
+    id: string;
+    encryptedData: ECDHData;
+}
+
 export interface ApiEncryptedProviderData {
-    encryptedData: EncryptedProviderData;
+    encryptedData: ECDHData;
 }
 
 export interface EncryptedConfirmedProviderData {
@@ -61,7 +65,7 @@ export interface ProviderData extends Provider {
     publicKeys: ProviderPublicKeys;
     submittedAt?: string;
     version?: string;
-    id?: string;
+    id: string;
 }
 
 export interface ProviderKeyPairs extends ActorKeyPairs {
