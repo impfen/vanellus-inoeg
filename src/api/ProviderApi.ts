@@ -1,16 +1,22 @@
-import { Provider, ProviderInput, PublicProvider } from "../interfaces";
+import { VanellusError } from "../errors";
+import {
+    Appointment,
+    Booking,
+    Provider,
+    ProviderInput,
+    PublicProvider,
+    Slot,
+} from "../interfaces";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    Appointment,
-    Booking,
+    ApiEncryptedBooking,
     BookingData,
     ECDHData,
     ProviderKeyPairs,
     SignedData,
     SignedProvider,
-    Slot,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import {
@@ -62,8 +68,8 @@ export class ProviderApi extends AbstractApi<
             id: randomBytes(32),
             bookings: [],
             updatedAt: now,
-            modified: true,
-            timestamp: dayjs(timestamp).utc().toISOString(),
+            // modified: true,
+            timestamp: dayjs(timestamp).utc().toDate(),
             duration: duration,
             properties: { vaccine: vaccine },
             slotData,
@@ -79,7 +85,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<Appointment[]>
      */
-    public async getAppointments(
+    public async getProviderAppointments(
         from: Date,
         to: Date,
         providerKeyPairs: ProviderKeyPairs
@@ -90,7 +96,7 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs.signing
         );
 
-        const newAppointments: Appointment[] = [];
+        const appointments: Appointment[] = [];
 
         for (const signedAppointment of signedAppointments) {
             const isVerified = await verify(
@@ -99,37 +105,29 @@ export class ProviderApi extends AbstractApi<
             );
 
             if (!isVerified) {
-                continue;
+                throw new VanellusError(
+                    "Could not verify provider-appointment"
+                );
             }
 
-            const appointment = parseUntrustedJSON<Appointment>(
+            const appointmentData = parseUntrustedJSON<Appointment>(
                 signedAppointment.data
             );
 
-            // ???
-            // // this appointment was loaded already (should not happen)
-            // if (
-            //     !appointment ||
-            //     newAppointments.find(
-            //         (appointment) => appointment.id === appointment.id
-            //     )
-            // ) {
-            //     continue;
-            // }
-
-            const newAppointment: Appointment = {
-                ...appointment,
+            const appointment: Appointment = {
+                ...appointmentData,
+                timestamp: new Date(appointmentData.timestamp),
                 bookings: await this.decryptBookings(
                     signedAppointment.bookings || [],
                     providerKeyPairs
                 ),
-                modified: false,
+                // modified: false,
             };
 
-            newAppointments.push(newAppointment);
+            appointments.push(appointment);
         }
 
-        return newAppointments;
+        return appointments;
     }
 
     /**
@@ -144,48 +142,30 @@ export class ProviderApi extends AbstractApi<
         const signedAppointments: SignedData[] = [];
         const appointments: Appointment[] = [];
 
-        // needed ?
-        // to be relevant, an appointment:
-        // const relevantAppointments = unpublishedAppointments.filter(
-        //     (oa) =>
-        //         // begins at least 4 hours in the future
-        //         dayjs(oa.timestamp).isAfter(dayjs().add(4, "hours"))
-        //     // &&
-        //     // and needs to be modified/new
-        //     oa.modified
-        // );
-
         for (const unpublishedAppointment of unpublishedAppointments) {
-            // const appointmentToPublish: UnpublishedAppointment = {
-            //     id: unpublishedAppointment.id,
-            //     duration: unpublishedAppointment.duration,
-            //     timestamp: unpublishedAppointment.timestamp,
-            //     publicKey: providerKeyPairs.encryption.publicKey,
-            //     properties: unpublishedAppointment.properties,
-            //     slotData: unpublishedAppointment.slotData.map((slot) => ({
-            //         id: slot.id,
-            //     })),
-            // };
-
             /**
              * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
              */
             const signedAppointment = await sign(
-                JSON.stringify(unpublishedAppointment), // appointmentToPublish
+                JSON.stringify(unpublishedAppointment),
                 providerKeyPairs.signing.privateKey,
                 providerKeyPairs.signing.publicKey
             );
 
             appointments.push({
-                ...unpublishedAppointment,
-            }); // appointmentToPublish
+                id: unpublishedAppointment.id,
+                duration: unpublishedAppointment.duration,
+                publicKey: providerKeyPairs.encryption.publicKey,
+                properties: unpublishedAppointment.properties,
+                slotData: unpublishedAppointment.slotData.map((slot) => ({
+                    id: slot.id,
+                })),
+                provider: unpublishedAppointment.provider,
+                timestamp: new Date(unpublishedAppointment.timestamp),
+            });
 
             signedAppointments.push(signedAppointment);
         }
-
-        // if (signedAppointments.length === 0) {
-        //     return [];
-        // }
 
         await this.transport.call(
             "publishAppointments",
@@ -264,10 +244,7 @@ export class ProviderApi extends AbstractApi<
 
     /**
      * Checks if a provider is confirmed and, if yes, returns the confirmed data.
-     *
-     * If the provider is not confirmed yet, null is returned.
-     *
-     * This method returns the provider without its public keys. Maybe subject to change.
+     * If the current provider, who provided the keys, is not confirmed yet, null is returned.
      *
      * @todo check signature of retrieved ProviderData
      *
@@ -360,40 +337,26 @@ export class ProviderApi extends AbstractApi<
      * @returns Promise<Booking[]>
      */
     protected async decryptBookings(
-        bookings: Booking[],
+        encryptedBookings: ApiEncryptedBooking[],
         providerKeyPairs: ProviderKeyPairs
     ) {
         return Promise.all(
-            bookings.map(async (booking) => {
-                try {
-                    const decryptedData = await ecdhDecrypt(
-                        booking.encryptedData,
-                        providerKeyPairs.encryption.privateKey
-                    );
+            encryptedBookings.map(async ({ encryptedData, ...restBooking }) => {
+                const decryptedDataString = await ecdhDecrypt(
+                    encryptedData,
+                    providerKeyPairs.encryption.privateKey
+                );
 
-                    booking.data =
-                        parseUntrustedJSON<BookingData>(decryptedData);
-                } catch (error) {
-                    console.error(error);
-                }
+                const decryptedBooking =
+                    parseUntrustedJSON<BookingData>(decryptedDataString);
+
+                const booking: Booking = {
+                    ...restBooking,
+                    ...decryptedBooking,
+                };
 
                 return booking;
             })
         );
-
-        // for (const booking of bookings) {
-        //     const decryptedData = await ecdhDecrypt(
-        //         booking.encryptedData,
-        //         privKey
-        //     );
-
-        //     try {
-        //         booking.data = parseUntrustedJSON<BookingData>(decryptedData);
-        //     } catch (error) {
-        //         continue;
-        //     }
-        // }
-
-        // return bookings;
     }
 }

@@ -1,5 +1,4 @@
-import { ActorKeyPairs } from "./ActorKeyPairs";
-import { KeyPair } from "./crypto";
+import { ActorKeyPairs, KeyPair } from "../api/interfaces";
 
 export interface ProviderKeyPairs extends ActorKeyPairs {
     encryption: KeyPair;

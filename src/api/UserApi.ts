@@ -1,8 +1,10 @@
+import { VanellusError } from "../errors";
+import { Appointment } from "../interfaces";
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    Appointment,
+    BookingData,
     ContactData,
     QueueToken,
     UserKeyPairs,
@@ -31,21 +33,19 @@ export class UserApi extends AbstractApi<
         appointment: Appointment,
         queueToken: QueueToken
     ) {
-        const providerData = {
+        const providerData: BookingData = {
             signedToken: queueToken.signedToken,
             userToken: queueToken.userToken,
         };
 
-        const encryptedDataAndPublicKey = await ephemeralECDHEncrypt(
+        // we don't care about the ephmeral key
+        const [encryptedData] = await ephemeralECDHEncrypt(
             JSON.stringify(providerData),
             appointment.publicKey
         );
 
-        // we don't care about the ephmeral key
-        const [encryptedData] = encryptedDataAndPublicKey;
-
         // we store the information about the offer which we've accepted
-        return this.transport.call(
+        const booking = await this.transport.call(
             "bookAppointment",
             {
                 id: appointment.id,
@@ -55,10 +55,12 @@ export class UserApi extends AbstractApi<
             },
             queueToken.keyPairs.signing
         );
+
+        return booking;
     }
 
     /**
-     *
+     * Cancel an appointment
      *
      * @returns Promise<boolean>
      */
@@ -66,7 +68,7 @@ export class UserApi extends AbstractApi<
         appointment: Appointment,
         queueToken: QueueToken
     ) {
-        return this.transport.call(
+        const result = await this.transport.call(
             "cancelAppointment",
             {
                 id: appointment.id,
@@ -75,6 +77,12 @@ export class UserApi extends AbstractApi<
             },
             queueToken.keyPairs.signing
         );
+
+        if ("ok" !== result) {
+            throw new VanellusError("Could not cancel booking");
+        }
+
+        return true;
     }
 
     /**
@@ -88,7 +96,7 @@ export class UserApi extends AbstractApi<
         code?: string
     ) {
         // we hash the user data to prove it didn't change later...
-        const [dataHash, nonce] = await this.hashContactData(contactData);
+        const { hash, nonce } = await this.hashContactData(contactData);
         const signingKeyPair = await generateECDSAKeyPair();
         const encryptionKeyPair = await generateECDHKeyPair();
 
@@ -101,7 +109,7 @@ export class UserApi extends AbstractApi<
         };
 
         const signedToken = await this.transport.call("getToken", {
-            hash: dataHash,
+            hash,
             publicKey: signingKeyPair.publicKey,
             code: code,
         });
@@ -114,7 +122,7 @@ export class UserApi extends AbstractApi<
                 encryption: encryptionKeyPair,
             },
             hashNonce: nonce,
-            dataHash: dataHash,
+            dataHash: hash,
             userToken: userToken,
         };
 
@@ -148,7 +156,7 @@ export class UserApi extends AbstractApi<
     }
 
     /**
-     *
+     * Hash contact-data so any tempering can be detected later
      */
     protected async hashContactData(data: ContactData) {
         const hashData = {
@@ -159,6 +167,9 @@ export class UserApi extends AbstractApi<
         const hashDataJSON = JSON.stringify(hashData);
         const dataHash = await hash(hashDataJSON);
 
-        return [dataHash, hashData.nonce];
+        return {
+            hash: dataHash,
+            nonce: hashData.nonce,
+        };
     }
 }

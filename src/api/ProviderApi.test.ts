@@ -7,9 +7,9 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { Provider } from "../interfaces";
+import { Appointment, Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import { Appointment, MediatorKeyPairs, ProviderKeyPairs } from "./interfaces";
+import { MediatorKeyPairs, ProviderKeyPairs } from "./interfaces";
 import { ProviderApi } from "./ProviderApi";
 
 let mediatorApi: MediatorApi;
@@ -75,7 +75,7 @@ describe("ProviderApi", () => {
         });
 
         it("should retrieve published appointments", async () => {
-            const appointments1 = await providerApi.getAppointments(
+            const appointments1 = await providerApi.getProviderAppointments(
                 from,
                 to,
                 providerKeyPairs

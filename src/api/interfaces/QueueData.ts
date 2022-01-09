@@ -1,5 +1,5 @@
+import { UserKeyPairs } from ".";
 import { SignedData } from "./crypto";
-import { UserKeyPairs } from "./UserKeyPairs";
 
 export interface ContactData {
     name?: string;
@@ -17,11 +17,11 @@ export interface QueueData {
     zipCode: string;
 }
 
-export type SignedQueueToken = SignedData;
+export type ApiSignedQueueToken = SignedData;
 
 export interface QueueToken {
     keyPairs: UserKeyPairs;
-    signedToken: SignedQueueToken;
+    signedToken: ApiSignedQueueToken;
     userToken: UserToken;
     createdAt: string;
     hashNonce: string;

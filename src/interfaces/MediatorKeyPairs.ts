@@ -2,8 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ActorKeyPairs } from "./ActorKeyPairs";
-import { KeyPair, SignedData } from "./crypto";
+import { ActorKeyPairs, KeyPair, SignedData } from "../api/interfaces";
 
 export interface MediatorKeyData {
     signing: string;

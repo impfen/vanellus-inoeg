@@ -11,7 +11,7 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
         confirmedProviderData: SignedData;
         publicProviderData: SignedData;
         signedKeyData: SignedData;
-    }) => boolean;
+    }) => "ok";
 
     getPendingProviderData: ({
         limit,

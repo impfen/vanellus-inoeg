@@ -1,3 +1,4 @@
+import { VanellusError } from "../errors";
 import { Provider, PublicProvider } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
@@ -21,27 +22,27 @@ export class MediatorApi extends AbstractApi<
      * @return Promise<Provider>
      */
     public async confirmProvider(
-        providerData: Provider,
+        provider: Provider,
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         const keyHashesData = {
-            signing: providerData.publicKeys.signing,
-            encryption: providerData.publicKeys.encryption,
+            signing: provider.publicKeys.signing,
+            encryption: provider.publicKeys.encryption,
             queueData: {
-                zipCode: providerData.zipCode,
-                accessible: providerData.accessible,
+                zipCode: provider.zipCode,
+                accessible: provider.accessible,
             },
         };
 
         const publicProvider: PublicProvider = {
-            id: providerData.id,
-            name: providerData.name,
-            street: providerData.street,
-            city: providerData.city,
-            zipCode: providerData.zipCode,
-            website: providerData.website,
-            description: providerData.description,
-            accessible: providerData.accessible,
+            id: provider.id,
+            name: provider.name,
+            street: provider.street,
+            city: provider.city,
+            zipCode: provider.zipCode,
+            website: provider.website,
+            description: provider.description,
+            accessible: provider.accessible,
         };
 
         const signedKeyData = await sign(
@@ -52,7 +53,7 @@ export class MediatorApi extends AbstractApi<
 
         // this will be stored for the provider, so we add the public key data
         const signedProviderData = await sign(
-            JSON.stringify(providerData),
+            JSON.stringify(provider),
             mediatorKeyPairs.signing.privateKey,
             mediatorKeyPairs.signing.publicKey
         );
@@ -72,7 +73,7 @@ export class MediatorApi extends AbstractApi<
         // we encrypt the data with the public key supplied by the provider
         const [confirmedProviderData] = await ephemeralECDHEncrypt(
             JSON.stringify(providerSignedData),
-            providerData.publicKeys.data
+            provider.publicKeys.data
         );
 
         const signedConfirmedProviderData = await sign(
@@ -81,7 +82,7 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing.publicKey
         );
 
-        await this.transport.call(
+        const result = await this.transport.call(
             "confirmProvider",
             {
                 confirmedProviderData: signedConfirmedProviderData,
@@ -91,7 +92,11 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing
         );
 
-        return providerData;
+        if ("ok" !== result) {
+            throw new VanellusError(`Could not verify provider ${provider.id}`);
+        }
+
+        return provider;
     }
 
     /**

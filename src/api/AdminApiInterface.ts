@@ -1,11 +1,11 @@
 import { SignedMediatorKeyData } from "./interfaces";
 
 export interface AdminApiInterface {
-    resetDB: () => boolean;
+    resetDB: () => "ok";
 
     addMediatorPublicKeys: ({
         signedKeyData,
     }: {
         signedKeyData: SignedMediatorKeyData;
-    }) => boolean;
+    }) => "ok";
 }

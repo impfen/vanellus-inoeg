@@ -4,7 +4,7 @@
 
 export interface KeyPair {
     publicKey: string; // SPKI
-    privateKey: JsonWebKey; // JWK (due to Firefox not supporting PKCS8)
+    privateKey: JsonWebKey; // JWK (due to Firefox not supporting PKCS8 in older versions)
 }
 
 export interface AESData {
@@ -22,10 +22,4 @@ export interface SignedData {
     publicKey: string;
     signature: string;
     data: string;
-}
-
-export interface KeyPairs {
-    signing: KeyPair;
-    encryption: KeyPair;
-    sync: string;
 }

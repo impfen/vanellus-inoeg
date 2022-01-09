@@ -20,33 +20,23 @@ export class AdminApi extends AbstractApi<
     AdminKeyPairs
 > {
     /**
-     * Generates all needed keypairs for the admin
-     * Needs the configured keys of the service-backend as input.
-     *
-     * @return Promise<AdminKeyPairs>
-     */
-    static async generateAdminKeys(adminConfig: AdminConfig) {
-        const adminKeyPairs: AdminKeyPairs = {
-            signing: await extractAdminKey(adminConfig, "root"),
-            token: await extractAdminKey(adminConfig, "token"),
-            provider: await extractAdminKey(adminConfig, "provider"),
-        };
-
-        return adminKeyPairs;
-    }
-
-    /**
      * Resets the appointment-db. Mainly used for testing
      *
      * @returns Promise<boolean>
      */
     async resetAppointmentsDb(adminKeyPairs: AdminKeyPairs) {
-        return this.transport.call("resetDB", undefined, adminKeyPairs.signing);
-    }
+        const result = await this.transport.call(
+            "resetDB",
+            undefined,
+            adminKeyPairs.signing
+        );
 
-    // async resetStorageDb() {
-    //     return backend.storage.resetDB({}, this.adminKeys.root)
-    // }
+        if ("ok" !== result) {
+            throw new VanellusError("Could not add reset appointment-db");
+        }
+
+        return true;
+    }
 
     /**
      * Generates all needed keypairs for a mediator
@@ -87,7 +77,7 @@ export class AdminApi extends AbstractApi<
             adminKeyPairs.signing.publicKey
         );
 
-        return this.transport.call(
+        const result = await this.transport.call(
             "addMediatorPublicKeys",
             {
                 signedKeyData: {
@@ -99,6 +89,28 @@ export class AdminApi extends AbstractApi<
 
             adminKeyPairs.signing
         );
+
+        if ("ok" !== result) {
+            throw new VanellusError("Could not add mediator-key");
+        }
+
+        return true;
+    }
+
+    /**
+     * Generates all needed keypairs for the admin
+     * Needs the configured keys of the service-backend as input.
+     *
+     * @return Promise<AdminKeyPairs>
+     */
+    static async generateAdminKeys(adminConfig: AdminConfig) {
+        const adminKeyPairs: AdminKeyPairs = {
+            signing: await extractAdminKey(adminConfig, "root"),
+            token: await extractAdminKey(adminConfig, "token"),
+            provider: await extractAdminKey(adminConfig, "provider"),
+        };
+
+        return adminKeyPairs;
     }
 }
 

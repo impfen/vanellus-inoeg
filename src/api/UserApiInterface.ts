@@ -1,5 +1,10 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { Booking, ECDHData, SignedData, SignedQueueToken } from "./interfaces";
+import {
+    ApiEncryptedBooking,
+    ApiSignedQueueToken,
+    ECDHData,
+    SignedData,
+} from "./interfaces";
 
 export interface UserApiInterface extends AnonymousApiInterface {
     cancelAppointment: ({
@@ -10,7 +15,7 @@ export interface UserApiInterface extends AnonymousApiInterface {
         providerID: string;
         id: string;
         signedTokenData: SignedData;
-    }) => boolean;
+    }) => "ok";
 
     bookAppointment: ({
         providerID,
@@ -22,7 +27,7 @@ export interface UserApiInterface extends AnonymousApiInterface {
         id: string;
         encryptedData: ECDHData;
         signedTokenData: SignedData;
-    }) => Booking;
+    }) => ApiEncryptedBooking;
 
     // get a token for a given queue
     getToken: ({
@@ -33,5 +38,5 @@ export interface UserApiInterface extends AnonymousApiInterface {
         hash: string;
         publicKey: string;
         code?: string;
-    }) => SignedQueueToken;
+    }) => ApiSignedQueueToken;
 }

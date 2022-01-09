@@ -1,8 +1,8 @@
-import { PublicProvider } from "../interfaces";
+import { Appointment, PublicProvider } from "../interfaces";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiSignedAppointments, Appointment, Slot } from "./interfaces";
+import { ApiSignedAppointments } from "./interfaces";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
@@ -10,7 +10,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @todo: verify based on key chain
      *
-     * @return Promise<Appointments>
+     * @return Promise<Appointment | null>
      */
     public async getAppointment(id: string, providerID: string) {
         return (
@@ -26,7 +26,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
      * @todo: verify based on key chain
      *
-     * @return Promise<Appointments[]>
+     * @return Promise<Appointment[]>
      */
     public async getAppointmentsByZipCode(
         zipCode: string,
@@ -81,10 +81,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 signedProvider.data
             );
 
-            if (!publicProvider) {
-                continue;
-            }
-
             publicProvider.id = signedProvider.id;
             providers.push(publicProvider);
         }
@@ -120,36 +116,29 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     protected decryptAppointments(
         signedProviderAppointments: ApiSignedAppointments
     ) {
-        const publicProvider = parseUntrustedJSON<PublicProvider>(
+        const provider = parseUntrustedJSON<PublicProvider>(
             signedProviderAppointments.provider.data
         );
 
         const appointments: Appointment[] = [];
 
         for (const signedAppointment of signedProviderAppointments.appointments) {
-            const appointment = parseUntrustedJSON<Appointment>(
+            const appointmentData = parseUntrustedJSON<Appointment>(
                 signedAppointment.data
             );
 
-            if (!appointment) {
-                continue;
-            }
+            appointments.push({
+                ...appointmentData,
+                provider,
+                timestamp: new Date(appointmentData.timestamp),
+                slotData: appointmentData.slotData.map((slot) => {
+                    slot.open = !signedAppointment.bookedSlots?.some(
+                        (aslot) => aslot.id === slot.id
+                    );
 
-            for (const slot of appointment.slotData) {
-                if (
-                    signedAppointment.bookedSlots?.some(
-                        (aslot: Slot) => aslot.id === slot.id
-                    )
-                ) {
-                    slot.open = false;
-                } else {
-                    slot.open = true;
-                }
-            }
-
-            appointment.provider = publicProvider;
-
-            appointments.push(appointment);
+                    return slot;
+                }),
+            });
         }
 
         return appointments;

@@ -7,9 +7,9 @@ import {
     getProviderApi,
     getUserApi,
 } from "../../tests/test-utils";
-import { Provider } from "../interfaces";
+import { Appointment, Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import { Appointment, ProviderKeyPairs, QueueToken } from "./interfaces";
+import { ProviderKeyPairs, QueueToken } from "./interfaces";
 import { UserApi } from "./UserApi";
 
 let userApi: UserApi;
@@ -103,15 +103,15 @@ describe("UserApi", () => {
     });
 
     it("should save the booking into the appointment", async () => {
-        const providerAppointments = await providerApi.getAppointments(
+        const appointments = await providerApi.getProviderAppointments(
             from,
             to,
             providerKeyPairs
         );
 
-        expect(
-            providerAppointments[0].bookings?.[0].data?.userToken.code
-        ).toEqual(secret.slice(0, 4));
+        expect(appointments[0].bookings?.[0].userToken.code).toEqual(
+            secret.slice(0, 4)
+        );
     });
 
     it("should cancel the booking", async () => {
@@ -124,7 +124,7 @@ describe("UserApi", () => {
     });
 
     it("should have no bookings after cancelation", async () => {
-        const appointments = await providerApi.getAppointments(
+        const appointments = await providerApi.getProviderAppointments(
             from,
             to,
             providerKeyPairs
