@@ -1,14 +1,14 @@
 import { VanellusError } from "../errors";
-import { Appointment } from "../interfaces";
-import { UserBackupData } from "../interfaces/UserBackup";
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
+    Appointment,
     BookingData,
     ContactData,
     EncryptedBackup,
     QueueToken,
+    UserBackup,
     UserKeyPairs,
 } from "./interfaces";
 import { UserApiInterface } from "./UserApiInterface";
@@ -135,7 +135,7 @@ export class UserApi extends AbstractApi<
      * @todo finish implementation
      */
     public async backupData(
-        userBackupData: UserBackupData,
+        userBackupData: UserBackup,
         secret: string
     ): Promise<EncryptedBackup | null> {
         // storage-api
@@ -146,9 +146,7 @@ export class UserApi extends AbstractApi<
     /**
      * @todo finish implementation
      */
-    public async restoreFromBackup(
-        secret: string
-    ): Promise<UserBackupData | null> {
+    public async restoreFromBackup(secret: string): Promise<UserBackup | null> {
         // storage-api
         return Promise.resolve(null);
     }

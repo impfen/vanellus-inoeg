@@ -1,12 +1,11 @@
-import { ProviderApi } from "./api";
+import { JsonRpcTransport, ProviderApi } from "./api";
+import { AuthError } from "./errors";
 import {
     Appointment,
     Config,
     ProviderInput,
     ProviderKeyPairs,
-} from "./api/interfaces";
-import { JsonRpcTransport } from "./api/transports/JsonRpcTransport";
-import { AuthError } from "./errors";
+} from "./interfaces";
 
 export class ProviderService {
     protected providerApi: ProviderApi;
@@ -19,9 +18,13 @@ export class ProviderService {
         );
     }
 
-    public authenticate(secret: string, keyPairs: ProviderKeyPairs) {
+    public async authenticate(secret: string, keyPairs: ProviderKeyPairs) {
         this.secret = secret;
         this.keyPairs = keyPairs;
+
+        await this.getAuthenticatedProvider();
+
+        // const backupData = await this.providerApi.restoreFromBackup(secret);
 
         return true;
     }

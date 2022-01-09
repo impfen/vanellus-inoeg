@@ -1,29 +1,29 @@
 import { VanellusError } from "../errors";
-import {
-    Appointment,
-    Booking,
-    Provider,
-    ProviderInput,
-    PublicProvider,
-    Slot,
-} from "../interfaces";
-import { ProviderBackup } from "../interfaces/ProviderBackup";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     ApiEncryptedBooking,
+    Appointment,
+    Booking,
     BookingData,
     ECDHData,
     EncryptedBackup,
+    Provider,
+    ProviderBackup,
+    ProviderInput,
     ProviderKeyPairs,
+    PublicProvider,
     SignedData,
     SignedProvider,
+    Slot,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import {
     b642buf,
     buf2base32,
+    ecdhDecrypt,
+    ecdhEncrypt,
     generateECDHKeyPair,
     generateECDSAKeyPair,
     generateSymmetricKey,
@@ -31,7 +31,6 @@ import {
     sign,
     verify,
 } from "./utils";
-import { ecdhDecrypt, ecdhEncrypt } from "./utils/encrypt";
 
 export class ProviderApi extends AbstractApi<
     AnonymousApiInterface & ProviderApiInterface,

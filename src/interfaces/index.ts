@@ -4,5 +4,7 @@ export * from "./Config";
 export * from "./Configurables";
 export * from "./MediatorKeyPairs";
 export * from "./Provider";
+export * from "./ProviderBackup";
 export * from "./ProviderKeyPairs";
+export * from "./UserBackup";
 export * from "./UserKeyPairs";

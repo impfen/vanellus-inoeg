@@ -1,6 +1,5 @@
-import { Provider } from "../interfaces";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiEncryptedProviderData, SignedData } from "./interfaces";
+import { ApiEncryptedProviderData, Provider, SignedData } from "./interfaces";
 
 export interface MediatorApiInterface extends AnonymousApiInterface {
     confirmProvider: ({

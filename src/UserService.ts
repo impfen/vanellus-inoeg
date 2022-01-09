@@ -1,8 +1,7 @@
-import { AnonymousApi, UserApi } from ".";
-import { Config, QueueToken } from "./api/interfaces";
-import { JsonRpcTransport } from "./api/transports";
+import { AnonymousApi, JsonRpcTransport, UserApi } from "./api";
+import { QueueToken } from "./api/interfaces";
 import { AuthError } from "./errors";
-import { Appointment, UserKeyPairs } from "./interfaces";
+import { Appointment, Config, UserKeyPairs } from "./interfaces";
 
 export class UserService {
     protected userApi: UserApi;

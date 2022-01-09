@@ -1,6 +1,6 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import { ActorKeyPairs } from "./interfaces";
-import { Transport } from "./transports/Transport";
+import { Transport } from "./transports";
 
 export class AbstractApi<
     Api = AnonymousApiInterface,

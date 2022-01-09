@@ -1,5 +1,4 @@
 import { VanellusError } from "../errors";
-import { Provider, PublicProvider } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -7,6 +6,8 @@ import {
     ApiEncryptedProviderData,
     ECDHData,
     MediatorKeyPairs,
+    Provider,
+    PublicProvider,
     SignedProvider,
 } from "./interfaces";
 import { MediatorApiInterface } from "./MediatorApiInterface";

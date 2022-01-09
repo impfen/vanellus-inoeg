@@ -1,6 +1,6 @@
 import { AESData } from "./crypto";
 
-export interface BackupData {
+export interface Backup {
     createdAt: string;
     version: string;
     [Key: string]: unknown;

@@ -6,9 +6,8 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import { AdminKeyPairs, ProviderKeyPairs } from "./interfaces";
+import { AdminKeyPairs, Provider, ProviderKeyPairs } from "./interfaces";
 
 let adminKeyPairs: AdminKeyPairs;
 let providerKeyPairs: ProviderKeyPairs;

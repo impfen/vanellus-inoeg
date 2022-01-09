@@ -7,9 +7,13 @@ import {
     getProviderApi,
     getUserApi,
 } from "../../tests/test-utils";
-import { Appointment, Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import { ProviderKeyPairs, QueueToken } from "./interfaces";
+import {
+    Appointment,
+    Provider,
+    ProviderKeyPairs,
+    QueueToken,
+} from "./interfaces";
 import { UserApi } from "./UserApi";
 
 let userApi: UserApi;

@@ -1,8 +1,11 @@
-import { Appointment, PublicProvider } from "../interfaces";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiSignedAppointments } from "./interfaces";
+import {
+    ApiSignedAppointments,
+    Appointment,
+    PublicProvider,
+} from "./interfaces";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**

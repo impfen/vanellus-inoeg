@@ -8,8 +8,7 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { Provider } from "../interfaces";
-import { MediatorKeyPairs } from "./interfaces";
+import { MediatorKeyPairs, Provider } from "./interfaces";
 import { MediatorApi } from "./MediatorApi";
 
 let mediatorApi: MediatorApi;
