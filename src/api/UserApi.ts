@@ -7,6 +7,7 @@ import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     BookingData,
     ContactData,
+    EncryptedBackup,
     QueueToken,
     UserKeyPairs,
 } from "./interfaces";
