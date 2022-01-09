@@ -8,6 +8,7 @@ export * from "./AdminConfig";
 export * from "./AdminKeyPairs";
 export * from "./Appointments";
 export * from "./BackendPublicKeys";
+export * from "./Backup";
 export * from "./Booking";
 export * from "./crypto";
 export * from "./Provider";

@@ -110,7 +110,9 @@ describe("ProviderApi", () => {
         });
 
         it("should retrieve no data while provider is pending", async () => {
-            const checkResult = await providerApi.checkData(providerKeyPairs2);
+            const checkResult = await providerApi.getProvider(
+                providerKeyPairs2
+            );
 
             expect(checkResult).toBeNull();
         });
@@ -133,7 +135,7 @@ describe("ProviderApi", () => {
         });
 
         it("should get data for confirmed provider", async () => {
-            const result3 = await providerApi.checkData(providerKeyPairs2);
+            const result3 = await providerApi.getProvider(providerKeyPairs2);
 
             expect(result3).toHaveProperty("name");
         });

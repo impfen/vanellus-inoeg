@@ -1,5 +1,6 @@
 import { VanellusError } from "../errors";
 import { Appointment } from "../interfaces";
+import { UserBackupData } from "../interfaces/UserBackup";
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -127,6 +128,28 @@ export class UserApi extends AbstractApi<
         };
 
         return queueToken;
+    }
+
+    /**
+     * @todo finish implementation
+     */
+    public async backupData(
+        userBackupData: UserBackupData,
+        secret: string
+    ): Promise<EncryptedBackup | null> {
+        // storage-api
+
+        return Promise.resolve(null);
+    }
+
+    /**
+     * @todo finish implementation
+     */
+    public async restoreFromBackup(
+        secret: string
+    ): Promise<UserBackupData | null> {
+        // storage-api
+        return Promise.resolve(null);
     }
 
     /**

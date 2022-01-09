@@ -7,6 +7,7 @@ import {
     PublicProvider,
     Slot,
 } from "../interfaces";
+import { ProviderBackup } from "../interfaces/ProviderBackup";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -14,6 +15,7 @@ import {
     ApiEncryptedBooking,
     BookingData,
     ECDHData,
+    EncryptedBackup,
     ProviderKeyPairs,
     SignedData,
     SignedProvider,
@@ -250,7 +252,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<Provider | null>
      */
-    public async checkData(providerKeyPairs: ProviderKeyPairs) {
+    public async getProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
             const encryptedConfirmedProviderECDAData =
                 await this.transport.call(
@@ -292,6 +294,28 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
+     * @todo finish implementation
+     */
+    public async backupData(
+        providerBackup: ProviderBackup,
+        secret: string
+    ): Promise<EncryptedBackup | null> {
+        // storage-api
+
+        return Promise.resolve(null);
+    }
+
+    /**
+     * @todo finish implementation
+     */
+    public async restoreFromBackup(
+        secret: string
+    ): Promise<ProviderBackup | null> {
+        // storage-api
+        return Promise.resolve(null);
+    }
+
+    /**
      * Generates all needed keypairs for the provider
      *
      * @return Promise<ProviderKeyPairs>
@@ -320,16 +344,6 @@ export class ProviderApi extends AbstractApi<
     public generateSecret() {
         return buf2base32(b642buf(randomBytes(15)));
     }
-
-    // Unused?
-    // public createSlot() {
-    //     return {
-    //         open: true,
-    //         id: randomBytes(32), // where the user can submit his confirmation
-    //         status: randomBytes(32), // where the user can get the appointment status
-    //         cancel: randomBytes(32), // where the user can cancel his confirmation
-    //     };
-    // }
 
     /**
      * Decrypt a booking

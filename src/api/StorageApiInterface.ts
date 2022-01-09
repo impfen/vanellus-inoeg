@@ -1,6 +1,13 @@
 import { ApiSettingsData } from "./interfaces";
 
 export interface StorageApiInterface {
-    storeSettings: (id: string, data: ApiSettingsData) => boolean;
-    getSettings: (id: string) => ApiSettingsData;
+    storeSettings: ({
+        id,
+        data,
+    }: {
+        id: string;
+        data: ApiSettingsData;
+    }) => "ok";
+
+    getSettings: ({ id }: { id: string }) => ApiSettingsData;
 }
