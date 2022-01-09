@@ -6,8 +6,8 @@ export interface AdminConfig {
                 type: string;
                 format: string;
                 params: Record<string, string>;
-                publicKey: string;
                 purposes: string[];
+                publicKey: string;
                 privateKey: string;
             }[];
         };

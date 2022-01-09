@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { VanellusError } from "../../errors";
 import { KeyPair } from "../interfaces";
 import { buf2b64 } from "./conversion";
 
@@ -28,7 +29,7 @@ export async function generateECDSAKeyPair(): Promise<KeyPair> {
     );
 
     if (!key.publicKey || !key.privateKey) {
-        throw new Error("key generation failed");
+        throw new VanellusError("key generation failed");
     }
 
     const pubKey = await crypto.subtle.exportKey("spki", key.publicKey);
@@ -45,7 +46,7 @@ export async function generateECDHKeyPair(): Promise<KeyPair> {
     );
 
     if (!key.publicKey || !key.privateKey) {
-        throw new Error("key generation failed");
+        throw new VanellusError("key generation failed");
     }
 
     const pubKey = await crypto.subtle.exportKey("spki", key.publicKey);

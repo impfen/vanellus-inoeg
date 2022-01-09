@@ -7,19 +7,15 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
+import { Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import {
-    Appointment,
-    MediatorKeyPairs,
-    ProviderData,
-    ProviderKeyPairs,
-    UnpublishedAppointment,
-} from "./interfaces";
+import { Appointment, MediatorKeyPairs, ProviderKeyPairs } from "./interfaces";
 import { ProviderApi } from "./ProviderApi";
 
 let mediatorApi: MediatorApi;
 let mediatorKeyPairs: MediatorKeyPairs;
 let providerApi: ProviderApi;
+let provider: Provider;
 let providerKeyPairs: ProviderKeyPairs;
 let anonymousApi: AnonymousApi;
 
@@ -40,12 +36,11 @@ beforeAll(async () => {
     mediatorApi = mediatorResult.mediatorApi;
     mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
 
-    await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
+    provider = await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
 });
 
 describe("ProviderApi", () => {
     describe("cancel appointments", () => {
-        let unpublishedAppointment: UnpublishedAppointment;
         let appointment: Appointment;
         const from = dayjs().utc().toDate();
         const to = dayjs().utc().add(1, "day").toDate();
@@ -60,25 +55,23 @@ describe("ProviderApi", () => {
                 .second(0)
                 .toDate();
 
-            unpublishedAppointment = providerApi.createAppointment(
+            appointment = providerApi.createAppointment(
                 15,
                 "moderna",
                 5,
-                date
+                date,
+                provider,
+                providerKeyPairs
             );
         });
 
         it("should publish appointments", async () => {
             const publishResult = await providerApi.publishAppointments(
-                [unpublishedAppointment],
+                [appointment],
                 providerKeyPairs
             );
 
             expect(publishResult).toHaveLength(1);
-
-            if (publishResult?.[0]) {
-                appointment = publishResult[0];
-            }
         });
 
         it("should retrieve published appointments", async () => {
@@ -108,7 +101,7 @@ describe("ProviderApi", () => {
     });
 
     describe("confirming a provider", () => {
-        let provider2: ProviderData;
+        let provider2: Provider;
         let providerKeyPairs2: ProviderKeyPairs;
 
         it("should create new provider", async () => {

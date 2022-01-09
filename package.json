@@ -26,7 +26,7 @@
     "scripts": {
         "build": "tsup",
         "build:docs": "typedoc --out ./docs src",
-        "test": "jest --runInBand",
+        "test": "jest --runInBand --verbose",
         "lint": "eslint . --ext .ts --ignore-path .gitignore",
         "typecheck": "tsc --noEmit"
     },

@@ -7,50 +7,27 @@ import { ECDHData, SignedData } from "./crypto";
 
 export type ProviderBackupReferenceData = Record<string, unknown>;
 
-export interface EncryptedProviderData {
-    id: string;
-    encryptedData: ECDHData;
-}
-
-export interface ApiEncryptedProviderData {
-    encryptedData: ECDHData;
-}
-
+export type VerifiedProviderData = Record<string, string>;
 export interface EncryptedConfirmedProviderData {
     iv: string;
     data: string;
-    json?: ProviderData;
+    json?: Provider;
+}
+
+export interface SignedProvider {
+    signedData: SignedData;
+    signedPublicData: SignedData;
+}
+
+export interface ApiEncryptedProviderData {
+    id: string;
+    encryptedData: ECDHData;
 }
 
 export interface ApiConfirmedProviderData extends SignedData {
     json?: EncryptedConfirmedProviderData;
 }
-
-export type VerifiedProviderData = Record<string, string>;
-
 export interface ApiSignedPublicProvider extends SignedData {
     id: string;
-    json?: PublicProviderData;
-}
-
-export interface PublicProviderData extends PublicProvider {
-    id: string;
-}
-
-export interface ProviderPublicKeys {
-    signing: string;
-    encryption: string;
-    data: string;
-}
-
-export interface ProviderData extends Provider {
-    publicKeys: ProviderPublicKeys;
-    submittedAt?: string;
-    version?: string;
-    id: string;
-}
-
-export interface ProviderSignedData {
-    signedData: SignedData;
-    signedPublicData: SignedData;
+    json?: PublicProvider;
 }

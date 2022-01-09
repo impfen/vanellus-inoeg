@@ -1,8 +1,8 @@
 import {
-    ApiSignedProviderAppointments,
+    ApiSignedAppointments,
     ApiSignedPublicProvider,
+    BackendPublicKeys,
     Configurables,
-    PublicKeys,
 } from "./interfaces";
 import { StorageApiInterface } from "./StorageApiInterface";
 
@@ -13,7 +13,7 @@ export interface AnonymousApiInterface extends StorageApiInterface {
     }: {
         id: string;
         providerID: string;
-    }) => ApiSignedProviderAppointments;
+    }) => ApiSignedAppointments;
 
     getAppointmentsByZipCode: ({
         zipCode,
@@ -25,7 +25,7 @@ export interface AnonymousApiInterface extends StorageApiInterface {
         radius: number;
         from: string;
         to: string;
-    }) => ApiSignedProviderAppointments[];
+    }) => ApiSignedAppointments[];
 
     getProvidersByZipCode: ({
         zipFrom,
@@ -36,7 +36,7 @@ export interface AnonymousApiInterface extends StorageApiInterface {
     }) => ApiSignedPublicProvider[];
 
     // return all public keys present in the system
-    getKeys: () => PublicKeys;
+    getKeys: () => BackendPublicKeys;
 
     getConfigurables: () => Configurables;
 

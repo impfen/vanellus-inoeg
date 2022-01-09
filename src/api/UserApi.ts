@@ -4,7 +4,6 @@ import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     Appointment,
     ContactData,
-    PublicProviderData,
     QueueToken,
     UserKeyPairs,
 } from "./interfaces";
@@ -23,25 +22,13 @@ export class UserApi extends AbstractApi<
     AnonymousApiInterface & UserApiInterface,
     UserKeyPairs
 > {
-    public async cancelAppointment(
-        appointment: Appointment,
-        provider: PublicProviderData,
-        queueToken: QueueToken
-    ) {
-        return this.transport.call(
-            "cancelAppointment",
-            {
-                id: appointment.id,
-                providerID: provider.id,
-                signedTokenData: queueToken.signedToken,
-            },
-            queueToken.keyPairs.signing
-        );
-    }
-
+    /**
+     * Book an appointment
+     *
+     * @returns Promise<Booking>
+     */
     public async bookAppointment(
         appointment: Appointment,
-        provider: PublicProviderData,
         queueToken: QueueToken
     ) {
         const providerData = {
@@ -57,22 +44,44 @@ export class UserApi extends AbstractApi<
         // we don't care about the ephmeral key
         const [encryptedData] = encryptedDataAndPublicKey;
 
-        const booking = await this.transport.call(
+        // we store the information about the offer which we've accepted
+        return this.transport.call(
             "bookAppointment",
             {
                 id: appointment.id,
-                providerID: provider.id,
+                providerID: appointment.provider.id,
                 encryptedData: encryptedData,
                 signedTokenData: queueToken.signedToken,
             },
             queueToken.keyPairs.signing
         );
-
-        // we store the information about the offer which we've accepted
-        return booking;
     }
 
-    // get a token for a given queue
+    /**
+     *
+     *
+     * @returns Promise<boolean>
+     */
+    public async cancelAppointment(
+        appointment: Appointment,
+        queueToken: QueueToken
+    ) {
+        return this.transport.call(
+            "cancelAppointment",
+            {
+                id: appointment.id,
+                providerID: appointment.provider.id,
+                signedTokenData: queueToken.signedToken,
+            },
+            queueToken.keyPairs.signing
+        );
+    }
+
+    /**
+     * get a token for a given queue
+     *
+     * @return Promise<QueueToken>
+     */
     public async getQueueToken(
         contactData: ContactData,
         secret: string,
@@ -112,15 +121,25 @@ export class UserApi extends AbstractApi<
         return queueToken;
     }
 
+    /**
+     * Generate a secret for the user
+     *
+     * @returns string
+     */
     public generateSecret() {
         return buf2base32(b642buf(randomBytes(10)));
     }
 
+    /**
+     * Generates all needed keypairs for the user.
+     *
+     * @returns Promise<UserKeyPairs>
+     */
     public async generateKeyPairs() {
         const signingKeyPair = await generateECDSAKeyPair();
         const encryptionKeyPair = await generateECDHKeyPair();
 
-        const keyPairs = {
+        const keyPairs: UserKeyPairs = {
             signing: signingKeyPair,
             encryption: encryptionKeyPair,
         };
@@ -128,6 +147,9 @@ export class UserApi extends AbstractApi<
         return keyPairs;
     }
 
+    /**
+     *
+     */
     protected async hashContactData(data: ContactData) {
         const hashData = {
             name: data.name,

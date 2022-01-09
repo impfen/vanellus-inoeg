@@ -19,14 +19,27 @@ export class AdminApi extends AbstractApi<
     AnonymousApiInterface & AdminApiInterface,
     AdminKeyPairs
 > {
+    /**
+     * Generates all needed keypairs for the admin
+     * Needs the configured keys of the service-backend as input.
+     *
+     * @return Promise<AdminKeyPairs>
+     */
     static async generateAdminKeys(adminConfig: AdminConfig) {
-        return {
+        const adminKeyPairs: AdminKeyPairs = {
             signing: await extractAdminKey(adminConfig, "root"),
             token: await extractAdminKey(adminConfig, "token"),
             provider: await extractAdminKey(adminConfig, "provider"),
         };
+
+        return adminKeyPairs;
     }
 
+    /**
+     * Resets the appointment-db. Mainly used for testing
+     *
+     * @returns Promise<boolean>
+     */
     async resetAppointmentsDb(adminKeyPairs: AdminKeyPairs) {
         return this.transport.call("resetDB", undefined, adminKeyPairs.signing);
     }
@@ -35,6 +48,11 @@ export class AdminApi extends AbstractApi<
     //     return backend.storage.resetDB({}, this.adminKeys.root)
     // }
 
+    /**
+     * Generates all needed keypairs for a mediator
+     *
+     * @returns Promise<MediatorKeyPairs>
+     */
     async generateMediatorKeys(adminKeyPairs: AdminKeyPairs) {
         const signingKeyPair = await generateECDSAKeyPair();
         const encryptionKeyPair = await generateECDHKeyPair();
@@ -48,6 +66,12 @@ export class AdminApi extends AbstractApi<
         return mediatorKeyPairs;
     }
 
+    /**
+     * Add a MediatorKeyPairs to the system.
+     * Effectively, this method creates a mediator in the system.
+     *
+     * @returns Promise<boolean>
+     */
     async addMediatorPublicKeys(
         mediatorKeyPairs: MediatorKeyPairs,
         adminKeyPairs: AdminKeyPairs
@@ -87,7 +111,6 @@ const extractAdminKey = async (adminConfig: AdminConfig, name: string) => {
         throw new VanellusError("Could not find signing-keys for admin");
     }
 
-    // this will not work in Firefox, but that's ok as it's only for testing...
     const importedKey = await crypto.subtle.importKey(
         "pkcs8",
         b642buf(keyData.privateKey),

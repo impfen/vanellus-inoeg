@@ -8,7 +8,8 @@ import {
     getMediatorApi,
     getProviderApi,
 } from "../../tests/test-utils";
-import { MediatorKeyPairs, ProviderData } from "./interfaces";
+import { Provider } from "../interfaces";
+import { MediatorKeyPairs } from "./interfaces";
 import { MediatorApi } from "./MediatorApi";
 
 let mediatorApi: MediatorApi;
@@ -29,47 +30,49 @@ beforeAll(async () => {
 });
 
 describe("MediatorService", () => {
-    let provider: ProviderData;
+    describe("confirm a provider", () => {
+        let providerData: Provider;
 
-    it("should create unverified provider", async () => {
-        const { providerKeyPairs } = await getProviderApi();
+        it("should create unverified provider", async () => {
+            const { providerKeyPairs } = await getProviderApi();
 
-        provider = await createUnverifiedProvider(providerKeyPairs);
-    });
+            providerData = await createUnverifiedProvider(providerKeyPairs);
+        });
 
-    it("should get pending provider", async () => {
-        expect(provider).toHaveProperty("id");
+        it("should get pending provider", async () => {
+            expect(providerData).toHaveProperty("id");
 
-        const pendingProviders = await mediatorApi.getPendingProviders(
-            mediatorApiKeyPairs
-        );
+            const pendingProviders = await mediatorApi.getPendingProviders(
+                mediatorApiKeyPairs
+            );
 
-        expect(pendingProviders).toHaveLength(1);
-        expect(pendingProviders[0].name).toEqual(provider.name);
-    });
+            expect(pendingProviders).toHaveLength(1);
+            expect(pendingProviders[0].name).toEqual(providerData.name);
+        });
 
-    it("should confirm provider", async () => {
-        const confirmedProvider = await mediatorApi.confirmProvider(
-            provider,
-            mediatorApiKeyPairs
-        );
+        it("should confirm provider", async () => {
+            const confirmedProvider = await mediatorApi.confirmProvider(
+                providerData,
+                mediatorApiKeyPairs
+            );
 
-        expect(confirmedProvider).toHaveProperty("name");
-    });
+            expect(confirmedProvider).toHaveProperty("name");
+        });
 
-    it("should get 0 pending providers", async () => {
-        const pendingProviders = await mediatorApi.getPendingProviders(
-            mediatorApiKeyPairs
-        );
+        it("should not fetch pending providers after confirmation", async () => {
+            const pendingProviders = await mediatorApi.getPendingProviders(
+                mediatorApiKeyPairs
+            );
 
-        expect(pendingProviders).toHaveLength(0);
-    });
+            expect(pendingProviders).toHaveLength(0);
+        });
 
-    it("should get 1 verified provider", async () => {
-        const verifiedProviders = await mediatorApi.getVerifiedProviders(
-            mediatorApiKeyPairs
-        );
+        it("should get verified providers", async () => {
+            const verifiedProviders = await mediatorApi.getVerifiedProviders(
+                mediatorApiKeyPairs
+            );
 
-        expect(verifiedProviders).toHaveLength(1);
+            expect(verifiedProviders).toHaveLength(1);
+        });
     });
 });

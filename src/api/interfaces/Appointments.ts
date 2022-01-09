@@ -2,8 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { PublicProvider } from "../../interfaces";
 import { ECDHData, SignedData } from "./crypto";
-import { ApiSignedPublicProvider, PublicProviderData } from "./Provider";
+import { ApiSignedPublicProvider } from "./Provider";
 import { SignedQueueToken, UserToken } from "./QueueData";
 
 export interface BookingData {
@@ -24,7 +25,7 @@ export interface Slot {
     open?: boolean;
 }
 
-export interface UnpublishedAppointment {
+export interface Appointment {
     id: string;
     timestamp: string;
     duration: number;
@@ -33,10 +34,8 @@ export interface UnpublishedAppointment {
     bookings?: Booking[];
     updatedAt?: string;
     modified?: boolean;
-}
-
-export interface Appointment extends UnpublishedAppointment {
     publicKey: string;
+    provider: PublicProvider;
 }
 
 export interface ApiSignedAppointment extends SignedData {
@@ -44,12 +43,6 @@ export interface ApiSignedAppointment extends SignedData {
     bookedSlots?: Slot[];
     bookings?: Booking[];
     json: Appointment;
-}
-
-export interface PublicKeys {
-    providerData: string;
-    tokenKey: string;
-    rootKey: string;
 }
 
 export interface KeyChain {
@@ -67,12 +60,7 @@ export interface ActorKeyData {
     data?: Record<string, unknown>;
 }
 
-export interface ProviderAppointments {
-    provider: PublicProviderData;
-    appointments: Appointment[];
-}
-
-export interface ApiSignedProviderAppointments {
+export interface ApiSignedAppointments {
     provider: ApiSignedPublicProvider;
     appointments: ApiSignedAppointment[];
     keyChain: KeyChain;

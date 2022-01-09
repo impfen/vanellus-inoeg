@@ -7,14 +7,9 @@ import {
     getProviderApi,
     getUserApi,
 } from "../../tests/test-utils";
+import { Provider } from "../interfaces";
 import { dayjs } from "../utils";
-import {
-    Appointment,
-    ProviderData,
-    ProviderKeyPairs,
-    QueueToken,
-    UnpublishedAppointment,
-} from "./interfaces";
+import { Appointment, ProviderKeyPairs, QueueToken } from "./interfaces";
 import { UserApi } from "./UserApi";
 
 let userApi: UserApi;
@@ -22,7 +17,7 @@ let secret: string;
 let anonApi: AnonymousApi;
 let providerApi: ProviderApi;
 let providerKeyPairs: ProviderKeyPairs;
-let provider: ProviderData;
+let provider: Provider;
 
 beforeAll(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
@@ -50,7 +45,6 @@ beforeAll(async () => {
 });
 
 describe("UserApi", () => {
-    let unpublishedAppointment: UnpublishedAppointment;
     let appointment: Appointment;
     let queueToken: QueueToken;
     const from = dayjs().utc().toDate();
@@ -68,25 +62,23 @@ describe("UserApi", () => {
             .second(0)
             .toDate();
 
-        unpublishedAppointment = providerApi.createAppointment(
+        appointment = providerApi.createAppointment(
             15,
             "moderna",
             5,
-            date
+            date,
+            provider,
+            providerKeyPairs
         );
     });
 
     it("should publish an appointment", async () => {
         const appointments = await providerApi.publishAppointments(
-            [unpublishedAppointment],
+            [appointment],
             providerKeyPairs
         );
 
         expect(appointments).toHaveLength(1);
-
-        if (appointments?.[0]) {
-            appointment = appointments[0];
-        }
     });
 
     it("should get a user-token", async () => {
@@ -105,11 +97,7 @@ describe("UserApi", () => {
     });
 
     it("should book an appointment", async () => {
-        const booking = await userApi.bookAppointment(
-            appointment,
-            provider,
-            queueToken
-        );
+        const booking = await userApi.bookAppointment(appointment, queueToken);
 
         expect(booking).toHaveProperty("token");
     });
@@ -129,7 +117,6 @@ describe("UserApi", () => {
     it("should cancel the booking", async () => {
         const cancelResult = await userApi.cancelAppointment(
             appointment,
-            provider,
             queueToken
         );
 

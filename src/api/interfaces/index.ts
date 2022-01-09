@@ -7,6 +7,7 @@ export * from "./ActorKeyPairs";
 export * from "./AdminConfig";
 export * from "./AdminKeyPairs";
 export * from "./Appointments";
+export * from "./BackendPublicKeys";
 export * from "./Configurables";
 export * from "./crypto";
 export * from "./MediatorKeyPairs";

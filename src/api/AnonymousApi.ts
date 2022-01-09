@@ -1,29 +1,32 @@
+import { PublicProvider } from "../interfaces";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import {
-    ApiSignedProviderAppointments,
-    Appointment,
-    ProviderAppointments,
-    PublicProviderData,
-    Slot,
-} from "./interfaces";
+import { ApiSignedAppointments, Appointment, Slot } from "./interfaces";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
+     * Returns a single Appointment
+     *
      * @todo: verify based on key chain
+     *
+     * @return Promise<Appointments>
      */
     public async getAppointment(id: string, providerID: string) {
-        return this.decryptProviderAppointment(
-            await this.transport.call("getAppointment", {
-                id,
-                providerID,
-            })
+        return (
+            this.decryptAppointments(
+                await this.transport.call("getAppointment", {
+                    id,
+                    providerID,
+                })
+            )[0] || null
         );
     }
 
     /**
      * @todo: verify based on key chain
+     *
+     * @return Promise<Appointments[]>
      */
     public async getAppointmentsByZipCode(
         zipCode: string,
@@ -41,21 +44,27 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
         );
 
-        const providerAppointments: ProviderAppointments[] = [];
+        let appointments: Appointment[] = [];
 
         for (const signedProviderAppointment of signedProviderAppointments) {
-            providerAppointments.push(
-                this.decryptProviderAppointment(signedProviderAppointment)
+            appointments = appointments.concat(
+                this.decryptAppointments(signedProviderAppointment)
             );
         }
 
-        providerAppointments.sort((a, b) =>
-            a.provider.name > b.provider.name ? 1 : -1
-        );
+        // why ???
+        // appointments.sort((a, b) =>
+        //     a.provider.name > b.provider.name ? 1 : -1
+        // );
 
-        return providerAppointments;
+        return appointments;
     }
 
+    /**
+     * Returns a list of public provider-data, filtered by a range of zips
+     *
+     * @returns Promise<PublicProvider[]>
+     */
     public async getProvidersByZipCode(zipFrom: string, zipTo: string) {
         const signedProviders = await this.transport.call(
             "getProvidersByZipCode",
@@ -65,40 +74,55 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
         );
 
-        const providers: PublicProviderData[] = [];
+        const providers: PublicProvider[] = [];
 
         for (const signedProvider of signedProviders) {
-            const publicProviderData = parseUntrustedJSON<PublicProviderData>(
+            const publicProvider = parseUntrustedJSON<PublicProvider>(
                 signedProvider.data
             );
 
-            if (!publicProviderData) {
+            if (!publicProvider) {
                 continue;
             }
 
-            publicProviderData.id = signedProvider.id;
-            providers.push(publicProviderData);
+            publicProvider.id = signedProvider.id;
+            providers.push(publicProvider);
         }
 
         return providers;
     }
 
+    /**
+     * Returns the public keys in the system
+     *
+     * @returns Promise<BackendPublicKeys>
+     */
     public async getKeys() {
         return this.transport.call("getKeys");
     }
 
+    /**
+     * Returns the basic configurable settings which are relevant for the ui.
+     *
+     * Espacially requestable timeframes and vaccines.
+     *
+     * @returns Promise<Configurables>
+     */
     public async getConfigurables() {
         return this.transport.call("getConfigurables");
     }
 
-    protected decryptProviderAppointment(
-        signedProviderAppointments: ApiSignedProviderAppointments
+    /**
+     * Decrypts an appointment
+     *
+     * @returns Appointment[]
+     */
+    protected decryptAppointments(
+        signedProviderAppointments: ApiSignedAppointments
     ) {
-        const publicProviderData = parseUntrustedJSON<PublicProviderData>(
+        const publicProvider = parseUntrustedJSON<PublicProvider>(
             signedProviderAppointments.provider.data
         );
-
-        signedProviderAppointments.provider.json = publicProviderData;
 
         const appointments: Appointment[] = [];
 
@@ -123,18 +147,11 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 }
             }
 
+            appointment.provider = publicProvider;
+
             appointments.push(appointment);
         }
 
-        // we copy the ID for convenience
-        signedProviderAppointments.provider.json.id =
-            signedProviderAppointments.provider.id;
-
-        const providerAppointments: ProviderAppointments = {
-            provider: signedProviderAppointments.provider.json,
-            appointments: appointments,
-        };
-
-        return providerAppointments;
+        return appointments;
     }
 }

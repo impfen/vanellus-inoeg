@@ -1,4 +1,4 @@
-import { PublicProvider } from "../interfaces";
+import { Provider, PublicProvider } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -6,8 +6,7 @@ import {
     ApiEncryptedProviderData,
     ECDHData,
     MediatorKeyPairs,
-    ProviderData,
-    ProviderSignedData,
+    SignedProvider,
 } from "./interfaces";
 import { MediatorApiInterface } from "./MediatorApiInterface";
 import { ecdhDecrypt, ephemeralECDHEncrypt, sign } from "./utils";
@@ -17,31 +16,25 @@ export class MediatorApi extends AbstractApi<
     MediatorKeyPairs
 > {
     /**
-     * @todo Make parameters more explicit
+     * Confirm a given, unconfirmed provider
      *
-     * @param param0
-     * @param keyPairs
-     *
-     * @returns
+     * @return Promise<Provider>
      */
     public async confirmProvider(
-        providerData: ProviderData,
+        providerData: Provider,
         mediatorKeyPairs: MediatorKeyPairs
     ) {
-        const providerPublicKeys = providerData.publicKeys;
-
         const keyHashesData = {
-            signing: providerPublicKeys.signing,
-            encryption: providerPublicKeys.encryption,
+            signing: providerData.publicKeys.signing,
+            encryption: providerData.publicKeys.encryption,
             queueData: {
                 zipCode: providerData.zipCode,
                 accessible: providerData.accessible,
             },
         };
 
-        const keysJSONData = JSON.stringify(keyHashesData);
-
         const publicProvider: PublicProvider = {
+            id: providerData.id,
             name: providerData.name,
             street: providerData.street,
             city: providerData.city,
@@ -51,10 +44,8 @@ export class MediatorApi extends AbstractApi<
             accessible: providerData.accessible,
         };
 
-        const publicProviderJSONData = JSON.stringify(publicProvider);
-
         const signedKeyData = await sign(
-            keysJSONData,
+            JSON.stringify(keyHashesData),
             mediatorKeyPairs.signing.privateKey,
             mediatorKeyPairs.signing.publicKey
         );
@@ -68,19 +59,19 @@ export class MediatorApi extends AbstractApi<
 
         // this will be stored for the general public
         const signedPublicProviderData = await sign(
-            publicProviderJSONData,
+            JSON.stringify(publicProvider),
             mediatorKeyPairs.signing.privateKey,
             mediatorKeyPairs.signing.publicKey
         );
 
-        const fullData: ProviderSignedData = {
+        const providerSignedData: SignedProvider = {
             signedData: signedProviderData,
             signedPublicData: signedPublicProviderData,
         };
 
         // we encrypt the data with the public key supplied by the provider
         const [confirmedProviderData] = await ephemeralECDHEncrypt(
-            JSON.stringify(fullData),
+            JSON.stringify(providerSignedData),
             providerData.publicKeys.data
         );
 
@@ -104,7 +95,11 @@ export class MediatorApi extends AbstractApi<
     }
 
     /**
+     * Returns the decrypted list of all pending providers
      *
+     * A provider is pending until it is confirmed by a mediator.
+     *
+     * @return Promise<Provider[]>
      */
     public async getPendingProviders(mediatorKeyPairs: MediatorKeyPairs) {
         return this.decryptProviderDatas(
@@ -118,7 +113,9 @@ export class MediatorApi extends AbstractApi<
     }
 
     /**
+     * Returns the decrypted list of all verified providers
      *
+     * @return Promise<Provider[]>
      */
     public async getVerifiedProviders(mediatorKeyPairs: MediatorKeyPairs) {
         return this.decryptProviderDatas(
@@ -131,8 +128,13 @@ export class MediatorApi extends AbstractApi<
         );
     }
 
+    /**
+     * Decrypts and parses an array of providerData objects returned by the services
+     *
+     * @return Promise<Provider[]>
+     */
     protected async decryptProviderDatas(
-        encryptedProviderDatas: ApiEncryptedProviderData[],
+        encryptedProviderDatas: Omit<ApiEncryptedProviderData, "id">[],
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         return Promise.all(
@@ -143,10 +145,11 @@ export class MediatorApi extends AbstractApi<
     }
 
     /**
+     * Decrypts and parses a single providerData object returned by the services
+     *
      * @todo verify provider data!
      *
-     * @throws if decryption fails
-     * @throws if json is invalid
+     * @return Promise<Provider>
      */
     protected async decryptProviderData(
         encryptedProviderData: ECDHData,
@@ -157,7 +160,7 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.provider.privateKey
         );
 
-        const providerData = parseUntrustedJSON<ProviderData>(
+        const providerData = parseUntrustedJSON<Omit<Provider, "id">>(
             decryptedProviderDataString
         );
 
