@@ -10,13 +10,13 @@ import {
     ECDHData,
     EncryptedBackup,
     Provider,
+    ProviderAppointment,
     ProviderBackup,
     ProviderInput,
     ProviderKeyPairs,
     PublicProvider,
     SignedData,
     SignedProvider,
-    Slot,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import {
@@ -31,6 +31,7 @@ import {
     sign,
     verify,
 } from "./utils";
+import { createAppointment } from "./utils/appointment";
 
 export class ProviderApi extends AbstractApi<
     AnonymousApiInterface & ProviderApiInterface,
@@ -42,41 +43,26 @@ export class ProviderApi extends AbstractApi<
      * @param duration  length of the appointment in minutes
      * @param vaccine   vaccine offered at the appointment
      * @param slotCount number of people that can be vaccinated
-     * @param timestamp time of the appointment
+     * @param startDate startDate of the appointment
      *
      * @return Appointment
      */
     public createAppointment(
+        startDate: Date,
         duration: number,
         vaccine: string,
         slotCount: number,
-        timestamp: Date,
         provider: PublicProvider,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const slotData: Slot[] = [];
-
-        for (let i = 0; i < slotCount; i++) {
-            slotData[i] = {
-                id: randomBytes(32),
-                open: true,
-            };
-        }
-
-        const now = dayjs().utc().toISOString();
-
-        const appointment: Appointment = {
-            id: randomBytes(32),
-            bookings: [],
-            updatedAt: now,
-            // modified: true,
-            timestamp: dayjs(timestamp).utc().toDate(),
-            duration: duration,
-            properties: { vaccine: vaccine },
-            slotData,
-            publicKey: providerKeyPairs.encryption.publicKey,
+        const appointment: Appointment = createAppointment(
+            startDate,
+            duration,
+            slotCount,
+            vaccine,
             provider,
-        };
+            providerKeyPairs
+        );
 
         return appointment;
     }
@@ -97,7 +83,7 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs.signing
         );
 
-        const appointments: Appointment[] = [];
+        const appointments: ProviderAppointment[] = [];
 
         for (const signedAppointment of signedAppointments) {
             const isVerified = await verify(
@@ -115,14 +101,25 @@ export class ProviderApi extends AbstractApi<
                 signedAppointment.data
             );
 
-            const appointment: Appointment = {
+            const appointment: ProviderAppointment = {
                 ...appointmentData,
-                timestamp: new Date(appointmentData.timestamp),
+                startDate: new Date(appointmentData.startDate),
+                endDate: new Date(
+                    new Date(appointmentData.startDate).getTime() +
+                        1000 * 60 * Math.max(0, appointmentData.duration)
+                ),
+                slotData: appointmentData.slotData.map((slot) => {
+                    slot.open = !signedAppointment.bookedSlots?.some(
+                        (aslot) => aslot.id === slot.id
+                    );
+
+                    return slot;
+                }),
+
                 bookings: await this.decryptBookings(
                     signedAppointment.bookings || [],
                     providerKeyPairs
                 ),
-                // modified: false,
             };
 
             appointments.push(appointment);
@@ -148,7 +145,10 @@ export class ProviderApi extends AbstractApi<
              * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
              */
             const signedAppointment = await sign(
-                JSON.stringify(unpublishedAppointment),
+                JSON.stringify({
+                    timestamp: unpublishedAppointment.startDate.toISOString(),
+                    ...unpublishedAppointment,
+                }),
                 providerKeyPairs.signing.privateKey,
                 providerKeyPairs.signing.publicKey
             );
@@ -162,7 +162,11 @@ export class ProviderApi extends AbstractApi<
                     id: slot.id,
                 })),
                 provider: unpublishedAppointment.provider,
-                timestamp: new Date(unpublishedAppointment.timestamp),
+                startDate: dayjs(unpublishedAppointment.startDate).toDate(),
+                endDate: dayjs(unpublishedAppointment.startDate)
+                    .utc()
+                    .add(unpublishedAppointment.duration, "minutes")
+                    .toDate(),
             });
 
             signedAppointments.push(signedAppointment);
@@ -251,7 +255,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<Provider | null>
      */
-    public async getProvider(providerKeyPairs: ProviderKeyPairs) {
+    public async getVerifiedProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
             const encryptedConfirmedProviderECDAData =
                 await this.transport.call(

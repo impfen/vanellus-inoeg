@@ -1,4 +1,4 @@
-import { AnonymousApi, ProviderApi } from ".";
+import { AnonymousApi, MediatorApi, ProviderApi } from ".";
 import {
     createVerifiedProvider,
     getAdminApi,
@@ -7,12 +7,19 @@ import {
     getProviderApi,
 } from "../../tests/test-utils";
 import { dayjs } from "../utils";
-import { AdminKeyPairs, Provider, ProviderKeyPairs } from "./interfaces";
+import {
+    AdminKeyPairs,
+    MediatorKeyPairs,
+    Provider,
+    ProviderKeyPairs,
+} from "./interfaces";
 
 let adminKeyPairs: AdminKeyPairs;
 let providerKeyPairs: ProviderKeyPairs;
 let providerApi: ProviderApi;
 let provider: Provider;
+let mediatorApi: MediatorApi;
+let mediatorKeyPairs: MediatorKeyPairs;
 let anonymousApi: AnonymousApi;
 
 beforeEach(async () => {
@@ -23,16 +30,17 @@ beforeEach(async () => {
 
     adminKeyPairs = adminResult.adminKeyPairs;
 
+    anonymousApi = getAnonymousApi();
+
     const providerResult = await getProviderApi();
 
     providerKeyPairs = providerResult.providerKeyPairs;
     providerApi = providerResult.providerApi;
 
-    anonymousApi = getAnonymousApi();
+    const mediatorResult = await getMediatorApi({ adminKeyPairs });
 
-    const { mediatorKeyPairs } = await getMediatorApi({
-        adminKeyPairs,
-    });
+    mediatorApi = mediatorResult.mediatorApi;
+    mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
 
     provider = await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
 });
@@ -49,10 +57,10 @@ describe("AnonymousApi", () => {
             .toDate();
 
         const unpublishedAppointment = providerApi.createAppointment(
+            date,
             15,
             "moderna",
             5,
-            date,
             provider,
             providerKeyPairs
         );

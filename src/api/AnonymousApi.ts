@@ -6,6 +6,7 @@ import {
     Appointment,
     PublicProvider,
 } from "./interfaces";
+import { enrichAppointment } from "./utils/appointment";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
@@ -17,7 +18,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      */
     public async getAppointment(id: string, providerID: string) {
         return (
-            this.decryptAppointments(
+            this.parseAppointments(
                 await this.transport.call("getAppointment", {
                     id,
                     providerID,
@@ -51,7 +52,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
-                this.decryptAppointments(signedProviderAppointment)
+                this.parseAppointments(signedProviderAppointment)
             );
         }
 
@@ -116,7 +117,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @returns Appointment[]
      */
-    protected decryptAppointments(
+    protected parseAppointments(
         signedProviderAppointments: ApiSignedAppointments
     ) {
         const provider = parseUntrustedJSON<PublicProvider>(
@@ -130,18 +131,9 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 signedAppointment.data
             );
 
-            appointments.push({
-                ...appointmentData,
-                provider,
-                timestamp: new Date(appointmentData.timestamp),
-                slotData: appointmentData.slotData.map((slot) => {
-                    slot.open = !signedAppointment.bookedSlots?.some(
-                        (aslot) => aslot.id === slot.id
-                    );
-
-                    return slot;
-                }),
-            });
+            appointments.push(
+                enrichAppointment({ ...appointmentData, provider })
+            );
         }
 
         return appointments;

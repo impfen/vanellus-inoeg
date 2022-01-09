@@ -67,10 +67,10 @@ describe("UserApi", () => {
             .toDate();
 
         appointment = providerApi.createAppointment(
+            date,
             15,
             "moderna",
             5,
-            date,
             provider,
             providerKeyPairs
         );

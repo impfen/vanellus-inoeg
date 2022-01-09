@@ -33,9 +33,9 @@ beforeAll(async () => {
     providerApi = providerResult.providerApi;
     providerKeyPairs = providerResult.providerKeyPairs;
 
-    const mediatorResult = await getMediatorApi({ adminKeyPairs });
-
     anonymousApi = getAnonymousApi();
+
+    const mediatorResult = await getMediatorApi({ adminKeyPairs });
 
     mediatorApi = mediatorResult.mediatorApi;
     mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
@@ -60,10 +60,10 @@ describe("ProviderApi", () => {
                 .toDate();
 
             appointment = providerApi.createAppointment(
+                date,
                 15,
                 "moderna",
                 5,
-                date,
                 provider,
                 providerKeyPairs
             );
@@ -114,7 +114,7 @@ describe("ProviderApi", () => {
         });
 
         it("should retrieve no data while provider is pending", async () => {
-            const checkResult = await providerApi.getProvider(
+            const checkResult = await providerApi.getVerifiedProvider(
                 providerKeyPairs2
             );
 
@@ -139,7 +139,9 @@ describe("ProviderApi", () => {
         });
 
         it("should get data for confirmed provider", async () => {
-            const result3 = await providerApi.getProvider(providerKeyPairs2);
+            const result3 = await providerApi.getVerifiedProvider(
+                providerKeyPairs2
+            );
 
             expect(result3).toHaveProperty("name");
         });

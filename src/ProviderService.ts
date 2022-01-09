@@ -1,4 +1,5 @@
 import { JsonRpcTransport, ProviderApi } from "./api";
+import { createAppointmentSet } from "./api/utils";
 import { AuthError } from "./errors";
 import {
     Appointment,
@@ -41,10 +42,10 @@ export class ProviderService {
     }
 
     public async createAppointment(
+        startDate: Date,
         duration: number,
         vaccine: string,
-        slotCount: number,
-        timestamp: Date
+        slotCount: number
     ) {
         const provider = await this.getAuthenticatedProvider();
 
@@ -53,10 +54,34 @@ export class ProviderService {
         }
 
         return this.providerApi.createAppointment(
+            startDate,
             duration,
             vaccine,
             slotCount,
-            timestamp,
+            provider,
+            this.getKeyPairs()
+        );
+    }
+
+    public async createAppointmentSet(
+        startDate: Date,
+        endDate: Date,
+        interval: number,
+        vaccine: string,
+        lanes: number
+    ) {
+        const provider = await this.getAuthenticatedProvider();
+
+        if (!provider) {
+            throw new AuthError("");
+        }
+
+        return createAppointmentSet(
+            startDate,
+            endDate,
+            interval,
+            lanes,
+            vaccine,
             provider,
             this.getKeyPairs()
         );
@@ -93,7 +118,7 @@ export class ProviderService {
     }
 
     protected getAuthenticatedProvider() {
-        return this.providerApi.getProvider(this.getKeyPairs());
+        return this.providerApi.getVerifiedProvider(this.getKeyPairs());
     }
 
     protected getKeyPairs() {

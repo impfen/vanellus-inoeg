@@ -8,13 +8,15 @@ export interface Slot {
 
 export interface Appointment {
     id: string;
-    timestamp: Date;
+    provider: PublicProvider;
+    startDate: Date;
+    endDate: Date;
     duration: number;
     properties: Record<string, unknown>;
     slotData: Slot[];
-    bookings?: Booking[];
-    // modified?: boolean;
     publicKey: string;
-    provider: PublicProvider;
-    updatedAt?: string;
+}
+
+export interface ProviderAppointment extends Appointment {
+    bookings?: Booking[];
 }

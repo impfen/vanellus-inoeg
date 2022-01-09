@@ -15,8 +15,8 @@ export class StorageApi {
         protected readonly transport: Transport<StorageApiInterface>
     ) {}
 
-    public async backup<BackupData>(backupData: BackupData, secret: string) {
-        const [id, key] = await deriveSecrets(base322buf(secret), 32, 2);
+    public async backup<Backup>(backupData: Backup, secret: string) {
+        const [id, key] = await this.deriveSecret(secret);
 
         const encryptedData = await aesEncrypt(
             JSON.stringify(backupData),
@@ -33,14 +33,14 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new VanellusError("Could not backup user-data");
+            throw new VanellusError("Couldn't backup data");
         }
 
         return encryptedData;
     }
 
-    public async restore<BackupData>(secret: string) {
-        const [id, key] = await deriveSecrets(base322buf(secret), 32, 2);
+    public async restore<Backup>(secret: string) {
+        const [id, key] = await this.deriveSecret(secret);
 
         const encryptedBackup = await this.transport.call("getSettings", {
             id: id,
@@ -48,6 +48,10 @@ export class StorageApi {
 
         const decryptedData = await aesDecrypt(encryptedBackup, b642buf(key));
 
-        return parseUntrustedJSON<BackupData>(decryptedData);
+        return parseUntrustedJSON<Backup>(decryptedData);
+    }
+
+    protected deriveSecret(secret: string) {
+        return deriveSecrets(base322buf(secret), 32, 2);
     }
 }

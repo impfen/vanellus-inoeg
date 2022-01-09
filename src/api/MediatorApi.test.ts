@@ -12,20 +12,17 @@ import { MediatorKeyPairs, Provider } from "./interfaces";
 import { MediatorApi } from "./MediatorApi";
 
 let mediatorApi: MediatorApi;
-let mediatorApiKeyPairs: MediatorKeyPairs;
+let mediatorKeyPairs: MediatorKeyPairs;
 
 beforeAll(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
 
     await adminApi.resetAppointmentsDb(adminKeyPairs);
 
-    mediatorApiKeyPairs = await adminApi.generateMediatorKeys(adminKeyPairs);
-    await adminApi.addMediatorPublicKeys(mediatorApiKeyPairs, adminKeyPairs);
-
     const mediatorResult = await getMediatorApi({ adminKeyPairs });
 
     mediatorApi = mediatorResult.mediatorApi;
-    mediatorApiKeyPairs = mediatorResult.mediatorKeyPairs;
+    mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
 });
 
 describe("MediatorService", () => {
@@ -42,7 +39,7 @@ describe("MediatorService", () => {
             expect(providerData).toHaveProperty("id");
 
             const pendingProviders = await mediatorApi.getPendingProviders(
-                mediatorApiKeyPairs
+                mediatorKeyPairs
             );
 
             expect(pendingProviders).toHaveLength(1);
@@ -52,7 +49,7 @@ describe("MediatorService", () => {
         it("should confirm provider", async () => {
             const confirmedProvider = await mediatorApi.confirmProvider(
                 providerData,
-                mediatorApiKeyPairs
+                mediatorKeyPairs
             );
 
             expect(confirmedProvider).toHaveProperty("name");
@@ -60,7 +57,7 @@ describe("MediatorService", () => {
 
         it("should not fetch pending providers after confirmation", async () => {
             const pendingProviders = await mediatorApi.getPendingProviders(
-                mediatorApiKeyPairs
+                mediatorKeyPairs
             );
 
             expect(pendingProviders).toHaveLength(0);
@@ -68,7 +65,7 @@ describe("MediatorService", () => {
 
         it("should get verified providers", async () => {
             const verifiedProviders = await mediatorApi.getVerifiedProviders(
-                mediatorApiKeyPairs
+                mediatorKeyPairs
             );
 
             expect(verifiedProviders).toHaveLength(1);
