@@ -1,13 +1,18 @@
-import { UserApi } from ".";
+import { AnonymousApi, UserApi } from ".";
+import { QueueToken } from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports";
+import { AuthError } from "./errors";
+import { Appointment, UserKeyPairs } from "./interfaces";
 
 export class UserService {
     protected userApi: UserApi;
-
-    protected secret: string | undefined;
+    protected anonymousApi: AnonymousApi;
+    protected secret?: string;
+    protected keyPairs?: UserKeyPairs;
 
     public constructor(readonly apiUrl: string) {
         this.userApi = new UserApi(new JsonRpcTransport(apiUrl));
+        this.anonymousApi = new AnonymousApi(new JsonRpcTransport(apiUrl));
     }
 
     public authenticate(secret: string) {
@@ -24,5 +29,49 @@ export class UserService {
         this.secret = undefined;
 
         return true;
+    }
+
+    public async getAppointment(appointmentId: string, providerID: string) {
+        return this.anonymousApi.getAppointment(appointmentId, providerID);
+    }
+
+    public async getAppointmentsByZipCode(
+        zipCode: string,
+        radius: number,
+        from: Date,
+        to: Date
+    ) {
+        return this.anonymousApi.getAppointmentsByZipCode(
+            zipCode,
+            radius,
+            from,
+            to
+        );
+    }
+
+    public async getProvidersByZipCode(zipFrom: string, zipTo: string) {
+        return this.anonymousApi.getProvidersByZipCode(zipFrom, zipTo);
+    }
+
+    public async bookAppointment(
+        appointment: Appointment,
+        queueToken: QueueToken
+    ) {
+        return this.userApi.bookAppointment(appointment, queueToken);
+    }
+
+    public async cancelAppointment(
+        appointment: Appointment,
+        queueToken: QueueToken
+    ) {
+        return this.userApi.cancelAppointment(appointment, queueToken);
+    }
+
+    protected getKeyPairs() {
+        if (!this.keyPairs) {
+            throw new AuthError();
+        }
+
+        return this.keyPairs;
     }
 }

@@ -1,8 +1,10 @@
 import { MediatorApi } from "./api";
-import { MediatorKeyPairs } from "./api/interfaces";
+import { MediatorKeyPairs, Provider } from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports/JsonRpcTransport";
 import { AuthError } from "./errors/AuthError";
-
+/**
+ * High-level-API for the mediator.
+ */
 export class MediatorService {
     protected mediatorApi: MediatorApi;
     protected keyPairs: MediatorKeyPairs | undefined;
@@ -27,16 +29,16 @@ export class MediatorService {
         return true;
     }
 
+    public async confirmProvider(provider: Provider) {
+        return this.mediatorApi.confirmProvider(provider, this.getKeyPairs());
+    }
+
     /**
      *
      * @throws AuthError if proper keys are absent
      */
     public getPendingProviders() {
-        if (!this.keyPairs) {
-            throw new AuthError();
-        }
-
-        return this.mediatorApi.getPendingProviders(this.keyPairs);
+        return this.mediatorApi.getPendingProviders(this.getKeyPairs());
     }
 
     /**
@@ -44,10 +46,14 @@ export class MediatorService {
      * @throws AuthError if proper keys are absent
      */
     public getVerifiedProviders() {
+        return this.mediatorApi.getVerifiedProviders(this.getKeyPairs());
+    }
+
+    protected getKeyPairs() {
         if (!this.keyPairs) {
             throw new AuthError();
         }
 
-        return this.mediatorApi.getVerifiedProviders(this.keyPairs);
+        return this.keyPairs;
     }
 }

@@ -1,14 +1,15 @@
-import { MediatorApi } from "./api";
-import { ProviderKeyPairs } from "./api/interfaces";
+import { ProviderApi } from "./api";
+import { Appointment, ProviderInput, ProviderKeyPairs } from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports/JsonRpcTransport";
+import { AuthError } from "./errors";
 
 export class ProviderService {
-    protected mediatorApi: MediatorApi;
+    protected providerApi: ProviderApi;
     protected keyPairs: ProviderKeyPairs | undefined;
     protected secret: string | undefined;
 
     public constructor(readonly apiUrl: string) {
-        this.mediatorApi = new MediatorApi(new JsonRpcTransport(apiUrl));
+        this.providerApi = new ProviderApi(new JsonRpcTransport(apiUrl));
     }
 
     public authenticate(secret: string, keyPairs: ProviderKeyPairs) {
@@ -27,5 +28,69 @@ export class ProviderService {
         this.keyPairs = undefined;
 
         return true;
+    }
+
+    public async createAppointment(
+        duration: number,
+        vaccine: string,
+        slotCount: number,
+        timestamp: Date
+    ) {
+        const provider = await this.getAuthenticatedProvider();
+
+        if (!provider) {
+            throw new AuthError("");
+        }
+
+        return this.providerApi.createAppointment(
+            duration,
+            vaccine,
+            slotCount,
+            timestamp,
+            provider,
+            this.getKeyPairs()
+        );
+    }
+
+    public async getProviderAppointments(from: Date, to: Date) {
+        return this.providerApi.getProviderAppointments(
+            from,
+            to,
+            this.getKeyPairs()
+        );
+    }
+
+    public async publishAppointments(unpublishedAppointments: Appointment[]) {
+        return this.providerApi.publishAppointments(
+            unpublishedAppointments,
+            this.getKeyPairs()
+        );
+    }
+
+    public async cancelAppointment(appointment: Appointment) {
+        return this.providerApi.cancelAppointment(
+            appointment,
+            this.getKeyPairs()
+        );
+    }
+
+    public async storeProvider(providerInput: ProviderInput, code?: string) {
+        return this.providerApi.storeProvider(
+            providerInput,
+            this.getKeyPairs(),
+            code
+        );
+    }
+
+    protected getAuthenticatedProvider() {
+        return this.providerApi.getProvider(this.getKeyPairs());
+    }
+
+    protected getKeyPairs() {
+        if (!this.keyPairs) {
+            throw new AuthError();
+        }
+
+        return this.keyPairs;
     }
 }
