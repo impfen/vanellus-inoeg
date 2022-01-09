@@ -1,3 +1,4 @@
+import { PublicProvider } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -7,7 +8,6 @@ import {
     MediatorKeyPairs,
     ProviderData,
     ProviderSignedData,
-    PublicProvider,
 } from "./interfaces";
 import { MediatorApiInterface } from "./MediatorApiInterface";
 import { ecdhDecrypt, ephemeralECDHEncrypt, sign } from "./utils";

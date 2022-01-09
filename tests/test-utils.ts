@@ -4,11 +4,11 @@ import {
     AdminConfig,
     AdminKeyPairs,
     MediatorKeyPairs,
-    Provider,
     ProviderKeyPairs,
     UserKeyPairs,
 } from "../src/api/interfaces";
 import { JsonRpcTransport } from "../src/api/transports";
+import { Provider } from "../src/interfaces";
 
 const defaultProviderData: Provider = {
     name: "Max Mustermann",
