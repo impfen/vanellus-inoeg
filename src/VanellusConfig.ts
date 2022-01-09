@@ -2,19 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-export const settingsPath =
-    process.env.KIEBITZ_SETTINGS || "../../test_backend";
+import { Config } from "./interfaces";
 
-export const settingsJSONRPC = {
-    apiUrls: {
-        appointments: `http://127.0.0.1:22222/jsonrpc`,
-        storage: `http://127.0.0.1:11111/jsonrpc`,
-    },
-};
-
-export const settingsREST = {
-    apiUrls: {
-        appointments: `http://127.0.0.1:22222/`,
-        storage: `http://127.0.0.1:11111/`,
+export const vanellusConfig: Config = {
+    endpoints: {
+        appointments:
+            process.env.KIEBITZ_APPOINTMENTS_ENDPOINT ||
+            `http://127.0.0.1:22222/jsonrpc`,
+        storage:
+            process.env.KIEBITZ_STORAGE_ENDPOINT ||
+            `http://127.0.0.1:11111/jsonrpc`,
     },
 };

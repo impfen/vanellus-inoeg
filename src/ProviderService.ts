@@ -1,5 +1,10 @@
 import { ProviderApi } from "./api";
-import { Appointment, ProviderInput, ProviderKeyPairs } from "./api/interfaces";
+import {
+    Appointment,
+    Config,
+    ProviderInput,
+    ProviderKeyPairs,
+} from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports/JsonRpcTransport";
 import { AuthError } from "./errors";
 
@@ -8,8 +13,10 @@ export class ProviderService {
     protected keyPairs: ProviderKeyPairs | undefined;
     protected secret: string | undefined;
 
-    public constructor(readonly apiUrl: string) {
-        this.providerApi = new ProviderApi(new JsonRpcTransport(apiUrl));
+    public constructor(readonly config: Config) {
+        this.providerApi = new ProviderApi(
+            new JsonRpcTransport(config.endpoints.appointments)
+        );
     }
 
     public authenticate(secret: string, keyPairs: ProviderKeyPairs) {

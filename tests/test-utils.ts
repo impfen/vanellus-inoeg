@@ -1,4 +1,10 @@
-import { AnonymousApi, MediatorApi, ProviderApi, UserApi } from "../src";
+import {
+    AnonymousApi,
+    MediatorApi,
+    ProviderApi,
+    UserApi,
+    vanellusConfig,
+} from "../src";
 import { AdminApi } from "../src/api/AdminApi";
 import {
     AdminConfig,
@@ -20,16 +26,14 @@ const defaultProviderData: ProviderInput = {
     accessible: true,
 };
 
-const apiUrl =
-    process.env.KIEBITZ_APPOINTMENT_ENDPOINT ||
-    "http://localhost:22222/jsonrpc";
-
 const adminJsonPath = `${
     process.env.KIEBITZ_SETTINGS || "./fixtures/keys"
 }/002_admin.json`;
 
 export const getAnonymousApi = () => {
-    const anonymousApi = new AnonymousApi(new JsonRpcTransport(apiUrl));
+    const anonymousApi = new AnonymousApi(
+        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
+    );
 
     return anonymousApi;
 };
@@ -41,7 +45,9 @@ export const getAdminApi = async (adminKeyPairs?: AdminKeyPairs) => {
         adminKeyPairs = await AdminApi.generateAdminKeys(jsonData);
     }
 
-    const adminApi = new AdminApi(new JsonRpcTransport(apiUrl));
+    const adminApi = new AdminApi(
+        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
+    );
 
     return {
         adminApi,
@@ -53,7 +59,9 @@ export const getUserApi = async (
     userKeyPairs?: UserKeyPairs,
     userSecret?: string
 ) => {
-    const userApi = new UserApi(new JsonRpcTransport(apiUrl));
+    const userApi = new UserApi(
+        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
+    );
 
     if (!userSecret) {
         userSecret = userApi.generateSecret();
@@ -71,7 +79,9 @@ export const getUserApi = async (
 };
 
 export const getProviderApi = async (providerKeyPairs?: ProviderKeyPairs) => {
-    const providerApi = new ProviderApi(new JsonRpcTransport(apiUrl));
+    const providerApi = new ProviderApi(
+        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
+    );
 
     if (!providerKeyPairs) {
         providerKeyPairs = await providerApi.generateKeyPairs();
@@ -90,7 +100,9 @@ export const getMediatorApi = async ({
     adminKeyPairs?: AdminKeyPairs;
     mediatorKeyPairs?: MediatorKeyPairs;
 }) => {
-    const mediatorApi = new MediatorApi(new JsonRpcTransport(apiUrl));
+    const mediatorApi = new MediatorApi(
+        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
+    );
 
     if (!mediatorKeyPairs) {
         const adminResult = await getAdminApi(adminKeyPairs);

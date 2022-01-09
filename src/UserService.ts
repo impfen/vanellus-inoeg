@@ -1,5 +1,5 @@
 import { AnonymousApi, UserApi } from ".";
-import { QueueToken } from "./api/interfaces";
+import { Config, QueueToken } from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports";
 import { AuthError } from "./errors";
 import { Appointment, UserKeyPairs } from "./interfaces";
@@ -10,9 +10,13 @@ export class UserService {
     protected secret?: string;
     protected keyPairs?: UserKeyPairs;
 
-    public constructor(readonly apiUrl: string) {
-        this.userApi = new UserApi(new JsonRpcTransport(apiUrl));
-        this.anonymousApi = new AnonymousApi(new JsonRpcTransport(apiUrl));
+    public constructor(readonly config: Config) {
+        this.userApi = new UserApi(
+            new JsonRpcTransport(config.endpoints.appointments)
+        );
+        this.anonymousApi = new AnonymousApi(
+            new JsonRpcTransport(config.endpoints.appointments)
+        );
     }
 
     public authenticate(secret: string) {

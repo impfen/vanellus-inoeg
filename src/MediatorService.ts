@@ -2,6 +2,7 @@ import { MediatorApi } from "./api";
 import { MediatorKeyPairs, Provider } from "./api/interfaces";
 import { JsonRpcTransport } from "./api/transports/JsonRpcTransport";
 import { AuthError } from "./errors/AuthError";
+import { Config } from "./interfaces";
 /**
  * High-level-API for the mediator.
  */
@@ -9,8 +10,10 @@ export class MediatorService {
     protected mediatorApi: MediatorApi;
     protected keyPairs: MediatorKeyPairs | undefined;
 
-    public constructor(readonly apiUrl: string) {
-        this.mediatorApi = new MediatorApi(new JsonRpcTransport(apiUrl));
+    public constructor(config: Config) {
+        this.mediatorApi = new MediatorApi(
+            new JsonRpcTransport(config.endpoints.appointments)
+        );
     }
 
     public authenticate(keyPairs: MediatorKeyPairs) {
