@@ -74,7 +74,7 @@ describe("AnonymousApi", () => {
             providerAppointments[0].provider.id
         );
 
-        expect(providerAppointment.appointment.id).toEqual(appointment.id);
+        expect(providerAppointment.appointments[0].id).toEqual(appointment.id);
     });
 
     it("should create and authenticate a provider and work with appointments", async function () {

@@ -39,22 +39,6 @@ export class UserApi extends AbstractApi<
         );
     }
 
-    public generateSecret() {
-        return buf2base32(b642buf(randomBytes(10)));
-    }
-
-    public async generateKeyPairs() {
-        const signingKeyPair = await generateECDSAKeyPair();
-        const encryptionKeyPair = await generateECDHKeyPair();
-
-        const keyPairs = {
-            signing: signingKeyPair,
-            encryption: encryptionKeyPair,
-        };
-
-        return keyPairs;
-    }
-
     public async bookAppointment(
         appointment: Appointment,
         provider: PublicProviderData,
@@ -126,6 +110,22 @@ export class UserApi extends AbstractApi<
         };
 
         return queueToken;
+    }
+
+    public generateSecret() {
+        return buf2base32(b642buf(randomBytes(10)));
+    }
+
+    public async generateKeyPairs() {
+        const signingKeyPair = await generateECDSAKeyPair();
+        const encryptionKeyPair = await generateECDHKeyPair();
+
+        const keyPairs = {
+            signing: signingKeyPair,
+            encryption: encryptionKeyPair,
+        };
+
+        return keyPairs;
     }
 
     protected async hashContactData(data: ContactData) {

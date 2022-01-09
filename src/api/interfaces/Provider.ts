@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Provider, PublicProvider } from "../../interfaces";
 import { ECDHData, SignedData } from "./crypto";
 
 export type ProviderBackupReferenceData = Record<string, unknown>;
@@ -30,20 +31,6 @@ export type VerifiedProviderData = Record<string, string>;
 export interface ApiSignedPublicProvider extends SignedData {
     id: string;
     json?: PublicProviderData;
-}
-
-export interface PublicProvider {
-    name: string;
-    street: string;
-    city: string;
-    zipCode: string;
-    description: string;
-    accessible: boolean;
-    website?: string;
-}
-
-export interface Provider extends PublicProvider {
-    email: string;
 }
 
 export interface PublicProviderData extends PublicProvider {

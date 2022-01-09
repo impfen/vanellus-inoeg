@@ -2,6 +2,7 @@ import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
+    ApiEncryptedProviderData,
     ECDHData,
     MediatorKeyPairs,
     ProviderData,
@@ -105,41 +106,62 @@ export class MediatorApi extends AbstractApi<
     /**
      *
      */
-    public async getPendingProviders(keyPairs: MediatorKeyPairs) {
-        const encryptedProviders = await this.transport.call(
-            "getPendingProviderData",
-            { limit: undefined },
-            keyPairs.signing
-        );
-
-        return Promise.all(
-            encryptedProviders.map(({ encryptedData }) =>
-                this.decryptProviderData(
-                    encryptedData,
-                    keyPairs.provider.privateKey
-                )
-            )
+    public async getPendingProviders(mediatorKeyPairs: MediatorKeyPairs) {
+        return this.decryptProviderDatas(
+            await this.transport.call(
+                "getPendingProviderData",
+                { limit: undefined },
+                mediatorKeyPairs.signing
+            ),
+            mediatorKeyPairs
         );
     }
 
     /**
      *
      */
-    public async getVerifiedProviders(keyPairs: MediatorKeyPairs) {
-        const encryptedProviders = await this.transport.call(
-            "getVerifiedProviderData",
-            { limit: undefined },
-            keyPairs.signing
+    public async getVerifiedProviders(mediatorKeyPairs: MediatorKeyPairs) {
+        return this.decryptProviderDatas(
+            await this.transport.call(
+                "getVerifiedProviderData",
+                { limit: undefined },
+                mediatorKeyPairs.signing
+            ),
+            mediatorKeyPairs
         );
+    }
 
+    protected async decryptProviderDatas(
+        encryptedProviderDatas: ApiEncryptedProviderData[],
+        mediatorKeyPairs: MediatorKeyPairs
+    ) {
         return Promise.all(
-            encryptedProviders.map(({ encryptedData }) =>
-                this.decryptProviderData(
-                    encryptedData,
-                    keyPairs.provider.privateKey
-                )
+            encryptedProviderDatas.map(({ encryptedData }) =>
+                this.decryptProviderData(encryptedData, mediatorKeyPairs)
             )
         );
+    }
+
+    /**
+     * @todo verify provider data!
+     *
+     * @throws if decryption fails
+     * @throws if json is invalid
+     */
+    protected async decryptProviderData(
+        encryptedProviderData: ECDHData,
+        mediatorKeyPairs: MediatorKeyPairs
+    ) {
+        const decryptedProviderDataString = await ecdhDecrypt(
+            encryptedProviderData,
+            mediatorKeyPairs.provider.privateKey
+        );
+
+        const providerData = parseUntrustedJSON<ProviderData>(
+            decryptedProviderDataString
+        );
+
+        return providerData;
     }
 
     // /**
@@ -150,26 +172,4 @@ export class MediatorApi extends AbstractApi<
     // protected async getStats(params: any) {
     //     return this.backend.getStats(params)
     // }
-
-    /**
-     * @todo verify provider data!
-     *
-     * @throws if decryption fails
-     * @throws if json is invalid
-     */
-    protected async decryptProviderData(
-        encryptedProviderData: ECDHData,
-        privateKey: JsonWebKey
-    ) {
-        const decryptedProviderDataString = await ecdhDecrypt(
-            encryptedProviderData,
-            privateKey
-        );
-
-        const providerData = parseUntrustedJSON<ProviderData>(
-            decryptedProviderDataString
-        );
-
-        return providerData;
-    }
 }

@@ -1,74 +1,37 @@
-import { VanellusError } from "../errors";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    ApiProviderAppointments,
-    ApiSignedAppointment,
     ApiSignedProviderAppointments,
     Appointment,
+    ProviderAppointments,
     PublicProviderData,
     Slot,
 } from "./interfaces";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
+    /**
+     * @todo: verify based on key chain
+     */
     public async getAppointment(id: string, providerID: string) {
-        const providerAppointments = await this.transport.call(
-            "getAppointment",
-            {
+        return this.decryptProviderAppointment(
+            await this.transport.call("getAppointment", {
                 id,
                 providerID,
-            }
+            })
         );
-
-        const jsonProvider = this.verifyProviderData(providerAppointments);
-
-        if (!jsonProvider) {
-            throw new VanellusError("invalid provider");
-        }
-
-        providerAppointments.provider.json = jsonProvider;
-
-        const signedAppointment = providerAppointments.appointments[0];
-
-        const appointment = this.verifyAppointment(
-            signedAppointment
-            // providerAppointments
-        );
-
-        if (!appointment) {
-            throw new VanellusError("invalid appointment");
-        }
-
-        for (const slot of appointment.slotData) {
-            if (
-                signedAppointment.bookedSlots?.some(
-                    (bookedSlot) => bookedSlot.id === slot.id
-                )
-            ) {
-                slot.open = false;
-            } else {
-                slot.open = true;
-            }
-        }
-
-        // we copy the ID for convenience
-        providerAppointments.provider.json.id =
-            providerAppointments.provider.id;
-
-        return {
-            provider: providerAppointments.provider.json,
-            appointment: appointment,
-        };
     }
 
+    /**
+     * @todo: verify based on key chain
+     */
     public async getAppointmentsByZipCode(
         zipCode: string,
         radius: number,
         from: Date,
         to: Date
     ) {
-        const unverifiedProviderAppointments = await this.transport.call(
+        const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
             {
                 zipCode,
@@ -78,52 +41,12 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
         );
 
-        const providerAppointments: ApiProviderAppointments[] = [];
+        const providerAppointments: ProviderAppointments[] = [];
 
-        for (const providerAppointment of unverifiedProviderAppointments) {
-            const jsonProvider = this.verifyProviderData(providerAppointment);
-
-            if (!jsonProvider) {
-                throw new VanellusError("invalid provider");
-            }
-
-            providerAppointment.provider.json = jsonProvider;
-
-            const appointments: Appointment[] = [];
-
-            for (const signedAppointment of providerAppointment.appointments) {
-                const appointment = this.verifyAppointment(
-                    signedAppointment
-                    // providerAppointment
-                );
-
-                if (!appointment) {
-                    continue;
-                }
-
-                for (const slot of appointment.slotData) {
-                    if (
-                        signedAppointment.bookedSlots?.some(
-                            (aslot: Slot) => aslot.id === slot.id
-                        )
-                    ) {
-                        slot.open = false;
-                    } else {
-                        slot.open = true;
-                    }
-                }
-
-                appointments.push(appointment);
-            }
-
-            // we copy the ID for convenience
-            providerAppointment.provider.json.id =
-                providerAppointment.provider.id;
-
-            providerAppointments.push({
-                provider: providerAppointment.provider.json,
-                appointments: appointments,
-            });
+        for (const signedProviderAppointment of signedProviderAppointments) {
+            providerAppointments.push(
+                this.decryptProviderAppointment(signedProviderAppointment)
+            );
         }
 
         providerAppointments.sort((a, b) =>
@@ -168,59 +91,50 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         return this.transport.call("getConfigurables");
     }
 
-    /**
-     * @todo: verify based on key chain
-     */
-    protected verifyAppointment(
-        signedAppointment: ApiSignedAppointment
-        // providerAppointments: ProviderAppointments
+    protected decryptProviderAppointment(
+        signedProviderAppointments: ApiSignedProviderAppointments
     ) {
-        // let found = false;
-
-        // for (const providerKeys of keys.lists.providers) {
-        //     if (providerKeys.json.signing === signedAppointment.publicKey) {
-        //         found = true;
-        //         break;
-        //     }
-        // }
-        // if (!found) {
-        //     throw new Error("invalid key");
-        // }
-
-        // const result = await verify(
-        //     [signedAppointment.publicKey],
-        //     signedAppointment
-        // );
-
-        // if (!result) {
-        //     throw new Error("invalid signature");
-        // }
-
-        return parseUntrustedJSON<Appointment>(signedAppointment.data);
-    }
-
-    /**
-     * @todo verify based on key chain
-     */
-    protected verifyProviderData(
-        providerAppointments: ApiSignedProviderAppointments
-    ) {
-        /*
-        let found = false;
-        if (item.keyChain.mediator.signin)
-        for (const mediatorKeys of keys.lists.mediators) {
-            if (mediatorKeys.json.signing === providerData.publicKey) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) throw 'invalid key';
-        const result = await verify([item.provider.publicKey], providerData);
-        if (!result) throw 'invalid signature';
-        */
-
-        return parseUntrustedJSON<PublicProviderData>(
-            providerAppointments.provider.data
+        const publicProviderData = parseUntrustedJSON<PublicProviderData>(
+            signedProviderAppointments.provider.data
         );
+
+        signedProviderAppointments.provider.json = publicProviderData;
+
+        const appointments: Appointment[] = [];
+
+        for (const signedAppointment of signedProviderAppointments.appointments) {
+            const appointment = parseUntrustedJSON<Appointment>(
+                signedAppointment.data
+            );
+
+            if (!appointment) {
+                continue;
+            }
+
+            for (const slot of appointment.slotData) {
+                if (
+                    signedAppointment.bookedSlots?.some(
+                        (aslot: Slot) => aslot.id === slot.id
+                    )
+                ) {
+                    slot.open = false;
+                } else {
+                    slot.open = true;
+                }
+            }
+
+            appointments.push(appointment);
+        }
+
+        // we copy the ID for convenience
+        signedProviderAppointments.provider.json.id =
+            signedProviderAppointments.provider.id;
+
+        const providerAppointments: ProviderAppointments = {
+            provider: signedProviderAppointments.provider.json,
+            appointments: appointments,
+        };
+
+        return providerAppointments;
     }
 }

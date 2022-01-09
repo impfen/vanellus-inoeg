@@ -1,3 +1,4 @@
+import { Provider } from "../interfaces";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -6,7 +7,6 @@ import {
     Booking,
     BookingData,
     ECDHData,
-    Provider,
     ProviderData,
     ProviderKeyPairs,
     ProviderSignedData,
@@ -207,32 +207,23 @@ export class ProviderApi extends AbstractApi<
 
     public async storeProvider(
         provider: Provider,
-        keyPairs: ProviderKeyPairs,
+        providerKeyPairs: ProviderKeyPairs,
         code?: string
     ) {
         const keys = await this.transport.call("getKeys");
 
         const providerDataWithoutId = Object.assign({}, provider, {
             publicKeys: {
-                data: keyPairs.data.publicKey,
-                signing: keyPairs.signing.publicKey,
-                encryption: keyPairs.encryption.publicKey,
+                data: providerKeyPairs.data.publicKey,
+                signing: providerKeyPairs.signing.publicKey,
+                encryption: providerKeyPairs.encryption.publicKey,
             },
         });
 
         const encryptedData = await ecdhEncrypt(
             JSON.stringify(providerDataWithoutId),
-            keyPairs.data,
+            providerKeyPairs.data,
             keys.providerData
-        );
-
-        await this.transport.call(
-            "storeProviderData",
-            {
-                encryptedData: encryptedData,
-                code: code,
-            },
-            keyPairs.signing
         );
 
         const { id } = await this.transport.call(
@@ -241,7 +232,7 @@ export class ProviderApi extends AbstractApi<
                 encryptedData: encryptedData,
                 code: code,
             },
-            keyPairs.signing
+            providerKeyPairs.signing
         );
 
         const providerData: ProviderData = {

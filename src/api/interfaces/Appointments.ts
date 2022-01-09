@@ -23,6 +23,7 @@ export interface Slot {
     id: string;
     open?: boolean;
 }
+
 export interface UnpublishedAppointment {
     id: string;
     timestamp: string;
@@ -66,7 +67,7 @@ export interface ActorKeyData {
     data?: Record<string, unknown>;
 }
 
-export interface ApiProviderAppointments {
+export interface ProviderAppointments {
     provider: PublicProviderData;
     appointments: Appointment[];
 }
