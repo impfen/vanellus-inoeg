@@ -1,9 +1,5 @@
-import { UserKeyPairs } from ".";
-import { SignedData } from "./crypto";
-
-export interface ContactData {
-    name?: string;
-}
+import { UserKeyPairs } from "../api/interfaces";
+import { SignedData } from "../api/interfaces/crypto";
 
 export interface UserToken {
     version: string;
@@ -15,13 +11,12 @@ export interface UserToken {
 
 export interface QueueData {
     zipCode: string;
+    accessible?: boolean;
 }
 
-export type ApiSignedQueueToken = SignedData;
-
-export interface QueueToken {
+export interface UserQueueToken {
     keyPairs: UserKeyPairs;
-    signedToken: ApiSignedQueueToken;
+    signedToken: SignedData;
     userToken: UserToken;
     createdAt: string;
     hashNonce: string;

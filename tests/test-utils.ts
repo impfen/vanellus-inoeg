@@ -128,7 +128,7 @@ export const createUnverifiedProvider = async (
 ) => {
     const { providerApi } = await getProviderApi(providerKeyPairs);
 
-    return providerApi.storeProvider(providerInput, providerKeyPairs);
+    return providerApi.storeUnverifiedProvider(providerInput, providerKeyPairs);
 };
 
 export const createVerifiedProvider = async (

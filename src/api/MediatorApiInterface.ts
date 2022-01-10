@@ -16,13 +16,13 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
         limit,
     }: {
         limit: undefined | number;
-    }) => Omit<ApiEncryptedProvider, "id">[];
+    }) => ApiEncryptedProvider[];
 
     getVerifiedProviderData: ({
         limit,
     }: {
         limit: undefined | number;
-    }) => Omit<ApiEncryptedProvider, "id">[];
+    }) => ApiEncryptedProvider[];
 
     checkProviderData: () => Provider;
 }

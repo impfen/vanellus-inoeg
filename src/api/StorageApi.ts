@@ -6,8 +6,9 @@ import {
     aesDecrypt,
     aesEncrypt,
     b642buf,
-    base322buf,
+    decodeBase32,
     deriveSecrets,
+    str2ab,
 } from "./utils";
 
 export class StorageApi {
@@ -66,6 +67,6 @@ export class StorageApi {
     }
 
     protected deriveSecret(secret: string) {
-        return deriveSecrets(base322buf(secret), 32, 2);
+        return deriveSecrets(str2ab(decodeBase32(secret)), 32, 2);
     }
 }

@@ -12,7 +12,7 @@ import {
     Appointment,
     Provider,
     ProviderKeyPairs,
-    QueueToken,
+    UserQueueToken,
 } from "./interfaces";
 import { UserApi } from "./UserApi";
 
@@ -50,11 +50,11 @@ beforeAll(async () => {
 
 describe("UserApi", () => {
     let appointment: Appointment;
-    let queueToken: QueueToken;
+    let userQueueToken: UserQueueToken;
     const from = dayjs().utc().toDate();
 
     // 24 hours in the future
-    const to = dayjs().utc().add(2, "days").toDate();
+    const to = dayjs().utc().add(1, "days").toDate();
 
     it("should create an appointment", () => {
         // tomorrow 3 pm
@@ -86,24 +86,28 @@ describe("UserApi", () => {
     });
 
     it("should get a user-token", async () => {
-        queueToken = await userApi.getQueueToken({}, secret);
+        userQueueToken = await userApi.getQueueToken(secret);
     });
 
     it("should fetch the published appointment", async () => {
         const appointments1 = await anonApi.getAppointmentsByZipCode(
             "10707",
-            10,
             from,
-            to
+            to,
+            10
         );
 
         expect(appointments1).toHaveLength(1);
     });
 
     it("should book an appointment", async () => {
-        const booking = await userApi.bookAppointment(appointment, queueToken);
+        const booking = await userApi.bookAppointment(
+            appointment,
+            userQueueToken
+        );
 
-        expect(booking).toHaveProperty("token");
+        expect(booking).toHaveProperty("id");
+        expect(booking.code).toHaveLength(4);
     });
 
     it("should save the booking into the appointment", async () => {
@@ -113,15 +117,13 @@ describe("UserApi", () => {
             providerKeyPairs
         );
 
-        expect(appointments[0].bookings?.[0].userToken.code).toEqual(
-            secret.slice(0, 4)
-        );
+        expect(appointments[0].bookings[0].code).toEqual(secret.slice(0, 4));
     });
 
     it("should cancel the booking", async () => {
-        const cancelResult = await userApi.cancelAppointment(
+        const cancelResult = await userApi.cancelBooking(
             appointment,
-            queueToken
+            userQueueToken
         );
 
         expect(cancelResult).toBeTruthy();
@@ -138,8 +140,8 @@ describe("UserApi", () => {
     });
 
     it("should get a token", async () => {
-        const queueToken = await userApi.getQueueToken({}, secret);
+        const userQueueToken = await userApi.getQueueToken(secret);
 
-        expect(queueToken.userToken.version).toEqual("0.3");
+        expect(userQueueToken.userToken.version).toEqual("0.3");
     });
 });

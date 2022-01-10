@@ -1,8 +1,8 @@
-import { Backup, ContactData, QueueData, QueueToken } from "../api/interfaces";
+import { ContactData, QueueData, UserQueueToken } from "./";
 import { Appointment } from "./Appointment";
 
-export interface UserBackup extends Backup {
-    tokenData?: QueueToken;
+export interface UserBackup {
+    userQueueToken?: UserQueueToken;
     queueData?: QueueData;
     contactData?: ContactData;
     acceptedAppointments: Appointment[];

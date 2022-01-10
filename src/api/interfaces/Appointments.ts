@@ -5,10 +5,10 @@
 import { Slot } from "../../interfaces";
 import { ApiEncryptedBooking } from "./Booking";
 import { SignedData } from "./crypto";
-import { ApiSignedPublicProvider } from "./Provider";
+import { ApiSignedProviderData } from "./Provider";
 export interface ApiSignedAppointment extends SignedData {
-    updatedAt: string;
     bookedSlots: Slot[];
+    updatedAt: string;
 }
 
 export interface ApiSignedProviderAppointment extends ApiSignedAppointment {
@@ -20,8 +20,17 @@ export interface ApiAppointmentKeyChain {
     mediator: SignedData;
 }
 
-export interface ApiSignedAppointments {
-    provider: ApiSignedPublicProvider;
+export interface ApiProviderAppointments {
+    provider: ApiSignedProviderData;
     appointments: ApiSignedAppointment[];
     keyChain: ApiAppointmentKeyChain;
+}
+
+export interface ApiAppointment {
+    id: string;
+    timestamp: string;
+    duration: number;
+    properties: Record<string, unknown>;
+    publicKey: string;
+    slotData: Slot[];
 }

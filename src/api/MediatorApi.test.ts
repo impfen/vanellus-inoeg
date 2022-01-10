@@ -38,7 +38,7 @@ describe("MediatorService", () => {
         it("should get pending provider", async () => {
             expect(providerData).toHaveProperty("id");
 
-            const pendingProviders = await mediatorApi.getPendingProviders(
+            const pendingProviders = await mediatorApi.getUnverifiedProviders(
                 mediatorKeyPairs
             );
 
@@ -56,7 +56,7 @@ describe("MediatorService", () => {
         });
 
         it("should not fetch pending providers after verification", async () => {
-            const pendingProviders = await mediatorApi.getPendingProviders(
+            const pendingProviders = await mediatorApi.getUnverifiedProviders(
                 mediatorKeyPairs
             );
 

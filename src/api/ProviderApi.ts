@@ -1,14 +1,15 @@
 import { VanellusError } from "../errors";
+import { Booking } from "../interfaces/Booking";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
+    ApiAppointment,
+    ApiBooking,
     ApiEncryptedBooking,
     Appointment,
-    Booking,
     BookingData,
     ECDHData,
-    EncryptedBackup,
     Provider,
     ProviderAppointment,
     ProviderBackup,
@@ -21,17 +22,18 @@ import {
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import {
     b642buf,
-    buf2base32,
     ecdhDecrypt,
     ecdhEncrypt,
+    encodebase32,
     generateECDHKeyPair,
     generateECDSAKeyPair,
     generateSymmetricKey,
     randomBytes,
+    sha256,
     sign,
     verify,
 } from "./utils";
-import { createAppointment } from "./utils/appointment";
+import { createAppointment, enrichAppointment } from "./utils/appointment";
 
 export class ProviderApi extends AbstractApi<
     AnonymousApiInterface & ProviderApiInterface,
@@ -70,7 +72,7 @@ export class ProviderApi extends AbstractApi<
     /**
      * Retrieves the appointments that belong to the provider from the backend
      *
-     * @return Promise<Appointment[]>
+     * @return Promise<ProviderAppointment[]>
      */
     public async getProviderAppointments(
         from: Date,
@@ -85,6 +87,12 @@ export class ProviderApi extends AbstractApi<
 
         const appointments: ProviderAppointment[] = [];
 
+        // @todo Fake until provider is also returned
+        const publicProvider = parseUntrustedJSON<PublicProvider>(
+            // signedAppointments.provider.data
+            "{}"
+        );
+
         for (const signedAppointment of signedAppointments) {
             const isVerified = await verify(
                 [providerKeyPairs.signing.publicKey],
@@ -97,29 +105,23 @@ export class ProviderApi extends AbstractApi<
                 );
             }
 
-            const appointmentData = parseUntrustedJSON<Appointment>(
+            const apiAppointment = parseUntrustedJSON<ApiAppointment>(
                 signedAppointment.data
             );
 
+            const apiBookings = await this.decryptBookings(
+                signedAppointment.bookings || [],
+                providerKeyPairs
+            );
+
+            const bookings: Booking[] = apiBookings.map((apiBooking) => ({
+                id: apiBooking.id,
+                code: apiBooking.userToken.code,
+            }));
+
             const appointment: ProviderAppointment = {
-                ...appointmentData,
-                startDate: new Date(appointmentData.startDate),
-                endDate: new Date(
-                    new Date(appointmentData.startDate).getTime() +
-                        1000 * 60 * Math.max(0, appointmentData.duration)
-                ),
-                slotData: appointmentData.slotData.map((slot) => {
-                    slot.open = !signedAppointment.bookedSlots?.some(
-                        (aslot) => aslot.id === slot.id
-                    );
-
-                    return slot;
-                }),
-
-                bookings: await this.decryptBookings(
-                    signedAppointment.bookings || [],
-                    providerKeyPairs
-                ),
+                ...enrichAppointment(apiAppointment, publicProvider),
+                bookings,
             };
 
             appointments.push(appointment);
@@ -137,45 +139,39 @@ export class ProviderApi extends AbstractApi<
         unpublishedAppointments: Appointment[],
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const signedAppointments: SignedData[] = [];
+        const signedApiAppointments: SignedData[] = [];
         const appointments: Appointment[] = [];
 
         for (const unpublishedAppointment of unpublishedAppointments) {
+            const apiAppointment: ApiAppointment = {
+                id: unpublishedAppointment.id,
+                timestamp: dayjs(unpublishedAppointment.startDate)
+                    .utc()
+                    .toISOString(),
+                duration: unpublishedAppointment.duration,
+                properties: unpublishedAppointment.properties,
+                publicKey: providerKeyPairs.encryption.publicKey,
+                slotData: unpublishedAppointment.slotData,
+            };
+
             /**
              * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
              */
-            const signedAppointment = await sign(
-                JSON.stringify({
-                    timestamp: unpublishedAppointment.startDate.toISOString(),
-                    ...unpublishedAppointment,
-                }),
+            const signedApiAppointment = await sign(
+                JSON.stringify(apiAppointment),
                 providerKeyPairs.signing.privateKey,
                 providerKeyPairs.signing.publicKey
             );
 
-            appointments.push({
-                id: unpublishedAppointment.id,
-                duration: unpublishedAppointment.duration,
-                publicKey: providerKeyPairs.encryption.publicKey,
-                properties: unpublishedAppointment.properties,
-                slotData: unpublishedAppointment.slotData.map((slot) => ({
-                    id: slot.id,
-                })),
-                provider: unpublishedAppointment.provider,
-                startDate: dayjs(unpublishedAppointment.startDate).toDate(),
-                endDate: dayjs(unpublishedAppointment.startDate)
-                    .utc()
-                    .add(unpublishedAppointment.duration, "minutes")
-                    .toDate(),
-            });
+            appointments.push(unpublishedAppointment);
 
-            signedAppointments.push(signedAppointment);
+            signedApiAppointments.push(signedApiAppointment);
         }
 
         await this.transport.call(
             "publishAppointments",
             {
-                appointments: signedAppointments,
+                appointments: signedApiAppointments,
             },
             providerKeyPairs.signing
         );
@@ -207,19 +203,19 @@ export class ProviderApi extends AbstractApi<
      *
      * @returns Promise<Provider>
      */
-    public async storeProvider(
+    public async storeUnverifiedProvider(
         providerInput: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         signupCode?: string
     ) {
         const keys = await this.transport.call("getKeys");
+        const id = await sha256(providerKeyPairs.signing.publicKey);
 
-        const providerDataWithoutId = Object.assign(
+        const providerData: Provider = Object.assign(
             {},
             {
+                id,
                 ...providerInput,
-            },
-            {
                 publicKeys: {
                     data: providerKeyPairs.data.publicKey,
                     signing: providerKeyPairs.signing.publicKey,
@@ -229,12 +225,12 @@ export class ProviderApi extends AbstractApi<
         );
 
         const encryptedData = await ecdhEncrypt(
-            JSON.stringify(providerDataWithoutId),
+            JSON.stringify(providerData),
             providerKeyPairs.data,
             keys.providerData
         );
 
-        const { id } = await this.transport.call(
+        await this.transport.call(
             "storeProviderData",
             {
                 encryptedData: encryptedData,
@@ -243,12 +239,7 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs.signing
         );
 
-        const provider: Provider = {
-            ...providerDataWithoutId,
-            id,
-        };
-
-        return provider;
+        return providerData;
     }
 
     /**
@@ -305,10 +296,10 @@ export class ProviderApi extends AbstractApi<
     public async backupData(
         providerBackup: ProviderBackup,
         secret: string
-    ): Promise<EncryptedBackup | null> {
+    ): Promise<boolean> {
         // storage-api
 
-        return Promise.resolve(null);
+        return Promise.resolve(false);
     }
 
     /**
@@ -348,7 +339,7 @@ export class ProviderApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return buf2base32(b642buf(randomBytes(15)));
+        return encodebase32(b642buf(randomBytes(15)));
     }
 
     /**
@@ -370,8 +361,10 @@ export class ProviderApi extends AbstractApi<
                 const decryptedBooking =
                     parseUntrustedJSON<BookingData>(decryptedDataString);
 
-                const booking: Booking = {
-                    ...restBooking,
+                const booking: ApiBooking = {
+                    id: restBooking.id,
+                    publicKey: restBooking.publicKey,
+                    token: restBooking.token,
                     ...decryptedBooking,
                 };
 

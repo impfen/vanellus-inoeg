@@ -1,10 +1,5 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import {
-    ApiEncryptedBooking,
-    ApiSignedQueueToken,
-    ECDHData,
-    SignedData,
-} from "./interfaces";
+import { ApiEncryptedBooking, ECDHData, SignedData } from "./interfaces";
 
 export interface UserApiInterface extends AnonymousApiInterface {
     cancelAppointment: ({
@@ -38,5 +33,5 @@ export interface UserApiInterface extends AnonymousApiInterface {
         hash: string;
         publicKey: string;
         code?: string;
-    }) => ApiSignedQueueToken;
+    }) => SignedData;
 }

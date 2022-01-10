@@ -25,7 +25,7 @@ export class ProviderService {
 
         await this.getAuthenticatedProvider();
 
-        // const backupData = await this.providerApi.restoreFromBackup(secret);
+        const backupData = await this.providerApi.restoreFromBackup(secret);
 
         return true;
     }
@@ -109,8 +109,11 @@ export class ProviderService {
         );
     }
 
-    public async storeProvider(providerInput: ProviderInput, code?: string) {
-        return this.providerApi.storeProvider(
+    public async storeUnverifiedProvider(
+        providerInput: ProviderInput,
+        code?: string
+    ) {
+        return this.providerApi.storeUnverifiedProvider(
             providerInput,
             this.getKeyPairs(),
             code

@@ -2,7 +2,8 @@ import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    ApiSignedAppointments,
+    ApiAppointment,
+    ApiProviderAppointments,
     Appointment,
     PublicProvider,
 } from "./interfaces";
@@ -34,17 +35,19 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      */
     public async getAppointmentsByZipCode(
         zipCode: string,
-        radius: number,
         from: Date,
-        to: Date
+        to: Date,
+        radius = 50,
+        aggregate = false
     ) {
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
             {
                 zipCode,
-                radius,
                 from: dayjs(from).toISOString(),
                 to: dayjs(to).toISOString(),
+                radius,
+                aggregate,
             }
         );
 
@@ -117,20 +120,20 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @returns Appointment[]
      */
-    protected parseAppointments(signedAppointments: ApiSignedAppointments) {
-        const provider = parseUntrustedJSON<PublicProvider>(
+    protected parseAppointments(signedAppointments: ApiProviderAppointments) {
+        const publicProvider = parseUntrustedJSON<PublicProvider>(
             signedAppointments.provider.data
         );
 
         const appointments: Appointment[] = [];
 
         for (const signedAppointment of signedAppointments.appointments) {
-            const appointmentData = parseUntrustedJSON<Appointment>(
+            const apiAppointment = parseUntrustedJSON<ApiAppointment>(
                 signedAppointment.data
             );
 
             appointments.push(
-                enrichAppointment({ ...appointmentData, provider })
+                enrichAppointment(apiAppointment, publicProvider)
             );
         }
 

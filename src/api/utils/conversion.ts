@@ -5,12 +5,12 @@
 import { base32Decode, base32Encode } from "@ctrl/ts-base32";
 import { Buffer } from "buffer";
 
-export const buf2base32 = (buffer: Buffer) => {
-    return base32Encode(Buffer.from(buffer), "Crockford");
+export const encodebase32 = (string: string | Buffer) => {
+    return base32Encode(Buffer.from(string), "Crockford");
 };
 
-export const base322buf = (base32: string) => {
-    return Buffer.from(base32Decode(base32, "Crockford"));
+export const decodeBase32 = (base32: string) => {
+    return Buffer.from(base32Decode(base32, "Crockford")).toString();
 };
 
 export const buf2b64 = (buffer: ArrayBufferLike) => {

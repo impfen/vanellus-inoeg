@@ -1,6 +1,7 @@
 import { VanellusError } from "../../errors";
 import { dayjs } from "../../utils/dayjs";
 import {
+    ApiAppointment,
     Appointment,
     ProviderKeyPairs,
     PublicProvider,
@@ -8,12 +9,15 @@ import {
 } from "../interfaces";
 import { randomBytes } from "./random";
 
-export const enrichAppointment = (appointmentData: Appointment) => {
+export const enrichAppointment = (
+    appointmentData: ApiAppointment,
+    provider: PublicProvider
+) => {
     const appointment: Appointment = {
         id: appointmentData.id,
-        provider: appointmentData.provider,
-        startDate: dayjs(appointmentData.startDate).utc().toDate(),
-        endDate: dayjs(appointmentData.startDate)
+        provider: provider,
+        startDate: dayjs(appointmentData.timestamp).utc().toDate(),
+        endDate: dayjs(appointmentData.timestamp)
             .utc()
             .add(appointmentData.duration, "minutes")
             .toDate(),

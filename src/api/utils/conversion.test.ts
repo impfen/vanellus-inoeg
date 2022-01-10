@@ -1,29 +1,21 @@
 import { Buffer } from "buffer";
-import {
-    ab2str,
-    b642buf,
-    base322buf,
-    buf2b64,
-    buf2base32,
-    str2ab,
-} from "./conversion";
+import { decodeBase32, encodebase32 } from ".";
+import { ab2str, b642buf, buf2b64, str2ab } from "./conversion";
 
 describe("conversions", () => {
-    it("buf2base32", () => {
-        const buffer = Buffer.from("This is my testbuffer");
-
-        const base32 = buf2base32(buffer);
+    it("encodebase32", () => {
+        const base32 = encodebase32("This is my testbuffer");
 
         expect(base32).toMatchInlineSnapshot(
             `"AHM6JWS0D5SJ0VBS41T6AWVMC9TPCSK5E8"`
         );
     });
 
-    it("base322buf", () => {
+    it("base32Decode", () => {
         // "This is my testbuffer" as base32-crockford
         const base32 = "AHM6JWS0D5SJ0VBS41T6AWVMC9TPCSK5E8";
 
-        const result = base322buf(base32);
+        const result = decodeBase32(base32);
 
         expect(result.toString()).toMatchInlineSnapshot(
             `"This is my testbuffer"`

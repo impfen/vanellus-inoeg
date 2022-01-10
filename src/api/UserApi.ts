@@ -4,17 +4,17 @@ import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     Appointment,
+    Booking,
     BookingData,
     ContactData,
-    EncryptedBackup,
-    QueueToken,
     UserBackup,
     UserKeyPairs,
+    UserQueueToken,
 } from "./interfaces";
 import { UserApiInterface } from "./UserApiInterface";
 import {
     b642buf,
-    buf2base32,
+    encodebase32,
     ephemeralECDHEncrypt,
     generateECDHKeyPair,
     generateECDSAKeyPair,
@@ -33,11 +33,11 @@ export class UserApi extends AbstractApi<
      */
     public async bookAppointment(
         appointment: Appointment,
-        queueToken: QueueToken
+        userQueueToken: UserQueueToken
     ) {
         const providerData: BookingData = {
-            signedToken: queueToken.signedToken,
-            userToken: queueToken.userToken,
+            signedToken: userQueueToken.signedToken,
+            userToken: userQueueToken.userToken,
         };
 
         // we don't care about the ephmeral key
@@ -47,16 +47,21 @@ export class UserApi extends AbstractApi<
         );
 
         // we store the information about the offer which we've accepted
-        const booking = await this.transport.call(
+        const apiBooking = await this.transport.call(
             "bookAppointment",
             {
                 id: appointment.id,
                 providerID: appointment.provider.id,
                 encryptedData: encryptedData,
-                signedTokenData: queueToken.signedToken,
+                signedTokenData: userQueueToken.signedToken,
             },
-            queueToken.keyPairs.signing
+            userQueueToken.keyPairs.signing
         );
+
+        const booking: Booking = {
+            id: apiBooking.id,
+            code: userQueueToken.userToken.code,
+        };
 
         return booking;
     }
@@ -66,18 +71,18 @@ export class UserApi extends AbstractApi<
      *
      * @returns Promise<boolean>
      */
-    public async cancelAppointment(
+    public async cancelBooking(
         appointment: Appointment,
-        queueToken: QueueToken
+        userQueueToken: UserQueueToken
     ) {
         const result = await this.transport.call(
             "cancelAppointment",
             {
                 id: appointment.id,
                 providerID: appointment.provider.id,
-                signedTokenData: queueToken.signedToken,
+                signedTokenData: userQueueToken.signedToken,
             },
-            queueToken.keyPairs.signing
+            userQueueToken.keyPairs.signing
         );
 
         if ("ok" !== result) {
@@ -90,45 +95,41 @@ export class UserApi extends AbstractApi<
     /**
      * get a token for a given queue
      *
-     * @return Promise<QueueToken>
+     * @return Promise<UserQueueToken>
      */
     public async getQueueToken(
-        contactData: ContactData,
         secret: string,
+        contactData: ContactData = {},
         code?: string
     ) {
         // we hash the user data to prove it didn't change later...
         const { hash, nonce } = await this.hashContactData(contactData);
-        const signingKeyPair = await generateECDSAKeyPair();
-        const encryptionKeyPair = await generateECDHKeyPair();
+        const keyPairs = await this.generateKeyPairs();
 
         const userToken = {
             version: "0.3",
             code: secret.slice(0, 4),
             createdAt: dayjs().utc().toISOString(),
-            publicKey: signingKeyPair.publicKey, // the signing key to control the ID
-            encryptionPublicKey: encryptionKeyPair.publicKey,
+            publicKey: keyPairs.signing.publicKey, // the signing key to control the ID
+            encryptionPublicKey: keyPairs.encryption.publicKey,
         };
 
         const signedToken = await this.transport.call("getToken", {
             hash,
-            publicKey: signingKeyPair.publicKey,
+            publicKey: keyPairs.signing.publicKey,
             code: code,
         });
 
-        const queueToken: QueueToken = {
+        const userQueueToken: UserQueueToken = {
             createdAt: dayjs().utc().toISOString(),
             signedToken: signedToken,
-            keyPairs: {
-                signing: signingKeyPair,
-                encryption: encryptionKeyPair,
-            },
+            keyPairs,
             hashNonce: nonce,
             dataHash: hash,
             userToken: userToken,
         };
 
-        return queueToken;
+        return userQueueToken;
     }
 
     /**
@@ -137,10 +138,10 @@ export class UserApi extends AbstractApi<
     public async backupData(
         userBackupData: UserBackup,
         secret: string
-    ): Promise<EncryptedBackup | null> {
+    ): Promise<boolean> {
         // storage-api
 
-        return Promise.resolve(null);
+        return Promise.resolve(false);
     }
 
     /**
@@ -157,7 +158,7 @@ export class UserApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return buf2base32(b642buf(randomBytes(10)));
+        return encodebase32(b642buf(randomBytes(10)));
     }
 
     /**

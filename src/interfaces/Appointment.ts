@@ -17,6 +17,6 @@ export interface Appointment {
     publicKey: string;
 }
 
-export interface ProviderAppointment extends Appointment {
-    bookings?: Booking[];
+export interface ProviderAppointment extends Omit<Appointment, "provider"> {
+    bookings: Booking[];
 }

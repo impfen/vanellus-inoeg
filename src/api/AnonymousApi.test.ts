@@ -76,7 +76,7 @@ describe("AnonymousApi", () => {
         const to = dayjs().utc().add(1, "days").toDate();
 
         const providerAppointments =
-            await anonymousApi.getAppointmentsByZipCode("10707", 10, from, to);
+            await anonymousApi.getAppointmentsByZipCode("10707", from, to, 10);
 
         expect(providerAppointments).toHaveLength(1);
 
@@ -88,7 +88,7 @@ describe("AnonymousApi", () => {
         expect(appointment.id).toEqual(unpublishedAppointment.id);
     });
 
-    it("should create and authenticate a provider and work with appointments", async () => {
+    it("should create and verify a provider and work with appointments", async () => {
         //create providers
         const providerData = {
             name: "Max Mustermann",
@@ -101,27 +101,27 @@ describe("AnonymousApi", () => {
         };
 
         const k1 = await providerApi.generateKeyPairs();
-        const p1 = await providerApi.storeProvider(providerData, k1);
+        const p1 = await providerApi.storeUnverifiedProvider(providerData, k1);
 
-        expect(p1).toHaveProperty("name");
+        expect(p1).toHaveProperty("id");
 
         providerData.zipCode = "60312";
         const k2 = await providerApi.generateKeyPairs();
-        const p2 = await providerApi.storeProvider(providerData, k2);
+        const p2 = await providerApi.storeUnverifiedProvider(providerData, k2);
 
-        expect(p2).toHaveProperty("name");
+        expect(p2).toHaveProperty("id");
 
         providerData.zipCode = "65936";
         const k3 = await providerApi.generateKeyPairs();
-        const p3 = await providerApi.storeProvider(providerData, k3);
+        const p3 = await providerApi.storeUnverifiedProvider(providerData, k3);
 
-        expect(p3).toHaveProperty("name");
+        expect(p3).toHaveProperty("id");
 
         providerData.zipCode = "96050";
         const k4 = await providerApi.generateKeyPairs();
-        const p4 = await providerApi.storeProvider(providerData, k4);
+        const p4 = await providerApi.storeUnverifiedProvider(providerData, k4);
 
-        expect(p4).toHaveProperty("name");
+        expect(p4).toHaveProperty("id");
 
         // query providers
         const noProviders = await anonymousApi.getProvidersByZipCode(
@@ -131,32 +131,31 @@ describe("AnonymousApi", () => {
 
         expect(noProviders).toHaveLength(0);
 
-        // disabled until id is added to getPendingProviders
-        // // verify providers
-        // const verifiedProviders = await mediatorApi.getVerifiedProviders(
-        //     mediatorKeyPairs
-        // );
+        // verify providers
+        const unverifiedProviders = await mediatorApi.getUnverifiedProviders(
+            mediatorKeyPairs
+        );
 
-        // for (const pendingProvider of pendingProviders) {
-        //     const verifiedResult = await mediatorApi.verifyProvider(
-        //         pendingProvider,
-        //         mediatorKeyPairs
-        //     );
+        for (const unverifiedProvider of unverifiedProviders) {
+            const verifiedResult = await mediatorApi.verifyProvider(
+                unverifiedProvider,
+                mediatorKeyPairs
+            );
 
-        //     expect(verifiedResult).toHaveProperty("name");
-        // }
+            expect(verifiedResult).toHaveProperty("name");
+        }
 
-        // // query providers
-        // const providers = await anonymousApi.getProvidersByZipCode(
-        //     "60000",
-        //     "69999"
-        // );
+        // query providers
+        const providers = await anonymousApi.getProvidersByZipCode(
+            "60000",
+            "69999"
+        );
 
-        // expect(providers).toHaveLength(2);
-        // expect(providers.map((provider) => provider.zipCode).sort()).toEqual([
-        //     "60312",
-        //     "65936",
-        // ]);
+        expect(providers).toHaveLength(2);
+        expect(providers.map((provider) => provider.zipCode).sort()).toEqual([
+            "60312",
+            "65936",
+        ]);
     });
 
     it("we should be able to get the public keys anonymously", async () => {

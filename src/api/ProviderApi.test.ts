@@ -95,9 +95,9 @@ describe("ProviderApi", () => {
         it("should not retrieve canceled appointments", async () => {
             const appointments3 = await anonymousApi.getAppointmentsByZipCode(
                 "10707",
-                10,
                 from,
-                to
+                to,
+                10
             );
 
             expect(appointments3).toHaveLength(0);
@@ -122,7 +122,7 @@ describe("ProviderApi", () => {
         });
 
         it("should get pending providers", async () => {
-            const providerDatas = await mediatorApi.getPendingProviders(
+            const providerDatas = await mediatorApi.getUnverifiedProviders(
                 mediatorKeyPairs
             );
 

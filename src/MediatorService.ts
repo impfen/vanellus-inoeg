@@ -39,8 +39,8 @@ export class MediatorService {
      *
      * @throws AuthError if proper keys are absent
      */
-    public getPendingProviders() {
-        return this.mediatorApi.getPendingProviders(this.getKeyPairs());
+    public getUnverifiedProviders() {
+        return this.mediatorApi.getUnverifiedProviders(this.getKeyPairs());
     }
 
     /**
