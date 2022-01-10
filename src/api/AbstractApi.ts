@@ -1,10 +1,16 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ActorKeyPairs } from "./interfaces";
-import { Transport } from "./transports";
+import { ActorKeyPairs, Config } from "./interfaces";
+import { JsonRpcTransport, Transport } from "./transports";
 
 export class AbstractApi<
     Api = AnonymousApiInterface,
     KP extends ActorKeyPairs | undefined = undefined
 > {
-    public constructor(protected readonly transport: Transport<Api, KP>) {}
+    protected transport: Transport<Api, KP>;
+
+    public constructor(readonly config: Config) {
+        this.transport = new JsonRpcTransport<Api>(
+            config.endpoints.appointments
+        );
+    }
 }

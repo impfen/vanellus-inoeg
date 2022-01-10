@@ -11,6 +11,7 @@ import {
     UserKeyPairs,
     UserQueueToken,
 } from "./interfaces";
+import { StorageApi } from "./StorageApi";
 import { UserApiInterface } from "./UserApiInterface";
 import {
     b642buf,
@@ -142,23 +143,21 @@ export class UserApi extends AbstractApi<
     }
 
     /**
-     * @todo finish implementation
+     *
      */
-    public async backupData(
-        userBackupData: UserBackup,
-        secret: string
-    ): Promise<boolean> {
-        // storage-api
+    public async backupData(userBackup: UserBackup, secret: string) {
+        const storage = new StorageApi(this.config);
 
-        return Promise.resolve(false);
+        return storage.backup<UserBackup>(userBackup, secret);
     }
 
     /**
-     * @todo finish implementation
+     *
      */
-    public async restoreFromBackup(secret: string): Promise<UserBackup | null> {
-        // storage-api
-        return Promise.resolve(null);
+    public async restoreFromBackup(secret: string) {
+        const storage = new StorageApi(this.config);
+
+        return storage.restore<UserBackup>(secret);
     }
 
     /**

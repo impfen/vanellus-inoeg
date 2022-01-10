@@ -21,6 +21,7 @@ import {
     SignedProvider,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
+import { StorageApi } from "./StorageApi";
 import {
     b642buf,
     ecdhDecrypt,
@@ -311,25 +312,21 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * @todo finish implementation
+     *
      */
-    public async backupData(
-        providerBackup: ProviderBackup,
-        secret: string
-    ): Promise<boolean> {
-        // storage-api
+    public async backupData(providerBackup: ProviderBackup, secret: string) {
+        const storage = new StorageApi(this.config);
 
-        return Promise.resolve(false);
+        return storage.backup<ProviderBackup>(providerBackup, secret);
     }
 
     /**
-     * @todo finish implementation
+     *
      */
-    public async restoreFromBackup(
-        secret: string
-    ): Promise<ProviderBackup | null> {
-        // storage-api
-        return Promise.resolve(null);
+    public async restoreFromBackup(secret: string) {
+        const storage = new StorageApi(this.config);
+
+        return storage.restore<ProviderBackup>(secret);
     }
 
     /**

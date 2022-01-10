@@ -1,4 +1,4 @@
-import { JsonRpcTransport, MediatorApi } from "./api";
+import { MediatorApi } from "./api";
 import { AuthError } from "./errors";
 import { Config, MediatorKeyPairs, Provider } from "./interfaces";
 
@@ -10,9 +10,7 @@ export class MediatorService {
     protected keyPairs?: MediatorKeyPairs;
 
     public constructor(readonly config: Config) {
-        this.mediatorApi = new MediatorApi(
-            new JsonRpcTransport(config.endpoints.appointments)
-        );
+        this.mediatorApi = new MediatorApi(config);
     }
 
     public authenticate(keyPairs: MediatorKeyPairs) {

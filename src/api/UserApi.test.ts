@@ -12,6 +12,7 @@ import {
     Appointment,
     Provider,
     ProviderKeyPairs,
+    UserBackup,
     UserQueueToken,
 } from "./interfaces";
 import { UserApi } from "./UserApi";
@@ -152,5 +153,24 @@ describe("UserApi", () => {
         const userQueueToken = await userApi.getQueueToken(secret);
 
         expect(userQueueToken.userToken.version).toEqual("0.3");
+    });
+
+    it("should backup and restore", async () => {
+        const userQueueToken = await userApi.getQueueToken(secret);
+
+        expect(userQueueToken.userToken.version).toEqual("0.3");
+
+        const userBackup: UserBackup = {
+            userQueueToken,
+            acceptedAppointments: [],
+        };
+
+        const result = await userApi.backupData(userBackup, secret);
+
+        expect(result).toHaveProperty("data");
+
+        const restore = await userApi.restoreFromBackup(secret);
+
+        expect(userBackup).toEqual(restore);
     });
 });

@@ -1,7 +1,8 @@
+import { Config } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { ApiError } from "./errors";
 import { StorageApiInterface } from "./StorageApiInterface";
-import { Transport } from "./transports";
+import { JsonRpcTransport, Transport } from "./transports";
 import {
     aesDecrypt,
     aesEncrypt,
@@ -12,9 +13,13 @@ import {
 } from "./utils";
 
 export class StorageApi {
-    public constructor(
-        protected readonly transport: Transport<StorageApiInterface>
-    ) {}
+    protected transport: Transport<StorageApiInterface>;
+
+    public constructor(config: Config) {
+        this.transport = new JsonRpcTransport<StorageApiInterface>(
+            config.endpoints.storage
+        );
+    }
 
     public async backup<Backup>(backupData: Backup, secret: string) {
         const [id, key] = await this.deriveSecret(secret);

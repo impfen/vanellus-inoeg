@@ -13,7 +13,6 @@ import {
     ProviderKeyPairs,
     UserKeyPairs,
 } from "../src/api/interfaces";
-import { JsonRpcTransport } from "../src/api/transports";
 import { ProviderInput } from "../src/interfaces";
 
 const defaultProviderData: ProviderInput = {
@@ -31,9 +30,7 @@ const adminJsonPath = `${
 }/002_admin.json`;
 
 export const getAnonymousApi = () => {
-    const anonymousApi = new AnonymousApi(
-        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
-    );
+    const anonymousApi = new AnonymousApi(vanellusConfig);
 
     return anonymousApi;
 };
@@ -45,9 +42,7 @@ export const getAdminApi = async (adminKeyPairs?: AdminKeyPairs) => {
         adminKeyPairs = await AdminApi.generateAdminKeys(jsonData);
     }
 
-    const adminApi = new AdminApi(
-        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
-    );
+    const adminApi = new AdminApi(vanellusConfig);
 
     return {
         adminApi,
@@ -59,9 +54,7 @@ export const getUserApi = async (
     userKeyPairs?: UserKeyPairs,
     userSecret?: string
 ) => {
-    const userApi = new UserApi(
-        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
-    );
+    const userApi = new UserApi(vanellusConfig);
 
     if (!userSecret) {
         userSecret = userApi.generateSecret();
@@ -79,9 +72,7 @@ export const getUserApi = async (
 };
 
 export const getProviderApi = async (providerKeyPairs?: ProviderKeyPairs) => {
-    const providerApi = new ProviderApi(
-        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
-    );
+    const providerApi = new ProviderApi(vanellusConfig);
 
     if (!providerKeyPairs) {
         providerKeyPairs = await providerApi.generateKeyPairs();
@@ -100,9 +91,7 @@ export const getMediatorApi = async ({
     adminKeyPairs?: AdminKeyPairs;
     mediatorKeyPairs?: MediatorKeyPairs;
 }) => {
-    const mediatorApi = new MediatorApi(
-        new JsonRpcTransport(vanellusConfig.endpoints.appointments)
-    );
+    const mediatorApi = new MediatorApi(vanellusConfig);
 
     if (!mediatorKeyPairs) {
         const adminResult = await getAdminApi(adminKeyPairs);

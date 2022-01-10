@@ -12,6 +12,7 @@ import {
     Appointment,
     MediatorKeyPairs,
     Provider,
+    ProviderBackup,
     ProviderKeyPairs,
 } from "./interfaces";
 import { ProviderApi } from "./ProviderApi";
@@ -152,6 +153,25 @@ describe("ProviderApi", () => {
             const result3 = await providerApi.checkProvider(providerKeyPairs2);
 
             expect(result3).toHaveProperty("name");
+        });
+    });
+
+    describe("backup", () => {
+        it("should backup and restore", async () => {
+            const secret = providerApi.generateSecret();
+
+            const providerBackup: ProviderBackup = {
+                verifiedData: {},
+                data: provider,
+            };
+
+            const result = await providerApi.backupData(providerBackup, secret);
+
+            expect(result).toHaveProperty("data");
+
+            const restore = await providerApi.restoreFromBackup(secret);
+
+            expect(providerBackup).toEqual(restore);
         });
     });
 });

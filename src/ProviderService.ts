@@ -1,4 +1,4 @@
-import { JsonRpcTransport, ProviderApi } from "./api";
+import { ProviderApi } from "./api";
 import { createAppointmentSet } from "./api/utils";
 import { AuthError } from "./errors";
 import {
@@ -14,9 +14,7 @@ export class ProviderService {
     protected secret: string | undefined;
 
     public constructor(readonly config: Config) {
-        this.providerApi = new ProviderApi(
-            new JsonRpcTransport(config.endpoints.appointments)
-        );
+        this.providerApi = new ProviderApi(config);
     }
 
     public async authenticate(secret: string, keyPairs: ProviderKeyPairs) {

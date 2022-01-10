@@ -1,4 +1,4 @@
-import { AnonymousApi, JsonRpcTransport, UserApi } from "./api";
+import { AnonymousApi, UserApi } from "./api";
 import { AuthError } from "./errors";
 import { Appointment, Config, ContactData, UserQueueToken } from "./interfaces";
 
@@ -9,21 +9,12 @@ export class UserService {
     protected userQueueToken?: UserQueueToken;
 
     public constructor(readonly config: Config) {
-        this.userApi = new UserApi(
-            new JsonRpcTransport(config.endpoints.appointments)
-        );
-
-        this.anonymousApi = new AnonymousApi(
-            new JsonRpcTransport(config.endpoints.appointments)
-        );
+        this.userApi = new UserApi(config);
+        this.anonymousApi = new AnonymousApi(config);
     }
 
     public async authenticate(secret: string) {
-        this.secret = secret;
-
-        await this.restore();
-
-        return true;
+        return this.restore(secret);
     }
 
     public isAuthenticated() {
@@ -39,13 +30,19 @@ export class UserService {
     }
 
     public async register(contactData?: ContactData, inviteCode?: string) {
-        this.secret = this.userApi.generateSecret();
+        if (!this.secret) {
+            this.secret = this.userApi.generateSecret();
+        }
 
-        this.userQueueToken = await this.userApi.getQueueToken(
-            this.secret,
-            contactData,
-            inviteCode
-        );
+        if (!this.userQueueToken) {
+            this.userQueueToken = await this.userApi.getQueueToken(
+                this.secret,
+                contactData,
+                inviteCode
+            );
+        }
+
+        return this.userQueueToken;
     }
 
     public async backup() {
@@ -53,23 +50,20 @@ export class UserService {
             throw new AuthError("User not authenticated");
         }
 
-        const result = await this.userApi.backupData(
+        return this.userApi.backupData(
             {
                 userQueueToken: this.userQueueToken,
                 acceptedAppointments: [],
             },
             this.secret
         );
-
-        return result;
     }
 
-    public async restore() {
-        if (!this.secret) {
-            throw new AuthError("User not authenticated");
-        }
+    public async restore(secret: string) {
+        const backup = await this.userApi.restoreFromBackup(secret);
 
-        const result = await this.userApi.restoreFromBackup(this.secret);
+        this.secret = secret;
+        this.userQueueToken = backup.userQueueToken;
     }
 
     public async getAppointment(appointmentId: string, providerID: string) {
@@ -97,17 +91,19 @@ export class UserService {
         );
     }
 
-    public async bookAppointment(
-        appointment: Appointment,
-        userQueueToken: UserQueueToken
-    ) {
+    public async bookAppointment(appointment: Appointment) {
+        const userQueueToken = await this.register();
+
         return this.userApi.bookAppointment(appointment, userQueueToken);
     }
 
-    public async cancelBooking(
-        appointment: Appointment,
-        userQueueToken: UserQueueToken
-    ) {
-        return this.userApi.cancelBooking(appointment, userQueueToken);
+    public async cancelBooking(appointment: Appointment) {
+        if (!this.userQueueToken) {
+            throw new AuthError(
+                "You are not authorized. Please restore your backup first"
+            );
+        }
+
+        return this.userApi.cancelBooking(appointment, this.userQueueToken);
     }
 }
