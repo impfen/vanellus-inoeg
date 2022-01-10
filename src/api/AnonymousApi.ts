@@ -113,20 +113,18 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     }
 
     /**
-     * Decrypts an appointment
+     * Parses an appointment
      *
      * @returns Appointment[]
      */
-    protected parseAppointments(
-        signedProviderAppointments: ApiSignedAppointments
-    ) {
+    protected parseAppointments(signedAppointments: ApiSignedAppointments) {
         const provider = parseUntrustedJSON<PublicProvider>(
-            signedProviderAppointments.provider.data
+            signedAppointments.provider.data
         );
 
         const appointments: Appointment[] = [];
 
-        for (const signedAppointment of signedProviderAppointments.appointments) {
+        for (const signedAppointment of signedAppointments.appointments) {
             const appointmentData = parseUntrustedJSON<Appointment>(
                 signedAppointment.data
             );

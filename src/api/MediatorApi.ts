@@ -3,7 +3,7 @@ import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    ApiEncryptedProviderData,
+    ApiEncryptedProvider,
     ECDHData,
     MediatorKeyPairs,
     Provider,
@@ -140,7 +140,7 @@ export class MediatorApi extends AbstractApi<
      * @return Promise<Provider[]>
      */
     protected async decryptProviderDatas(
-        encryptedProviderDatas: Omit<ApiEncryptedProviderData, "id">[],
+        encryptedProviderDatas: Omit<ApiEncryptedProvider, "id">[],
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         return Promise.all(

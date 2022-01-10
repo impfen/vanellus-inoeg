@@ -1,5 +1,5 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiEncryptedProviderData, Provider, SignedData } from "./interfaces";
+import { ApiEncryptedProvider, Provider, SignedData } from "./interfaces";
 
 export interface MediatorApiInterface extends AnonymousApiInterface {
     confirmProvider: ({
@@ -16,13 +16,13 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
         limit,
     }: {
         limit: undefined | number;
-    }) => Omit<ApiEncryptedProviderData, "id">[];
+    }) => Omit<ApiEncryptedProvider, "id">[];
 
     getVerifiedProviderData: ({
         limit,
     }: {
         limit: undefined | number;
-    }) => Omit<ApiEncryptedProviderData, "id">[];
+    }) => Omit<ApiEncryptedProvider, "id">[];
 
     checkProviderData: () => Provider;
 }

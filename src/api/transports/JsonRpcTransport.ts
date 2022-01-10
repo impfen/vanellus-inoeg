@@ -59,7 +59,7 @@ export class JsonRpcTransport<TMethods> extends AbstractTransport<TMethods> {
         >;
 
         if (!fetchResponse.ok || !rpcResponse.result) {
-            console.log(method, rpcResponse);
+            // console.log(method, rpcResponse);
 
             throw new TransportError(
                 fetchResponse.statusText

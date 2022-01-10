@@ -1,7 +1,6 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
-    ApiConfirmedProviderData,
-    ApiEncryptedProviderData,
+    ApiEncryptedProvider,
     ApiSignedAppointment,
     ECDHData,
     SignedData,
@@ -30,7 +29,7 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
     }: {
         encryptedData: ECDHData;
         code?: string;
-    }) => ApiEncryptedProviderData;
+    }) => ApiEncryptedProvider;
 
-    checkProviderData: () => ApiConfirmedProviderData;
+    checkProviderData: () => SignedData;
 }

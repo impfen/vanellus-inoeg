@@ -1,4 +1,4 @@
-import { SignedMediatorKeyData } from "./interfaces";
+import { SignedData } from "./interfaces";
 
 export interface AdminApiInterface {
     resetDB: () => "ok";
@@ -6,6 +6,6 @@ export interface AdminApiInterface {
     addMediatorPublicKeys: ({
         signedKeyData,
     }: {
-        signedKeyData: SignedMediatorKeyData;
+        signedKeyData: SignedData;
     }) => "ok";
 }
