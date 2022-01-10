@@ -57,7 +57,7 @@ export class AdminApi extends AbstractApi<
     }
 
     /**
-     * Add a MediatorKeyPairs to the system.
+     * Add MediatorKeyPairs to the system.
      * Effectively, this method creates a mediator in the system.
      *
      * @returns Promise<boolean>

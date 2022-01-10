@@ -137,7 +137,7 @@ describe("UserApi", () => {
         expect(appointments[0].bookings).toHaveLength(0);
     });
 
-    it("should get a token", async function () {
+    it("should get a token", async () => {
         const queueToken = await userApi.getQueueToken({}, secret);
 
         expect(queueToken.userToken.version).toEqual("0.3");

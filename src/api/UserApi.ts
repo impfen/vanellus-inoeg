@@ -18,8 +18,8 @@ import {
     ephemeralECDHEncrypt,
     generateECDHKeyPair,
     generateECDSAKeyPair,
-    hash,
     randomBytes,
+    sha256,
 } from "./utils";
 
 export class UserApi extends AbstractApi<
@@ -180,18 +180,17 @@ export class UserApi extends AbstractApi<
     /**
      * Hash contact-data so any tempering can be detected later
      */
-    protected async hashContactData(data: ContactData) {
-        const hashData = {
-            name: data.name,
+    protected async hashContactData(contactData: ContactData) {
+        const dataToHash = {
+            name: contactData.name,
             nonce: randomBytes(32),
         };
 
-        const hashDataJSON = JSON.stringify(hashData);
-        const dataHash = await hash(hashDataJSON);
+        const dataHash = await sha256(JSON.stringify(dataToHash));
 
         return {
             hash: dataHash,
-            nonce: hashData.nonce,
+            nonce: dataToHash.nonce,
         };
     }
 }

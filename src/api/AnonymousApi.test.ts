@@ -46,7 +46,7 @@ beforeEach(async () => {
 });
 
 describe("AnonymousApi", () => {
-    it("should be able to get appointments", async function () {
+    it("should be able to get appointments", async () => {
         // tomorrow 3 pm
         const date = dayjs()
             .utc()
@@ -88,7 +88,7 @@ describe("AnonymousApi", () => {
         expect(appointment.id).toEqual(unpublishedAppointment.id);
     });
 
-    it("should create and authenticate a provider and work with appointments", async function () {
+    it("should create and authenticate a provider and work with appointments", async () => {
         //create providers
         const providerData = {
             name: "Max Mustermann",
@@ -159,7 +159,7 @@ describe("AnonymousApi", () => {
         // ]);
     });
 
-    it("we should be able to get the public keys anonymously", async function () {
+    it("we should be able to get the public keys anonymously", async () => {
         const publicKeys = await anonymousApi.getKeys();
 
         expect(publicKeys.rootKey).toEqual(adminKeyPairs.signing.publicKey);
