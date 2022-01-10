@@ -46,7 +46,7 @@ export async function getProviderAppointments(
 
     const newAppointments: Appointment[] = []
 
-    for (const appointment of response) {
+    for (const appointment of response.appointments) {
         const verified = await verify(
             [this.keyPairs.signing.publicKey],
             appointment

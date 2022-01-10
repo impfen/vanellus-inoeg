@@ -204,7 +204,7 @@ export class AppointmentsBackend {
         { from, to }: { from: string; to: string },
         keyPair: KeyPair
     ) {
-        return this.net.call<SignedAppointment[]>(
+        return this.net.call<ProviderAppointments>(
             this.net.methods.getProviderAppointments,
             { from, to },
             keyPair
