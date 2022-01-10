@@ -1,10 +1,10 @@
 import { Buffer } from "buffer";
-import { decodeBase32, encodebase32 } from ".";
+import { decodeBase32, encodeBase32 } from ".";
 import { ab2str, b642buf, buf2b64, str2ab } from "./conversion";
 
 describe("conversions", () => {
-    it("encodebase32", () => {
-        const base32 = encodebase32("This is my testbuffer");
+    it("encodeBase32", () => {
+        const base32 = encodeBase32("This is my testbuffer");
 
         expect(base32).toMatchInlineSnapshot(
             `"AHM6JWS0D5SJ0VBS41T6AWVMC9TPCSK5E8"`

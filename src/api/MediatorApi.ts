@@ -172,11 +172,7 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.provider.privateKey
         );
 
-        const provider = parseUntrustedJSON<Provider>(
-            decryptedProviderDataString
-        );
-
-        return provider;
+        return parseUntrustedJSON<Provider>(decryptedProviderDataString);
     }
 
     // /**

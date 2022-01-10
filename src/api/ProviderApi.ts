@@ -24,7 +24,7 @@ import {
     b642buf,
     ecdhDecrypt,
     ecdhEncrypt,
-    encodebase32,
+    encodeBase32,
     generateECDHKeyPair,
     generateECDSAKeyPair,
     generateSymmetricKey,
@@ -70,7 +70,7 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * Retrieves the appointments that belong to the provider from the backend
+     * Retrieves the appointments which belong to the provider
      *
      * @return Promise<ProviderAppointment[]>
      */
@@ -79,7 +79,7 @@ export class ProviderApi extends AbstractApi<
         to: Date,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const signedAppointments = await this.transport.call(
+        const apiProviderProviderAppointments = await this.transport.call(
             "getProviderAppointments",
             { from: dayjs(from).toISOString(), to: dayjs(to).toISOString() },
             providerKeyPairs.signing
@@ -88,10 +88,10 @@ export class ProviderApi extends AbstractApi<
         const appointments: ProviderAppointment[] = [];
 
         const provider = parseUntrustedJSON<Provider>(
-            signedAppointments.provider.data
+            apiProviderProviderAppointments.provider.data
         );
 
-        for (const signedAppointment of signedAppointments.appointments) {
+        for (const signedAppointment of apiProviderProviderAppointments.appointments) {
             const isVerified = await verify(
                 [providerKeyPairs.signing.publicKey],
                 signedAppointment
@@ -134,11 +134,15 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<Appointment[]>
      */
     public async publishAppointments(
-        unpublishedAppointments: Appointment[],
+        unpublishedAppointment: Appointment[] | Appointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
         const signedApiAppointments: SignedData[] = [];
         const appointments: Appointment[] = [];
+
+        const unpublishedAppointments = Array.isArray(unpublishedAppointment)
+            ? unpublishedAppointment
+            : [unpublishedAppointment];
 
         for (const unpublishedAppointment of unpublishedAppointments) {
             const apiAppointment: ApiAppointment = {
@@ -207,7 +211,9 @@ export class ProviderApi extends AbstractApi<
         signupCode?: string
     ) {
         const keys = await this.transport.call("getKeys");
-        const id = await sha256(providerKeyPairs.signing.publicKey);
+        const id = await sha256(
+            Buffer.from(providerKeyPairs.signing.publicKey, "base64")
+        );
 
         const providerData: Provider = Object.assign(
             {},
@@ -316,10 +322,12 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<ProviderKeyPairs>
      */
     public async generateKeyPairs() {
-        const sync = await generateSymmetricKey();
-        const data = await generateECDHKeyPair();
-        const signing = await generateECDSAKeyPair();
-        const encryption = await generateECDHKeyPair();
+        const [sync, data, signing, encryption] = await Promise.all([
+            generateSymmetricKey(),
+            generateECDHKeyPair(),
+            generateECDSAKeyPair(),
+            generateECDHKeyPair(),
+        ]);
 
         const keyPairs: ProviderKeyPairs = {
             sync,
@@ -337,7 +345,7 @@ export class ProviderApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return encodebase32(b642buf(randomBytes(15)));
+        return encodeBase32(b642buf(randomBytes(15)));
     }
 
     /**

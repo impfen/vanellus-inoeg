@@ -14,7 +14,7 @@ import {
 import { UserApiInterface } from "./UserApiInterface";
 import {
     b642buf,
-    encodebase32,
+    encodeBase32,
     ephemeralECDHEncrypt,
     generateECDHKeyPair,
     generateECDSAKeyPair,
@@ -158,7 +158,7 @@ export class UserApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return encodebase32(b642buf(randomBytes(10)));
+        return encodeBase32(b642buf(randomBytes(10)));
     }
 
     /**
@@ -167,12 +167,14 @@ export class UserApi extends AbstractApi<
      * @returns Promise<UserKeyPairs>
      */
     public async generateKeyPairs() {
-        const signingKeyPair = await generateECDSAKeyPair();
-        const encryptionKeyPair = await generateECDHKeyPair();
+        const [signing, encryption] = await Promise.all([
+            generateECDSAKeyPair(),
+            generateECDHKeyPair(),
+        ]);
 
         const keyPairs: UserKeyPairs = {
-            signing: signingKeyPair,
-            encryption: encryptionKeyPair,
+            signing,
+            encryption,
         };
 
         return keyPairs;

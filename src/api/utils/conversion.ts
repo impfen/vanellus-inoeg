@@ -5,7 +5,7 @@
 import { base32Decode, base32Encode } from "@ctrl/ts-base32";
 import { Buffer } from "buffer";
 
-export const encodebase32 = (string: string | Buffer) => {
+export const encodeBase32 = (string: string | Buffer) => {
     return base32Encode(Buffer.from(string), "Crockford");
 };
 
