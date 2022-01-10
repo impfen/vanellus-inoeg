@@ -138,7 +138,7 @@ export const createVerifiedProvider = async (
     const { mediatorApi } = await getMediatorApi({ mediatorKeyPairs });
     const provider = await createUnverifiedProvider(providerKeyPairs);
 
-    await mediatorApi.confirmProvider(provider, mediatorKeyPairs);
+    await mediatorApi.verifyProvider(provider, mediatorKeyPairs);
 
     return provider;
 };

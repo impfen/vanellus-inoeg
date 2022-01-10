@@ -132,18 +132,18 @@ describe("AnonymousApi", () => {
         expect(noProviders).toHaveLength(0);
 
         // disabled until id is added to getPendingProviders
-        // // confirm providers
-        // const pendingProviders = await mediatorApi.getPendingProviders(
+        // // verify providers
+        // const verifiedProviders = await mediatorApi.getVerifiedProviders(
         //     mediatorKeyPairs
         // );
 
         // for (const pendingProvider of pendingProviders) {
-        //     const confirmResult = await mediatorApi.confirmProvider(
+        //     const verifiedResult = await mediatorApi.verifyProvider(
         //         pendingProvider,
         //         mediatorKeyPairs
         //     );
 
-        //     expect(confirmResult).toHaveProperty("name");
+        //     expect(verifiedResult).toHaveProperty("name");
         // }
 
         // // query providers

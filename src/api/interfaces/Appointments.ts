@@ -8,7 +8,10 @@ import { SignedData } from "./crypto";
 import { ApiSignedPublicProvider } from "./Provider";
 export interface ApiSignedAppointment extends SignedData {
     updatedAt: string;
-    bookedSlots?: Slot[];
+    bookedSlots: Slot[];
+}
+
+export interface ApiSignedProviderAppointment extends ApiSignedAppointment {
     bookings: ApiEncryptedBooking[];
 }
 

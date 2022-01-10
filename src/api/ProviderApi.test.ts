@@ -104,7 +104,7 @@ describe("ProviderApi", () => {
         });
     });
 
-    describe("confirming a provider", () => {
+    describe("verify a provider", () => {
         let provider2: Provider;
         let providerKeyPairs2: ProviderKeyPairs;
 
@@ -129,8 +129,8 @@ describe("ProviderApi", () => {
             expect(providerDatas).toHaveLength(1);
         });
 
-        it("should confirm provider", async () => {
-            const result2 = await mediatorApi.confirmProvider(
+        it("should verify provider", async () => {
+            const result2 = await mediatorApi.verifyProvider(
                 provider2,
                 mediatorKeyPairs
             );
@@ -138,7 +138,7 @@ describe("ProviderApi", () => {
             expect(result2).toHaveProperty("name");
         });
 
-        it("should get data for confirmed provider", async () => {
+        it("should get data for verified provider", async () => {
             const result3 = await providerApi.getVerifiedProvider(
                 providerKeyPairs2
             );

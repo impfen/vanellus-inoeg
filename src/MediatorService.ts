@@ -31,8 +31,8 @@ export class MediatorService {
         return true;
     }
 
-    public async confirmProvider(provider: Provider) {
-        return this.mediatorApi.confirmProvider(provider, this.getKeyPairs());
+    public async verifyProvider(provider: Provider) {
+        return this.mediatorApi.verifyProvider(provider, this.getKeyPairs());
     }
 
     /**

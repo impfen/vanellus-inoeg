@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 describe("MediatorService", () => {
-    describe("confirm a provider", () => {
+    describe("verify a provider", () => {
         let providerData: Provider;
 
         it("should create unverified provider", async () => {
@@ -46,16 +46,16 @@ describe("MediatorService", () => {
             expect(pendingProviders[0].name).toEqual(providerData.name);
         });
 
-        it("should confirm provider", async () => {
-            const confirmedProvider = await mediatorApi.confirmProvider(
+        it("should verify provider", async () => {
+            const verifiedProvider = await mediatorApi.verifyProvider(
                 providerData,
                 mediatorKeyPairs
             );
 
-            expect(confirmedProvider).toHaveProperty("name");
+            expect(verifiedProvider).toHaveProperty("name");
         });
 
-        it("should not fetch pending providers after confirmation", async () => {
+        it("should not fetch pending providers after verification", async () => {
             const pendingProviders = await mediatorApi.getPendingProviders(
                 mediatorKeyPairs
             );

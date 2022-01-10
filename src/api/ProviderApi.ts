@@ -199,14 +199,18 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
+     * Stores a provider for initial signup or save after a change of data
      *
+     * @param providerInput     Data to save
+     * @param providerKeyPairs  KeyPairs of the provider to store
+     * @param signupCode        Optional signup code
      *
      * @returns Promise<Provider>
      */
     public async storeProvider(
         providerInput: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
-        code?: string
+        signupCode?: string
     ) {
         const keys = await this.transport.call("getKeys");
 
@@ -234,7 +238,7 @@ export class ProviderApi extends AbstractApi<
             "storeProviderData",
             {
                 encryptedData: encryptedData,
-                code: code,
+                code: signupCode,
             },
             providerKeyPairs.signing
         );
@@ -248,8 +252,8 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * Checks if a provider is confirmed and, if yes, returns the confirmed data.
-     * If the current provider, who provided the keys, is not confirmed yet, null is returned.
+     * Checks if a provider is verified and, if yes, returns the verified data.
+     * If the current provider, who provided the keys, is not verified yet, null is returned.
      *
      * @todo check signature of retrieved ProviderData
      *
@@ -257,20 +261,19 @@ export class ProviderApi extends AbstractApi<
      */
     public async getVerifiedProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
-            const encryptedConfirmedProviderECDAData =
-                await this.transport.call(
-                    "checkProviderData",
-                    undefined,
-                    providerKeyPairs.signing
-                );
+            const encryptedVerifiedProviderECDAData = await this.transport.call(
+                "checkProviderData",
+                undefined,
+                providerKeyPairs.signing
+            );
 
-            const encryptedConfirmedProvider = parseUntrustedJSON<ECDHData>(
-                encryptedConfirmedProviderECDAData.data
+            const encryptedVerifiedProvider = parseUntrustedJSON<ECDHData>(
+                encryptedVerifiedProviderECDAData.data
             );
 
             // decrypt retrieved data, if any, with the providers private key
             const decryptedProviderDataString = await ecdhDecrypt(
-                encryptedConfirmedProvider,
+                encryptedVerifiedProvider,
                 providerKeyPairs.data.privateKey
             );
 

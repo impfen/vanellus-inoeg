@@ -1,7 +1,7 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     ApiEncryptedProvider,
-    ApiSignedAppointment,
+    ApiSignedProviderAppointment,
     ECDHData,
     SignedData,
 } from "./interfaces";
@@ -14,7 +14,7 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
     }: {
         from: string;
         to: string;
-    }) => ApiSignedAppointment[];
+    }) => ApiSignedProviderAppointment[];
 
     // publish all local appointments to the backend
     publishAppointments: ({
