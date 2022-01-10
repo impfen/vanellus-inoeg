@@ -107,11 +107,14 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider[]>
      */
-    public async getUnverifiedProviders(mediatorKeyPairs: MediatorKeyPairs) {
+    public async getUnverifiedProviders(
+        mediatorKeyPairs: MediatorKeyPairs,
+        limit?: number
+    ) {
         return this.decryptProviderDatas(
             await this.transport.call(
                 "getPendingProviderData",
-                { limit: undefined },
+                { limit },
                 mediatorKeyPairs.signing
             ),
             mediatorKeyPairs
@@ -123,11 +126,14 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider[]>
      */
-    public async getVerifiedProviders(mediatorKeyPairs: MediatorKeyPairs) {
+    public async getVerifiedProviders(
+        mediatorKeyPairs: MediatorKeyPairs,
+        limit?: number
+    ) {
         return this.decryptProviderDatas(
             await this.transport.call(
                 "getVerifiedProviderData",
-                { limit: undefined },
+                { limit },
                 mediatorKeyPairs.signing
             ),
             mediatorKeyPairs
@@ -166,11 +172,11 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.provider.privateKey
         );
 
-        const providerData = parseUntrustedJSON<Provider>(
+        const provider = parseUntrustedJSON<Provider>(
             decryptedProviderDataString
         );
 
-        return providerData;
+        return provider;
     }
 
     // /**

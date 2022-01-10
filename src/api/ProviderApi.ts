@@ -87,13 +87,11 @@ export class ProviderApi extends AbstractApi<
 
         const appointments: ProviderAppointment[] = [];
 
-        // @todo Fake until provider is also returned
-        const publicProvider = parseUntrustedJSON<PublicProvider>(
-            // signedAppointments.provider.data
-            "{}"
+        const provider = parseUntrustedJSON<Provider>(
+            signedAppointments.provider.data
         );
 
-        for (const signedAppointment of signedAppointments) {
+        for (const signedAppointment of signedAppointments.appointments) {
             const isVerified = await verify(
                 [providerKeyPairs.signing.publicKey],
                 signedAppointment
@@ -120,7 +118,7 @@ export class ProviderApi extends AbstractApi<
             }));
 
             const appointment: ProviderAppointment = {
-                ...enrichAppointment(apiAppointment, publicProvider),
+                ...enrichAppointment(apiAppointment, provider),
                 bookings,
             };
 

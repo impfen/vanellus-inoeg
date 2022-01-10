@@ -26,6 +26,11 @@ export interface ApiProviderAppointments {
     keyChain: ApiAppointmentKeyChain;
 }
 
+export interface ApiProviderProviderAppointments
+    extends ApiProviderAppointments {
+    appointments: ApiSignedProviderAppointment[];
+}
+
 export interface ApiAppointment {
     id: string;
     timestamp: string;
