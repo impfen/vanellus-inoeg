@@ -11,6 +11,7 @@ export * from "./BackendPublicKeys";
 export * from "./Backup";
 export * from "./Booking";
 export * from "./crypto";
+export * from "./MediatorKeyData";
 export * from "./Provider";
 export * from "./QueueData";
 export * from "./Settings";

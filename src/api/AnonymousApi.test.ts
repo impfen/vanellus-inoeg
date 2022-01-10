@@ -26,7 +26,7 @@ beforeEach(async () => {
     const adminResult = await getAdminApi();
 
     // we reset the database
-    await adminResult.adminApi.resetAppointmentsDb(adminResult.adminKeyPairs);
+    await adminResult.adminApi.resetDb(adminResult.adminKeyPairs);
 
     adminKeyPairs = adminResult.adminKeyPairs;
 

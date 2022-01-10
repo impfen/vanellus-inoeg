@@ -11,9 +11,11 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
     getProviderAppointments: ({
         from,
         to,
+        updatedSince,
     }: {
         from: string;
         to: string;
+        updatedSince?: string;
     }) => ApiSignedProviderAppointment[];
 
     // publish all local appointments to the backend

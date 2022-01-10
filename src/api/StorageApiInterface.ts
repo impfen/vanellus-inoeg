@@ -10,4 +10,8 @@ export interface StorageApiInterface {
     }) => "ok";
 
     getSettings: ({ id }: { id: string }) => ApiSettingsData;
+
+    deleteSettings: ({ id }: { id: string }) => "ok";
+
+    resetDB: () => "ok";
 }

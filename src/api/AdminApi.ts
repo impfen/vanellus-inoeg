@@ -24,7 +24,7 @@ export class AdminApi extends AbstractApi<
      *
      * @returns Promise<boolean>
      */
-    async resetAppointmentsDb(adminKeyPairs: AdminKeyPairs) {
+    async resetDb(adminKeyPairs: AdminKeyPairs) {
         const result = await this.transport.call(
             "resetDB",
             undefined,

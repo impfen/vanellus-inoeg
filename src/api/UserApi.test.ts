@@ -26,7 +26,7 @@ let provider: Provider;
 beforeAll(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
 
-    await adminApi.resetAppointmentsDb(adminKeyPairs);
+    await adminApi.resetDb(adminKeyPairs);
 
     anonApi = getAnonymousApi();
 

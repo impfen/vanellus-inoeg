@@ -33,7 +33,7 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new VanellusError("Couldn't backup data");
+            throw new VanellusError("Couldn't save backup");
         }
 
         return encryptedData;
@@ -49,6 +49,20 @@ export class StorageApi {
         const decryptedData = await aesDecrypt(encryptedBackup, b642buf(key));
 
         return parseUntrustedJSON<Backup>(decryptedData);
+    }
+
+    public async delete(secret: string) {
+        const [id] = await this.deriveSecret(secret);
+
+        const response = await this.transport.call("deleteSettings", {
+            id: id,
+        });
+
+        if ("ok" !== response) {
+            throw new VanellusError("Couldn't delete backup");
+        }
+
+        return true;
     }
 
     protected deriveSecret(secret: string) {

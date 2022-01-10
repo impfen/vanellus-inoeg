@@ -17,7 +17,7 @@ let mediatorKeyPairs: MediatorKeyPairs;
 beforeAll(async () => {
     const { adminApi, adminKeyPairs } = await getAdminApi();
 
-    await adminApi.resetAppointmentsDb(adminKeyPairs);
+    await adminApi.resetDb(adminKeyPairs);
 
     const mediatorResult = await getMediatorApi({ adminKeyPairs });
 

@@ -4,11 +4,6 @@
 
 import { ActorKeyPairs, KeyPair } from "../api/interfaces";
 
-export interface MediatorKeyData {
-    signing: string;
-    encryption: string;
-}
-
 export interface MediatorKeyPairs extends ActorKeyPairs {
     encryption: KeyPair;
     provider: KeyPair;
