@@ -1,5 +1,5 @@
-import { VanellusError } from "../errors";
 import { parseUntrustedJSON } from "../utils";
+import { ApiError } from "./errors";
 import { StorageApiInterface } from "./StorageApiInterface";
 import { Transport } from "./transports";
 import {
@@ -25,7 +25,7 @@ export class StorageApi {
         );
 
         if (encryptedData === null) {
-            throw new VanellusError("Could not backup data");
+            throw new ApiError("Could not backup data");
         }
 
         const response = await this.transport.call("storeSettings", {
@@ -34,7 +34,7 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new VanellusError("Couldn't save backup");
+            throw new ApiError("Couldn't save backup");
         }
 
         return encryptedData;
@@ -60,7 +60,7 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new VanellusError("Couldn't delete backup");
+            throw new ApiError("Couldn't delete backup");
         }
 
         return true;

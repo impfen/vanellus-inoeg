@@ -1,7 +1,7 @@
-import { VanellusError } from "../errors";
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
+import { ApiError, TransportError } from "./errors";
 import {
     Appointment,
     Booking,
@@ -29,7 +29,7 @@ export class UserApi extends AbstractApi<
     /**
      * Book an appointment
      *
-     * @returns Promise<Booking>
+     * @returns Promise<Booking | null>
      */
     public async bookAppointment(
         appointment: Appointment,
@@ -46,24 +46,33 @@ export class UserApi extends AbstractApi<
             appointment.publicKey
         );
 
-        // we store the information about the offer which we've accepted
-        const apiBooking = await this.transport.call(
-            "bookAppointment",
-            {
-                id: appointment.id,
-                providerID: appointment.provider.id,
-                encryptedData: encryptedData,
-                signedTokenData: userQueueToken.signedToken,
-            },
-            userQueueToken.keyPairs.signing
-        );
+        try {
+            // we store the information about the offer which we've accepted
+            const apiBooking = await this.transport.call(
+                "bookAppointment",
+                {
+                    id: appointment.id,
+                    providerID: appointment.provider.id,
+                    encryptedData: encryptedData,
+                    signedTokenData: userQueueToken.signedToken,
+                },
+                userQueueToken.keyPairs.signing
+            );
 
-        const booking: Booking = {
-            id: apiBooking.id,
-            code: userQueueToken.userToken.code,
-        };
+            const booking: Booking = {
+                id: apiBooking.id,
+                code: userQueueToken.userToken.code,
+            };
 
-        return booking;
+            return booking;
+        } catch (error) {
+            if (error instanceof TransportError && error?.code === 401) {
+                // Double booking
+                return null;
+            }
+
+            throw error;
+        }
     }
 
     /**
@@ -86,7 +95,7 @@ export class UserApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new VanellusError("Could not cancel booking");
+            throw new ApiError("Could not cancel booking");
         }
 
         return true;

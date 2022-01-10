@@ -107,7 +107,16 @@ describe("UserApi", () => {
         );
 
         expect(booking).toHaveProperty("id");
-        expect(booking.code).toHaveLength(4);
+        expect(booking?.code).toHaveLength(4);
+    });
+
+    it("should not double book an appointment", async () => {
+        const booking = await userApi.bookAppointment(
+            appointment,
+            userQueueToken
+        );
+
+        expect(booking).toBeNull();
     });
 
     it("should save the booking into the appointment", async () => {

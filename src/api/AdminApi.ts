@@ -1,7 +1,7 @@
-import { VanellusError } from "../errors";
 import { AbstractApi } from "./AbstractApi";
 import { AdminApiInterface } from "./AdminApiInterface";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
+import { ApiError } from "./errors";
 import {
     AdminConfig,
     AdminKeyPairs,
@@ -32,7 +32,7 @@ export class AdminApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new VanellusError("Could not add reset appointment-db");
+            throw new ApiError("Could not add reset appointment-db");
         }
 
         return true;
@@ -91,7 +91,7 @@ export class AdminApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new VanellusError("Could not add mediator-key");
+            throw new ApiError("Could not add mediator-key");
         }
 
         return true;
@@ -120,7 +120,7 @@ const extractAdminKey = async (adminConfig: AdminConfig, name: string) => {
     );
 
     if (!keyData) {
-        throw new VanellusError("Could not find signing-keys for admin");
+        throw new ApiError("Could not find signing-keys for admin");
     }
 
     const importedKey = await crypto.subtle.importKey(

@@ -1,10 +1,10 @@
+import { TransportError } from "../errors";
 import { KeyPair } from "../interfaces";
 import { AbstractTransport } from "./AbstractTransport";
 import type {
     MethodParamsIfExists,
     ReturnTypeOfMethodIfExists,
 } from "./Transport";
-import { TransportError } from "./TransportError";
 
 export interface RpcResponseError<TErrorData = unknown> {
     code: number;
@@ -61,10 +61,17 @@ export class JsonRpcTransport<TMethods> extends AbstractTransport<TMethods> {
         if (!fetchResponse.ok || !rpcResponse.result) {
             // console.log(method, rpcResponse);
 
-            throw new TransportError(
-                fetchResponse.statusText
-                // data: JSON.stringify(rpcResponse),
-            );
+            if (rpcResponse.error) {
+                throw new TransportError(
+                    rpcResponse.error?.message,
+                    rpcResponse.error?.code
+                );
+            } else {
+                throw new TransportError(
+                    fetchResponse.statusText,
+                    fetchResponse.status
+                );
+            }
         }
 
         return rpcResponse?.result;

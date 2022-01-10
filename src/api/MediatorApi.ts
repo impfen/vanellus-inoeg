@@ -1,7 +1,7 @@
-import { VanellusError } from "../errors";
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
+import { ApiError } from "./errors";
 import {
     ApiEncryptedProvider,
     ECDHData,
@@ -94,7 +94,7 @@ export class MediatorApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new VanellusError(`Could not verify provider ${provider.id}`);
+            throw new ApiError(`Could not verify provider ${provider.id}`);
         }
 
         return provider;

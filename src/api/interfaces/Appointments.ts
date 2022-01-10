@@ -26,8 +26,8 @@ export interface ApiProviderAppointments {
     keyChain: ApiAppointmentKeyChain;
 }
 
-export interface ApiProviderProviderAppointments
-    extends ApiProviderAppointments {
+export interface ApiProviderProviderAppointments {
+    provider: ApiSignedProviderData;
     appointments: ApiSignedProviderAppointment[];
 }
 

@@ -1,8 +1,9 @@
-import { VanellusError } from "../errors";
 import { Booking } from "../interfaces/Booking";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
+import { ApiError } from "./errors";
+import { TransportError } from "./errors/TransportError";
 import {
     ApiAppointment,
     ApiBooking,
@@ -71,6 +72,7 @@ export class ProviderApi extends AbstractApi<
 
     /**
      * Retrieves the appointments which belong to the provider
+     * Returns an empty array if the provider is not verified.
      *
      * @return Promise<ProviderAppointment[]>
      */
@@ -79,53 +81,63 @@ export class ProviderApi extends AbstractApi<
         to: Date,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const apiProviderProviderAppointments = await this.transport.call(
-            "getProviderAppointments",
-            { from: dayjs(from).toISOString(), to: dayjs(to).toISOString() },
-            providerKeyPairs.signing
-        );
-
-        const appointments: ProviderAppointment[] = [];
-
-        const provider = parseUntrustedJSON<Provider>(
-            apiProviderProviderAppointments.provider.data
-        );
-
-        for (const signedAppointment of apiProviderProviderAppointments.appointments) {
-            const isVerified = await verify(
-                [providerKeyPairs.signing.publicKey],
-                signedAppointment
+        try {
+            const apiProviderProviderAppointments = await this.transport.call(
+                "getProviderAppointments",
+                {
+                    from: dayjs(from).toISOString(),
+                    to: dayjs(to).toISOString(),
+                },
+                providerKeyPairs.signing
             );
 
-            if (!isVerified) {
-                throw new VanellusError(
-                    "Could not verify provider-appointment"
+            const appointments: ProviderAppointment[] = [];
+
+            const provider = parseUntrustedJSON<Provider>(
+                apiProviderProviderAppointments.provider.data
+            );
+
+            for (const signedAppointment of apiProviderProviderAppointments.appointments) {
+                const isVerified = await verify(
+                    [providerKeyPairs.signing.publicKey],
+                    signedAppointment
                 );
+
+                if (!isVerified) {
+                    throw new ApiError("Could not verify provider-appointment");
+                }
+
+                const apiAppointment = parseUntrustedJSON<ApiAppointment>(
+                    signedAppointment.data
+                );
+
+                const apiBookings = await this.decryptBookings(
+                    signedAppointment.bookings || [],
+                    providerKeyPairs
+                );
+
+                const bookings: Booking[] = apiBookings.map((apiBooking) => ({
+                    id: apiBooking.id,
+                    code: apiBooking.userToken.code,
+                }));
+
+                const appointment: ProviderAppointment = {
+                    ...enrichAppointment(apiAppointment, provider),
+                    bookings,
+                };
+
+                appointments.push(appointment);
             }
 
-            const apiAppointment = parseUntrustedJSON<ApiAppointment>(
-                signedAppointment.data
-            );
+            return appointments;
+        } catch (error) {
+            if (error instanceof TransportError && error.code === 403) {
+                // the provider is unverified
+                return [];
+            }
 
-            const apiBookings = await this.decryptBookings(
-                signedAppointment.bookings || [],
-                providerKeyPairs
-            );
-
-            const bookings: Booking[] = apiBookings.map((apiBooking) => ({
-                id: apiBooking.id,
-                code: apiBooking.userToken.code,
-            }));
-
-            const appointment: ProviderAppointment = {
-                ...enrichAppointment(apiAppointment, provider),
-                bookings,
-            };
-
-            appointments.push(appointment);
+            throw error;
         }
-
-        return appointments;
     }
 
     /**

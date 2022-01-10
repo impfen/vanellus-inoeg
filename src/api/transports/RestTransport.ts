@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* @todo needs some love... but too much other stuff to do first... */
-import { BackendError } from "../../errors";
+
+import { TransportError } from "../errors";
 import { KeyPair } from "../interfaces";
 import { AbstractTransport } from "./AbstractTransport";
 import { MethodParamsIfExists } from "./Transport";
@@ -108,44 +109,35 @@ export class RestTransport<TMethods = any> extends AbstractTransport<TMethods> {
                 ? await this.signParams(params, keyPair)
                 : params;
 
-        try {
-            const uri =
-                this.apiUrl +
-                (typeof methodParams.uri === "function"
-                    ? methodParams.uri(params)
-                    : methodParams.uri);
+        const uri =
+            this.apiUrl +
+            (typeof methodParams.uri === "function"
+                ? methodParams.uri(params)
+                : methodParams.uri);
 
-            let response;
+        let response;
 
-            if (methodParams.method === "GET") {
-                response = await fetch(uri, {
-                    method: "GET",
-                    headers: {
-                        ["content-type"]: "application/json",
-                    },
-                });
-            } else {
-                response = await fetch(uri, {
-                    method: methodParams.method,
-                    headers: {
-                        ["content-type"]: "application/json",
-                    },
-                    body: JSON.stringify(callParams),
-                });
-            }
-
-            if (!response.ok) {
-                throw new BackendError({
-                    error: response.statusText,
-                    data: JSON.stringify(await response.json()),
-                });
-            }
-
-            return response.json();
-        } catch (e) {
-            return new BackendError({
-                error: JSON.stringify(e),
+        if (methodParams.method === "GET") {
+            response = await fetch(uri, {
+                method: "GET",
+                headers: {
+                    ["content-type"]: "application/json",
+                },
+            });
+        } else {
+            response = await fetch(uri, {
+                method: methodParams.method,
+                headers: {
+                    ["content-type"]: "application/json",
+                },
+                body: JSON.stringify(callParams),
             });
         }
+
+        if (!response.ok) {
+            throw new TransportError(response.statusText, response.status);
+        }
+
+        return response.json();
     }
 }

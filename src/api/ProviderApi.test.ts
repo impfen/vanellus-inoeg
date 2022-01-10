@@ -107,6 +107,8 @@ describe("ProviderApi", () => {
     describe("verify a provider", () => {
         let provider2: Provider;
         let providerKeyPairs2: ProviderKeyPairs;
+        const from = dayjs().utc().toDate();
+        const to = dayjs().utc().add(1, "day").toDate();
 
         it("should create new provider", async () => {
             providerKeyPairs2 = await providerApi.generateKeyPairs();
@@ -114,11 +116,21 @@ describe("ProviderApi", () => {
         });
 
         it("should retrieve no data while provider is pending", async () => {
-            const checkResult = await providerApi.getVerifiedProvider(
+            const result = await providerApi.getVerifiedProvider(
                 providerKeyPairs2
             );
 
-            expect(checkResult).toBeNull();
+            expect(result).toBeNull();
+        });
+
+        it("should not get own appointments while provider is unverified", async () => {
+            const result = await providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs2
+            );
+
+            expect(result).toHaveLength(0);
         });
 
         it("should get pending providers", async () => {

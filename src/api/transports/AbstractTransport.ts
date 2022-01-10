@@ -19,7 +19,7 @@ export abstract class AbstractTransport<TMethods>
      * @param keyPair
      * @param id
      *
-     * @throws VanellusError
+     * @throws TransportError
      */
     public abstract call<K extends keyof TMethods>(
         method: K,
