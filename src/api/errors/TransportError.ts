@@ -1,6 +1,6 @@
-import { VanellusError } from "../../errors";
+import { ApiError } from ".";
 
-export class TransportError extends VanellusError {
+export class TransportError extends ApiError {
     constructor(
         message = "Bad Request",
         public readonly code?: number,

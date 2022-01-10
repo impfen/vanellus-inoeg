@@ -217,7 +217,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @returns Promise<Provider>
      */
-    public async storeUnverifiedProvider(
+    public async storeProvider(
         providerInput: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         signupCode?: string
@@ -270,7 +270,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<Provider | null>
      */
-    public async getVerifiedProvider(providerKeyPairs: ProviderKeyPairs) {
+    public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
             const encryptedVerifiedProviderECDAData = await this.transport.call(
                 "checkProviderData",

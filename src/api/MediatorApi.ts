@@ -22,7 +22,7 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider>
      */
-    public async verifyProvider(
+    public async confirmProvider(
         provider: Provider,
         mediatorKeyPairs: MediatorKeyPairs
     ) {
@@ -107,7 +107,7 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider[]>
      */
-    public async getUnverifiedProviders(
+    public async getPendingProviders(
         mediatorKeyPairs: MediatorKeyPairs,
         limit?: number
     ) {

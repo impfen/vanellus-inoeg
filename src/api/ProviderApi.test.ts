@@ -116,9 +116,7 @@ describe("ProviderApi", () => {
         });
 
         it("should retrieve no data while provider is pending", async () => {
-            const result = await providerApi.getVerifiedProvider(
-                providerKeyPairs2
-            );
+            const result = await providerApi.checkProvider(providerKeyPairs2);
 
             expect(result).toBeNull();
         });
@@ -134,7 +132,7 @@ describe("ProviderApi", () => {
         });
 
         it("should get pending providers", async () => {
-            const providerDatas = await mediatorApi.getUnverifiedProviders(
+            const providerDatas = await mediatorApi.getPendingProviders(
                 mediatorKeyPairs
             );
 
@@ -142,7 +140,7 @@ describe("ProviderApi", () => {
         });
 
         it("should verify provider", async () => {
-            const result2 = await mediatorApi.verifyProvider(
+            const result2 = await mediatorApi.confirmProvider(
                 provider2,
                 mediatorKeyPairs
             );
@@ -151,9 +149,7 @@ describe("ProviderApi", () => {
         });
 
         it("should get data for verified provider", async () => {
-            const result3 = await providerApi.getVerifiedProvider(
-                providerKeyPairs2
-            );
+            const result3 = await providerApi.checkProvider(providerKeyPairs2);
 
             expect(result3).toHaveProperty("name");
         });

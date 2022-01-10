@@ -23,7 +23,7 @@ export class ProviderService {
         this.secret = secret;
         this.keyPairs = keyPairs;
 
-        await this.getAuthenticatedProvider();
+        await this.checkProvider();
 
         const backupData = await this.providerApi.restoreFromBackup(secret);
 
@@ -47,7 +47,7 @@ export class ProviderService {
         vaccine: string,
         slotCount: number
     ) {
-        const provider = await this.getAuthenticatedProvider();
+        const provider = await this.checkProvider();
 
         if (!provider) {
             throw new AuthError("");
@@ -70,7 +70,7 @@ export class ProviderService {
         vaccine: string,
         lanes: number
     ) {
-        const provider = await this.getAuthenticatedProvider();
+        const provider = await this.checkProvider();
 
         if (!provider) {
             throw new AuthError("");
@@ -109,19 +109,16 @@ export class ProviderService {
         );
     }
 
-    public async storeUnverifiedProvider(
-        providerInput: ProviderInput,
-        code?: string
-    ) {
-        return this.providerApi.storeUnverifiedProvider(
+    public async storeProvider(providerInput: ProviderInput, code?: string) {
+        return this.providerApi.storeProvider(
             providerInput,
             this.getKeyPairs(),
             code
         );
     }
 
-    protected getAuthenticatedProvider() {
-        return this.providerApi.getVerifiedProvider(this.getKeyPairs());
+    protected checkProvider() {
+        return this.providerApi.checkProvider(this.getKeyPairs());
     }
 
     protected getKeyPairs() {

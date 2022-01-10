@@ -31,19 +31,16 @@ export class MediatorService {
         return true;
     }
 
-    public async verifyProvider(provider: Provider) {
-        return this.mediatorApi.verifyProvider(provider, this.getKeyPairs());
+    public async confirmProvider(provider: Provider) {
+        return this.mediatorApi.confirmProvider(provider, this.getKeyPairs());
     }
 
     /**
      *
      * @throws AuthError if proper keys are absent
      */
-    public getUnverifiedProviders(limit?: number) {
-        return this.mediatorApi.getUnverifiedProviders(
-            this.getKeyPairs(),
-            limit
-        );
+    public getPendingProviders(limit?: number) {
+        return this.mediatorApi.getPendingProviders(this.getKeyPairs(), limit);
     }
 
     /**

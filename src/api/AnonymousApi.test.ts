@@ -101,25 +101,25 @@ describe("AnonymousApi", () => {
         };
 
         const k1 = await providerApi.generateKeyPairs();
-        const p1 = await providerApi.storeUnverifiedProvider(providerData, k1);
+        const p1 = await providerApi.storeProvider(providerData, k1);
 
         expect(p1).toHaveProperty("id");
 
         providerData.zipCode = "60312";
         const k2 = await providerApi.generateKeyPairs();
-        const p2 = await providerApi.storeUnverifiedProvider(providerData, k2);
+        const p2 = await providerApi.storeProvider(providerData, k2);
 
         expect(p2).toHaveProperty("id");
 
         providerData.zipCode = "65936";
         const k3 = await providerApi.generateKeyPairs();
-        const p3 = await providerApi.storeUnverifiedProvider(providerData, k3);
+        const p3 = await providerApi.storeProvider(providerData, k3);
 
         expect(p3).toHaveProperty("id");
 
         providerData.zipCode = "96050";
         const k4 = await providerApi.generateKeyPairs();
-        const p4 = await providerApi.storeUnverifiedProvider(providerData, k4);
+        const p4 = await providerApi.storeProvider(providerData, k4);
 
         expect(p4).toHaveProperty("id");
 
@@ -132,12 +132,12 @@ describe("AnonymousApi", () => {
         expect(noProviders).toHaveLength(0);
 
         // verify providers
-        const unverifiedProviders = await mediatorApi.getUnverifiedProviders(
+        const unverifiedProviders = await mediatorApi.getPendingProviders(
             mediatorKeyPairs
         );
 
         for (const unverifiedProvider of unverifiedProviders) {
-            const verifiedResult = await mediatorApi.verifyProvider(
+            const verifiedResult = await mediatorApi.confirmProvider(
                 unverifiedProvider,
                 mediatorKeyPairs
             );
