@@ -131,7 +131,7 @@ export class ProviderApi extends AbstractApi<
 
             return appointments;
         } catch (error) {
-            if (error instanceof TransportError && error.code === 403) {
+            if (error instanceof TransportError && error.code === 401) {
                 // the provider is unverified
                 return [];
             }
@@ -246,7 +246,7 @@ export class ProviderApi extends AbstractApi<
             keys.providerData
         );
 
-        await this.transport.call(
+        const result = await this.transport.call(
             "storeProviderData",
             {
                 encryptedData: encryptedData,
@@ -254,6 +254,10 @@ export class ProviderApi extends AbstractApi<
             },
             providerKeyPairs.signing
         );
+
+        if ("ok" !== result) {
+            throw new ApiError("Could not save provider-data");
+        }
 
         return providerData;
     }
