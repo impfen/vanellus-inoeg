@@ -13,20 +13,12 @@ export const base322buf = (base32: string) => {
     return Buffer.from(base32Decode(base32, "Crockford"));
 };
 
-export const hex2buf = (hex: string) => {
-    return Buffer.from(hex, "hex");
-};
-
 export const buf2b64 = (buffer: ArrayBufferLike) => {
     return Buffer.from(buffer).toString("base64");
 };
 
 export const b642buf = (base64: string) => {
     return Buffer.from(base64, "base64");
-};
-
-export const buf2hex = (buffer: ArrayBuffer) => {
-    return Buffer.from(buffer).toString("hex");
 };
 
 export const str2ab = (str: string) => {

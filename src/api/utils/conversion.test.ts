@@ -5,8 +5,6 @@ import {
     base322buf,
     buf2b64,
     buf2base32,
-    buf2hex,
-    hex2buf,
     str2ab,
 } from "./conversion";
 
@@ -28,26 +26,6 @@ describe("conversions", () => {
         const result = base322buf(base32);
 
         expect(result.toString()).toMatchInlineSnapshot(
-            `"This is my testbuffer"`
-        );
-    });
-
-    it("buf2hex", () => {
-        const buffer = Buffer.from("This is my testbuffer");
-
-        const hex = buf2hex(buffer);
-
-        expect(hex).toMatchInlineSnapshot(
-            `"54686973206973206d792074657374627566666572"`
-        );
-    });
-
-    it("hex2buf", () => {
-        const hex = "54686973206973206d792074657374627566666572";
-
-        const buffer = hex2buf(hex);
-
-        expect(Buffer.from(buffer).toString()).toMatchInlineSnapshot(
             `"This is my testbuffer"`
         );
     });
