@@ -46,7 +46,7 @@ beforeEach(async () => {
 });
 
 describe("AnonymousApi", () => {
-    it("should be able to get appointments", async () => {
+    it("should get appointments", async () => {
         // tomorrow 3 pm
         const date = dayjs()
             .utc()
@@ -158,7 +158,7 @@ describe("AnonymousApi", () => {
         ]);
     });
 
-    it("we should be able to get the public keys anonymously", async () => {
+    it("should get the public keys anonymously", async () => {
         const publicKeys = await anonymousApi.getKeys();
 
         expect(publicKeys.rootKey).toEqual(adminKeyPairs.signing.publicKey);
@@ -166,5 +166,14 @@ describe("AnonymousApi", () => {
         expect(publicKeys.providerData).toEqual(
             adminKeyPairs.provider.publicKey
         );
+    });
+
+    it("should get the configurables", async () => {
+        const configurables = await anonymousApi.getConfigurables();
+
+        expect(configurables).toHaveProperty("vaccines");
+        expect(configurables).toHaveProperty("anon_max_time_window");
+        expect(configurables).toHaveProperty("anon_aggregated_max_time_window");
+        expect(configurables).toHaveProperty("provider_max_time_window");
     });
 });
