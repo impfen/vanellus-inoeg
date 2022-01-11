@@ -39,6 +39,19 @@ export class ProviderService {
         return true;
     }
 
+    public async register(providerInput: ProviderInput, signupCode?: string) {
+        this.keyPairs = await this.providerApi.generateKeyPairs();
+        this.secret = this.providerApi.generateSecret();
+
+        const provider = await this.providerApi.storeProvider(
+            providerInput,
+            this.getKeyPairs(),
+            signupCode
+        );
+
+        return provider;
+    }
+
     public async createAppointment(
         startDate: Date,
         duration: number,

@@ -305,8 +305,8 @@ export class ProviderApi extends AbstractApi<
         const id = await this.generateProviderId(providerKeyPairs);
 
         const providerData: Provider = {
-            ...providerInput,
             id,
+            ...providerInput,
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,
@@ -365,7 +365,7 @@ export class ProviderApi extends AbstractApi<
             const decryptedProviderDataJSON =
                 parseUntrustedJSON<SignedProvider>(providerDataString);
 
-            const provider = parseUntrustedJSON<Provider>(
+            const verifiedProvider = parseUntrustedJSON<Provider>(
                 decryptedProviderDataJSON.signedData.data
             );
 
@@ -373,7 +373,7 @@ export class ProviderApi extends AbstractApi<
             //     decryptedProviderDataJSON.signedPublicData.data
             // );
 
-            return provider;
+            return verifiedProvider;
         } catch (error) {
             return null;
         }
