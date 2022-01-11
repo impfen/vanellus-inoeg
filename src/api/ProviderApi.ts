@@ -342,7 +342,7 @@ export class ProviderApi extends AbstractApi<
      *
      * @todo check signature of retrieved ProviderData
      *
-     * @return Promise<Provider | null>
+     * @return Promise<ProviderData>
      */
     public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
@@ -369,13 +369,19 @@ export class ProviderApi extends AbstractApi<
                 decryptedProviderDataJSON.signedData.data
             );
 
-            // const publicProvider = parseUntrustedJSON<Provider>(
-            //     decryptedProviderDataJSON.signedPublicData.data
-            // );
+            const publicProvider = parseUntrustedJSON<Provider>(
+                decryptedProviderDataJSON.signedPublicData.data
+            );
 
-            return verifiedProvider;
+            return {
+                verifiedProvider,
+                publicProvider,
+            };
         } catch (error) {
-            return null;
+            return {
+                verifiedProvider: null,
+                publicProvider: null,
+            };
         }
     }
 

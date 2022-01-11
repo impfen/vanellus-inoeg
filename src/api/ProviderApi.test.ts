@@ -13,6 +13,7 @@ import {
     MediatorKeyPairs,
     Provider,
     ProviderBackup,
+    ProviderInput,
     ProviderKeyPairs,
 } from "./interfaces";
 import { ProviderApi } from "./ProviderApi";
@@ -113,13 +114,23 @@ describe("ProviderApi", () => {
 
         it("should create new provider", async () => {
             providerKeyPairs2 = await providerApi.generateKeyPairs();
-            provider2 = await createUnverifiedProvider(providerKeyPairs2);
+            provider2 = await createUnverifiedProvider(providerKeyPairs2, {
+                name: "Max Mustermann",
+                street: "Musterstr. 23",
+                city: "Berlin",
+                zipCode: "10707",
+                description: "",
+                email: "max@mustermann.de",
+                accessible: false,
+                website: "https://eff.org/",
+                foo: "bar",
+            } as ProviderInput);
         });
 
         it("should retrieve no data while provider is pending", async () => {
             const result = await providerApi.checkProvider(providerKeyPairs2);
 
-            expect(result).toBeNull();
+            expect(result.verifiedProvider).toBeNull();
         });
 
         it("should not get own appointments while provider is unverified", async () => {
@@ -152,7 +163,23 @@ describe("ProviderApi", () => {
         it("should get data for verified provider", async () => {
             const result3 = await providerApi.checkProvider(providerKeyPairs2);
 
-            expect(result3).toHaveProperty("id");
+            expect(result3.verifiedProvider).toEqual(provider2);
+        });
+
+        it("should update provider", async () => {
+            await providerApi.storeProvider(
+                {
+                    ...provider2,
+                    name: "foobar",
+                },
+                providerKeyPairs2
+            );
+
+            const providerData = await providerApi.checkProvider(
+                providerKeyPairs2
+            );
+
+            expect(providerData?.verifiedProvider).toEqual(provider2);
         });
     });
 
@@ -204,8 +231,7 @@ describe("ProviderApi", () => {
             const secret = providerApi.generateSecret();
 
             const providerBackup: ProviderBackup = {
-                verifiedData: {},
-                data: provider,
+                verifiedProvider: provider,
             };
 
             const result = await providerApi.backupData(providerBackup, secret);

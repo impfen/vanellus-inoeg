@@ -1,6 +1,6 @@
-import { Provider } from "../api/interfaces";
+import { Provider, PublicProvider } from "./Provider";
 
 export interface ProviderBackup {
-    verifiedData?: Record<string, unknown>;
-    data?: Provider;
+    verifiedProvider?: Provider;
+    publicProvider?: PublicProvider;
 }

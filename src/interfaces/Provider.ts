@@ -23,3 +23,8 @@ export interface Provider extends ProviderInput {
     id: string;
     publicKeys: ProviderPublicKeys;
 }
+
+export interface ProviderData {
+    verifiedProvider: Provider | null;
+    publicProvider: PublicProvider | null;
+}

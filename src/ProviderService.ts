@@ -58,9 +58,9 @@ export class ProviderService {
         vaccine: Vaccine,
         slotCount: number
     ) {
-        const provider = await this.checkProvider();
+        const { verifiedProvider } = await this.checkProvider();
 
-        if (!provider) {
+        if (!verifiedProvider) {
             throw new AuthError("");
         }
 
@@ -69,7 +69,7 @@ export class ProviderService {
             duration,
             vaccine,
             slotCount,
-            provider,
+            verifiedProvider,
             this.getKeyPairs()
         );
     }
@@ -81,9 +81,9 @@ export class ProviderService {
         vaccine: Vaccine,
         lanes: number
     ) {
-        const provider = await this.checkProvider();
+        const { verifiedProvider } = await this.checkProvider();
 
-        if (!provider) {
+        if (!verifiedProvider) {
             throw new AuthError("");
         }
 
@@ -93,7 +93,7 @@ export class ProviderService {
             interval,
             lanes,
             vaccine,
-            provider,
+            verifiedProvider,
             this.getKeyPairs()
         );
     }
