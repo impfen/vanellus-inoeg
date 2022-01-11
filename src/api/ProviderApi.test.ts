@@ -192,6 +192,10 @@ describe("ProviderApi", () => {
 
             expect(result).toHaveLength(192);
             expect(result).toEqual(appointmentSeries);
+
+            expect(result[0].properties.seriesId).toEqual(
+                appointmentSeries[0].properties.seriesId
+            );
         });
     });
 

@@ -105,11 +105,14 @@ export class MediatorApi extends AbstractApi<
      *
      * A provider is pending until it is confirmed by a mediator.
      *
+     * @param mediatorKeyPairs  KeyPairs of the mediator
+     * @param limit             Max number of providers to return. Number between 1 and 10000, defaults to 1000;
+     *
      * @return Promise<Provider[]>
      */
     public async getPendingProviders(
         mediatorKeyPairs: MediatorKeyPairs,
-        limit?: number
+        limit = 1000
     ) {
         return this.decryptProviderDatas(
             await this.transport.call(
@@ -126,11 +129,14 @@ export class MediatorApi extends AbstractApi<
      *
      * A provider is verified after confirmation of a mediator.
      *
+     * @param mediatorKeyPairs  KeyPairs of the mediator
+     * @param limit             Max number of providers to return. Number between 1 and 10000, defaults to 1000;
+     *
      * @return Promise<Provider[]>
      */
     public async getVerifiedProviders(
         mediatorKeyPairs: MediatorKeyPairs,
-        limit?: number
+        limit = 1000
     ) {
         return this.decryptProviderDatas(
             await this.transport.call(
