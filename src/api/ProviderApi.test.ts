@@ -76,7 +76,7 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            expect(publishResult).toHaveLength(1);
+            expect(publishResult).toEqual([appointment]);
         });
 
         it("should retrieve published appointments", async () => {
@@ -146,13 +146,52 @@ describe("ProviderApi", () => {
                 mediatorKeyPairs
             );
 
-            expect(result2).toHaveProperty("name");
+            expect(result2).toEqual(provider2);
         });
 
         it("should get data for verified provider", async () => {
             const result3 = await providerApi.checkProvider(providerKeyPairs2);
 
-            expect(result3).toHaveProperty("name");
+            expect(result3).toHaveProperty("id");
+        });
+    });
+
+    describe("appointment-series", () => {
+        it("should create and publish series", async () => {
+            const startAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(7)
+                .minute(0)
+                .second(0)
+                .toDate();
+            const endAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(23)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const appointmentSeries = providerApi.createAppointmentSeries(
+                startAt,
+                endAt,
+                5,
+                5,
+                "biontech",
+                provider,
+                providerKeyPairs
+            );
+
+            expect(appointmentSeries).toHaveLength(192);
+
+            const result = await providerApi.publishAppointments(
+                appointmentSeries,
+                providerKeyPairs
+            );
+
+            expect(result).toHaveLength(192);
+            expect(result).toEqual(appointmentSeries);
         });
     });
 

@@ -1,5 +1,4 @@
 import { ProviderApi } from "./api";
-import { createAppointmentSet } from "./api/utils";
 import { AuthError } from "./errors";
 import {
     Appointment,
@@ -61,7 +60,7 @@ export class ProviderService {
         );
     }
 
-    public async createAppointmentSet(
+    public async createAppointmentSeries(
         startDate: Date,
         endDate: Date,
         interval: number,
@@ -74,7 +73,7 @@ export class ProviderService {
             throw new AuthError("");
         }
 
-        return createAppointmentSet(
+        return this.providerApi.createAppointmentSeries(
             startDate,
             endDate,
             interval,

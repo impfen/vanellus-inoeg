@@ -1,10 +1,11 @@
 import { AbstractApi } from "./AbstractApi";
 import { AdminApiInterface } from "./AdminApiInterface";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError } from "./errors";
+import { UnexpectedError } from "./errors";
 import {
     AdminConfig,
     AdminKeyPairs,
+    KeyPair,
     MediatorKeyData,
     MediatorKeyPairs,
 } from "./interfaces";
@@ -32,7 +33,7 @@ export class AdminApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new ApiError("Could not add reset appointment-db");
+            throw new UnexpectedError("Could not add reset appointment-db");
         }
 
         return true;
@@ -71,7 +72,7 @@ export class AdminApi extends AbstractApi<
             encryption: mediatorKeyPairs.encryption.publicKey,
         };
 
-        const signedData = await sign(
+        const signedKeyData = await sign(
             JSON.stringify(mediatorKeyData),
             adminKeyPairs.signing.privateKey,
             adminKeyPairs.signing.publicKey
@@ -80,18 +81,13 @@ export class AdminApi extends AbstractApi<
         const result = await this.transport.call(
             "addMediatorPublicKeys",
             {
-                signedKeyData: {
-                    publicKey: signedData.publicKey,
-                    signature: signedData.signature,
-                    data: signedData.data,
-                },
+                signedKeyData,
             },
-
             adminKeyPairs.signing
         );
 
         if ("ok" !== result) {
-            throw new ApiError("Could not add mediator-key");
+            throw new UnexpectedError("Couldn't add mediator-key");
         }
 
         return true;
@@ -105,22 +101,22 @@ export class AdminApi extends AbstractApi<
      */
     static async generateAdminKeys(adminConfig: AdminConfig) {
         const adminKeyPairs: AdminKeyPairs = {
-            signing: await extractAdminKey(adminConfig, "root"),
-            token: await extractAdminKey(adminConfig, "token"),
-            provider: await extractAdminKey(adminConfig, "provider"),
+            signing: await extractAdminKeyPair(adminConfig, "root"),
+            token: await extractAdminKeyPair(adminConfig, "token"),
+            provider: await extractAdminKeyPair(adminConfig, "provider"),
         };
 
         return adminKeyPairs;
     }
 }
 
-const extractAdminKey = async (adminConfig: AdminConfig, name: string) => {
+const extractAdminKeyPair = async (adminConfig: AdminConfig, name: string) => {
     const keyData = adminConfig.admin.signing.keys.find(
         (key) => key?.name === name
     );
 
     if (!keyData) {
-        throw new ApiError("Could not find signing-keys for admin");
+        throw new UnexpectedError("Could not find signing-keys for admin");
     }
 
     const importedKey = await crypto.subtle.importKey(
@@ -137,8 +133,10 @@ const extractAdminKey = async (adminConfig: AdminConfig, name: string) => {
     // we reexport as JWK as that's the format that the library expects...
     const privateKey = await crypto.subtle.exportKey("jwk", importedKey);
 
-    return {
+    const keyPair: KeyPair = {
         publicKey: keyData.publicKey,
         privateKey: privateKey,
     };
+
+    return keyPair;
 };

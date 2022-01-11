@@ -1,7 +1,7 @@
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError, TransportError } from "./errors";
+import { TransportError, UnexpectedError } from "./errors";
 import {
     Appointment,
     Booking,
@@ -67,8 +67,8 @@ export class UserApi extends AbstractApi<
 
             return booking;
         } catch (error) {
+            // Catch double bookings
             if (error instanceof TransportError && error?.code === 401) {
-                // Double booking
                 return null;
             }
 
@@ -96,7 +96,7 @@ export class UserApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new ApiError("Could not cancel booking");
+            throw new UnexpectedError("Couldn't cancel booking");
         }
 
         return true;

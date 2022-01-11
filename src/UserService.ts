@@ -79,11 +79,8 @@ export class UserService {
         return this.anonymousApi.getAppointments(zipCode, from, to, radius);
     }
 
-    public async getProvidersByZipCode(zipFrom: string, zipTo?: string) {
-        return this.anonymousApi.getProvidersByZipCode(
-            zipFrom,
-            zipTo ? zipTo : zipFrom
-        );
+    public async getProviders(zipFrom: string, zipTo?: string) {
+        return this.anonymousApi.getProviders(zipFrom, zipTo ? zipTo : zipFrom);
     }
 
     public async bookAppointment(appointment: Appointment) {

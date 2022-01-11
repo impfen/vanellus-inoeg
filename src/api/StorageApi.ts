@@ -1,6 +1,6 @@
 import { Config } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
-import { ApiError } from "./errors";
+import { UnexpectedError } from "./errors";
 import { StorageApiInterface } from "./StorageApiInterface";
 import { JsonRpcTransport, Transport } from "./transports";
 import {
@@ -30,7 +30,7 @@ export class StorageApi {
         );
 
         if (encryptedData === null) {
-            throw new ApiError("Could not backup data");
+            throw new UnexpectedError("Couldn't encrypt backup data");
         }
 
         const response = await this.transport.call("storeSettings", {
@@ -39,7 +39,7 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new ApiError("Couldn't save backup");
+            throw new UnexpectedError("Couldn't save backup");
         }
 
         return encryptedData;
@@ -65,7 +65,7 @@ export class StorageApi {
         });
 
         if ("ok" !== response) {
-            throw new ApiError("Couldn't delete backup");
+            throw new UnexpectedError("Couldn't delete backup");
         }
 
         return true;

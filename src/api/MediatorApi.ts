@@ -1,13 +1,14 @@
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError } from "./errors";
+import { UnexpectedError } from "./errors";
 import {
     ApiEncryptedProvider,
     ECDHData,
     MediatorKeyPairs,
     Provider,
     PublicProvider,
+    QueueData,
     SignedProvider,
 } from "./interfaces";
 import { MediatorApiInterface } from "./MediatorApiInterface";
@@ -29,10 +30,7 @@ export class MediatorApi extends AbstractApi<
         const keyHashesData = {
             signing: provider.publicKeys.signing,
             encryption: provider.publicKeys.encryption,
-            queueData: {
-                zipCode: provider.zipCode,
-                accessible: provider.accessible,
-            },
+            queueData: this.getQueueDataFromProvider(provider),
         };
 
         const publicProvider: PublicProvider = {
@@ -94,7 +92,9 @@ export class MediatorApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new ApiError(`Could not verify provider ${provider.id}`);
+            throw new UnexpectedError(
+                `Could not verify provider ${provider.id}`
+            );
         }
 
         return provider;
@@ -175,6 +175,15 @@ export class MediatorApi extends AbstractApi<
         );
 
         return parseUntrustedJSON<Provider>(decryptedProviderDataString);
+    }
+
+    protected getQueueDataFromProvider(provider: Provider) {
+        const queueData: QueueData = {
+            zipCode: provider.zipCode,
+            accessible: provider.accessible,
+        };
+
+        return queueData;
     }
 
     // /**

@@ -18,15 +18,13 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @return Promise<Appointment | null>
      */
-    public async getAppointment(id: string, providerID: string) {
-        return (
-            this.parseAppointments(
-                await this.transport.call("getAppointment", {
-                    id,
-                    providerID,
-                })
-            )[0] || null
-        );
+    public async getAppointment(appointmentId: string, providerId: string) {
+        const signedAppointments = await this.transport.call("getAppointment", {
+            id: appointmentId,
+            providerID: providerId,
+        });
+
+        return this.parseAppointments(signedAppointments)[0] || null;
     }
 
     /**
@@ -106,7 +104,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @returns Promise<PublicProvider[]>
      */
-    public async getProvidersByZipCode(zipFrom: string, zipTo: string) {
+    public async getProviders(zipFrom: string, zipTo: string) {
         const signedProviders = await this.transport.call(
             "getProvidersByZipCode",
             {

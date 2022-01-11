@@ -7,6 +7,7 @@ export * from "./MediatorKeyPairs";
 export * from "./Provider";
 export * from "./ProviderBackup";
 export * from "./ProviderKeyPairs";
+export * from "./QueueData";
 export * from "./UserBackup";
 export * from "./UserKeyPairs";
 export * from "./UserQueueToken";

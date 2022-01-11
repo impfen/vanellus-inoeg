@@ -1,8 +1,9 @@
+import { VanellusError } from "../errors";
 import { Booking } from "../interfaces/Booking";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError } from "./errors";
+import { ApiError, UnexpectedError } from "./errors";
 import { TransportError } from "./errors/TransportError";
 import {
     ApiAppointment,
@@ -17,8 +18,8 @@ import {
     ProviderInput,
     ProviderKeyPairs,
     PublicProvider,
-    SignedData,
     SignedProvider,
+    Slot,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import { StorageApi } from "./StorageApi";
@@ -35,7 +36,7 @@ import {
     sign,
     verify,
 } from "./utils";
-import { createAppointment, enrichAppointment } from "./utils/appointment";
+import { enrichAppointment, unenrichAppointment } from "./utils/appointment";
 
 export class ProviderApi extends AbstractApi<
     AnonymousApiInterface & ProviderApiInterface,
@@ -57,18 +58,67 @@ export class ProviderApi extends AbstractApi<
         vaccine: string,
         slotCount: number,
         provider: PublicProvider,
-        providerKeyPairs: ProviderKeyPairs
+        providerKeyPairs: ProviderKeyPairs,
+        properties?: Record<string, unknown>
     ) {
-        const appointment: Appointment = createAppointment(
-            startDate,
-            duration,
-            slotCount,
-            vaccine,
+        const appointment: Appointment = {
+            id: randomBytes(32),
+            startDate: dayjs(startDate).utc().toDate(),
+            endDate: dayjs(startDate).utc().add(duration, "minutes").toDate(),
+            duration: duration,
+            properties: { ...properties, vaccine: vaccine },
+            slotData: this.createSlots(slotCount),
+            publicKey: providerKeyPairs.encryption.publicKey,
             provider,
-            providerKeyPairs
-        );
+        };
 
         return appointment;
+    }
+
+    /**
+     * Creates a series of appointments.
+     * Mostly used in large vaccination-facilities.
+     */
+    public createAppointmentSeries(
+        startAt: Date,
+        endAt: Date,
+        interval: number,
+        slotCount: number,
+        vaccine: string,
+        provider: PublicProvider,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        if (startAt > endAt) {
+            throw new VanellusError(
+                "Can't end appointmentset set before it starts."
+            );
+        }
+
+        if (startAt == endAt) {
+            throw new VanellusError("Start and end can't be equal.");
+        }
+
+        let startDayjs = dayjs(startAt);
+        const endDayjs = dayjs(endAt);
+
+        const appointments: Appointment[] = [];
+
+        do {
+            appointments.push(
+                this.createAppointment(
+                    startDayjs.toDate(),
+                    interval,
+                    vaccine,
+                    slotCount,
+                    provider,
+                    providerKeyPairs
+                )
+            );
+
+            startDayjs = startDayjs.add(interval, "minute");
+        } while (startDayjs < endDayjs);
+
+        return appointments;
     }
 
     /**
@@ -92,43 +142,53 @@ export class ProviderApi extends AbstractApi<
                 providerKeyPairs.signing
             );
 
-            const appointments: ProviderAppointment[] = [];
-
             const provider = parseUntrustedJSON<Provider>(
                 apiProviderProviderAppointments.provider.data
             );
 
-            for (const signedAppointment of apiProviderProviderAppointments.appointments) {
-                const isVerified = await verify(
-                    [providerKeyPairs.signing.publicKey],
-                    signedAppointment
-                );
+            const appointments = await Promise.all(
+                apiProviderProviderAppointments.appointments.map(
+                    async (signedAppointment) => {
+                        const isVerified = await verify(
+                            [providerKeyPairs.signing.publicKey],
+                            signedAppointment
+                        );
 
-                if (!isVerified) {
-                    throw new ApiError("Could not verify provider-appointment");
-                }
+                        if (!isVerified) {
+                            throw new UnexpectedError(
+                                "Could not verify provider-appointment"
+                            );
+                        }
 
-                const apiAppointment = parseUntrustedJSON<ApiAppointment>(
-                    signedAppointment.data
-                );
+                        const apiAppointment =
+                            parseUntrustedJSON<ApiAppointment>(
+                                signedAppointment.data
+                            );
 
-                const apiBookings = await this.decryptBookings(
-                    signedAppointment.bookings || [],
-                    providerKeyPairs
-                );
+                        const apiBookings = await this.decryptBookings(
+                            signedAppointment.bookings || [],
+                            providerKeyPairs
+                        );
 
-                const bookings: Booking[] = apiBookings.map((apiBooking) => ({
-                    id: apiBooking.id,
-                    code: apiBooking.userToken.code,
-                }));
+                        const bookings: Booking[] = apiBookings.map(
+                            (apiBooking) => ({
+                                id: apiBooking.id,
+                                code: apiBooking.userToken.code,
+                            })
+                        );
 
-                const appointment: ProviderAppointment = {
-                    ...enrichAppointment(apiAppointment, provider),
-                    bookings,
-                };
+                        const appointment: ProviderAppointment = {
+                            ...enrichAppointment(apiAppointment, provider),
+                            bookings,
+                        };
 
-                appointments.push(appointment);
-            }
+                        return appointment;
+                    }
+                )
+            );
+
+            // needed as promise.all() does not guarantee order
+            appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
 
             return appointments;
         } catch (error) {
@@ -150,38 +210,34 @@ export class ProviderApi extends AbstractApi<
         unpublishedAppointment: Appointment[] | Appointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const signedApiAppointments: SignedData[] = [];
-        const appointments: Appointment[] = [];
-
+        // handle single appointments as well as arrays of appointments
         const unpublishedAppointments = Array.isArray(unpublishedAppointment)
             ? unpublishedAppointment
             : [unpublishedAppointment];
 
-        for (const unpublishedAppointment of unpublishedAppointments) {
-            const apiAppointment: ApiAppointment = {
-                id: unpublishedAppointment.id,
-                timestamp: dayjs(unpublishedAppointment.startDate)
-                    .utc()
-                    .toISOString(),
-                duration: unpublishedAppointment.duration,
-                properties: unpublishedAppointment.properties,
-                publicKey: providerKeyPairs.encryption.publicKey,
-                slotData: unpublishedAppointment.slotData,
-            };
+        const appointments: Appointment[] = [];
 
-            /**
-             * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
-             */
-            const signedApiAppointment = await sign(
-                JSON.stringify(apiAppointment),
-                providerKeyPairs.signing.privateKey,
-                providerKeyPairs.signing.publicKey
-            );
+        const signedApiAppointments = await Promise.all(
+            unpublishedAppointments.map(async (unpublishedAppointment) => {
+                const apiAppointment = unenrichAppointment({
+                    ...unpublishedAppointment,
+                    publicKey: providerKeyPairs.encryption.publicKey,
+                });
 
-            appointments.push(unpublishedAppointment);
+                /**
+                 * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
+                 */
+                const signedApiAppointment = await sign(
+                    JSON.stringify(apiAppointment),
+                    providerKeyPairs.signing.privateKey,
+                    providerKeyPairs.signing.publicKey
+                );
 
-            signedApiAppointments.push(signedApiAppointment);
-        }
+                appointments.push(unpublishedAppointment);
+
+                return signedApiAppointment;
+            })
+        );
 
         await this.transport.call(
             "publishAppointments",
@@ -191,12 +247,16 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs.signing
         );
 
+        // needed as promise.all() does not guarantee order
+        appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+
         return appointments;
     }
 
     /**
-     * Cancles an appointment by emptying the slots of the appointment and uploading
-     * to server
+     * Cancles an appointment
+     * This is simply done by emptying the slots of the appointment
+     * and uploading it to the backend-server.
      *
      * @return Promise<Appointment[]>
      */
@@ -224,22 +284,17 @@ export class ProviderApi extends AbstractApi<
         signupCode?: string
     ) {
         const keys = await this.transport.call("getKeys");
-        const id = await sha256(
-            Buffer.from(providerKeyPairs.signing.publicKey, "base64")
-        );
+        const id = await this.generateProviderId(providerKeyPairs);
 
-        const providerData: Provider = Object.assign(
-            {},
-            {
-                id,
-                ...providerInput,
-                publicKeys: {
-                    data: providerKeyPairs.data.publicKey,
-                    signing: providerKeyPairs.signing.publicKey,
-                    encryption: providerKeyPairs.encryption.publicKey,
-                },
-            }
-        );
+        const providerData: Provider = {
+            ...providerInput,
+            id,
+            publicKeys: {
+                data: providerKeyPairs.data.publicKey,
+                signing: providerKeyPairs.signing.publicKey,
+                encryption: providerKeyPairs.encryption.publicKey,
+            },
+        };
 
         const encryptedData = await ecdhEncrypt(
             JSON.stringify(providerData),
@@ -257,7 +312,7 @@ export class ProviderApi extends AbstractApi<
         );
 
         if ("ok" !== result) {
-            throw new ApiError("Could not save provider-data");
+            throw new ApiError("Could not store provider");
         }
 
         return providerData;
@@ -273,37 +328,32 @@ export class ProviderApi extends AbstractApi<
      */
     public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
-            const encryptedVerifiedProviderECDAData = await this.transport.call(
+            const signedData = await this.transport.call(
                 "checkProviderData",
                 undefined,
                 providerKeyPairs.signing
             );
 
             const encryptedVerifiedProvider = parseUntrustedJSON<ECDHData>(
-                encryptedVerifiedProviderECDAData.data
+                signedData.data
             );
 
             // decrypt retrieved data, if any, with the providers private key
-            const decryptedProviderDataString = await ecdhDecrypt(
+            const providerDataString = await ecdhDecrypt(
                 encryptedVerifiedProvider,
                 providerKeyPairs.data.privateKey
             );
 
             const decryptedProviderDataJSON =
-                parseUntrustedJSON<SignedProvider>(decryptedProviderDataString);
+                parseUntrustedJSON<SignedProvider>(providerDataString);
 
-            const providerWithoutPublicKeys = parseUntrustedJSON<
-                Omit<Provider, "publicKeys">
-            >(decryptedProviderDataJSON.signedPublicData.data);
+            const provider = parseUntrustedJSON<Provider>(
+                decryptedProviderDataJSON.signedData.data
+            );
 
-            const provider: Provider = {
-                ...providerWithoutPublicKeys,
-                publicKeys: {
-                    data: providerKeyPairs.data.publicKey,
-                    signing: providerKeyPairs.signing.publicKey,
-                    encryption: providerKeyPairs.encryption.publicKey,
-                },
-            };
+            // const publicProvider = parseUntrustedJSON<Provider>(
+            //     decryptedProviderDataJSON.signedPublicData.data
+            // );
 
             return provider;
         } catch (error) {
@@ -390,5 +440,24 @@ export class ProviderApi extends AbstractApi<
                 return booking;
             })
         );
+    }
+
+    protected generateProviderId(providerKeyPairs: ProviderKeyPairs) {
+        return sha256(
+            Buffer.from(providerKeyPairs.signing.publicKey, "base64")
+        );
+    }
+
+    protected createSlots(count: number) {
+        const slotData: Slot[] = [];
+
+        for (let i = 0; i < count; i++) {
+            slotData[i] = {
+                id: randomBytes(32),
+                open: true,
+            };
+        }
+
+        return slotData;
     }
 }

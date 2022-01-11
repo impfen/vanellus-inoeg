@@ -9,11 +9,6 @@ export interface UserToken {
     encryptionPublicKey: string;
 }
 
-export interface QueueData {
-    zipCode: string;
-    accessible?: boolean;
-}
-
 export interface UserQueueToken {
     keyPairs: UserKeyPairs;
     signedToken: SignedData;
