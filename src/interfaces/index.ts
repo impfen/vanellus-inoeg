@@ -1,4 +1,5 @@
 export * from "./Appointment";
+export * from "./AppointmentSeries";
 export * from "./Booking";
 export * from "./Config";
 export * from "./Configurables";
@@ -11,3 +12,4 @@ export * from "./QueueData";
 export * from "./UserBackup";
 export * from "./UserKeyPairs";
 export * from "./UserQueueToken";
+export * from "./Vaccine";

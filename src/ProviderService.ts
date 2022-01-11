@@ -6,6 +6,7 @@ import {
     ProviderInput,
     ProviderKeyPairs,
 } from "./interfaces";
+import { Vaccine } from "./interfaces/Vaccine";
 
 export class ProviderService {
     protected providerApi: ProviderApi;
@@ -41,7 +42,7 @@ export class ProviderService {
     public async createAppointment(
         startDate: Date,
         duration: number,
-        vaccine: string,
+        vaccine: Vaccine,
         slotCount: number
     ) {
         const provider = await this.checkProvider();
@@ -64,7 +65,7 @@ export class ProviderService {
         startDate: Date,
         endDate: Date,
         interval: number,
-        vaccine: string,
+        vaccine: Vaccine,
         lanes: number
     ) {
         const provider = await this.checkProvider();

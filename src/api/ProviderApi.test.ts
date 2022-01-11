@@ -186,7 +186,7 @@ describe("ProviderApi", () => {
             expect(appointmentSeries).toHaveLength(192);
 
             const result = await providerApi.publishAppointments(
-                appointmentSeries,
+                appointmentSeries.appointments,
                 providerKeyPairs
             );
 
@@ -194,7 +194,7 @@ describe("ProviderApi", () => {
             expect(result).toEqual(appointmentSeries);
 
             expect(result[0].properties.seriesId).toEqual(
-                appointmentSeries[0].properties.seriesId
+                appointmentSeries.appointments[0].properties.seriesId
             );
         });
     });

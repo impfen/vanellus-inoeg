@@ -1,15 +1,15 @@
 import { VanellusError } from "../errors";
-import { Booking } from "../interfaces/Booking";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError, UnexpectedError } from "./errors";
-import { TransportError } from "./errors/TransportError";
+import { ApiError, TransportError, UnexpectedError } from "./errors";
 import {
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
     Appointment,
+    AppointmentSeries,
+    Booking,
     BookingData,
     ECDHData,
     Provider,
@@ -20,6 +20,7 @@ import {
     PublicProvider,
     SignedProvider,
     Slot,
+    Vaccine,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import { StorageApi } from "./StorageApi";
@@ -28,15 +29,16 @@ import {
     ecdhDecrypt,
     ecdhEncrypt,
     encodeBase32,
+    enrichAppointment,
     generateECDHKeyPair,
     generateECDSAKeyPair,
     generateSymmetricKey,
     randomBytes,
     sha256,
     sign,
+    unenrichAppointment,
     verify,
 } from "./utils";
-import { enrichAppointment, unenrichAppointment } from "./utils/appointment";
 
 export class ProviderApi extends AbstractApi<
     AnonymousApiInterface & ProviderApiInterface,
@@ -55,7 +57,7 @@ export class ProviderApi extends AbstractApi<
     public createAppointment(
         startDate: Date,
         duration: number,
-        vaccine: string,
+        vaccine: Vaccine,
         slotCount: number,
         provider: PublicProvider,
         providerKeyPairs: ProviderKeyPairs,
@@ -66,7 +68,7 @@ export class ProviderApi extends AbstractApi<
             startDate: dayjs(startDate).utc().toDate(),
             endDate: dayjs(startDate).utc().add(duration, "minutes").toDate(),
             duration: duration,
-            properties: { ...properties, vaccine: vaccine },
+            properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
@@ -84,13 +86,13 @@ export class ProviderApi extends AbstractApi<
         endAt: Date,
         interval: number,
         slotCount: number,
-        vaccine: string,
+        vaccine: Vaccine,
         provider: PublicProvider,
         providerKeyPairs: ProviderKeyPairs
     ) {
         if (startAt > endAt) {
             throw new VanellusError(
-                "Can't end appointmentset set before it starts."
+                "Can't end appointment-series before it starts."
             );
         }
 
@@ -120,10 +122,21 @@ export class ProviderApi extends AbstractApi<
                 )
             );
 
-            startDayjs = startDayjs.add(interval, "minute");
+            startDayjs = startDayjs.add(interval, "minutes");
         } while (startDayjs < endDayjs);
 
-        return appointments;
+        const appointmentSeries: AppointmentSeries = {
+            id: seriesId,
+            startAt,
+            endAt,
+            interval,
+            vaccine,
+            slotCount,
+            provider,
+            appointments,
+        };
+
+        return appointmentSeries;
     }
 
     /**
