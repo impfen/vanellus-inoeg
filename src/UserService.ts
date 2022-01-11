@@ -106,4 +106,8 @@ export class UserService {
 
         return this.userApi.cancelBooking(appointment, this.userQueueToken);
     }
+
+    public async getConfigurables() {
+        return this.anonymousApi.getConfigurables();
+    }
 }

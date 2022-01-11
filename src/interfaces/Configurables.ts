@@ -9,5 +9,10 @@ export interface Configurables {
     /**
      * value in days
      */
+    anon_aggregated_max_time_window: number;
+
+    /**
+     * value in days
+     */
     provider_max_time_window: number;
 }
