@@ -7,10 +7,10 @@ import { JsonRpcTransport, Transport } from "./transports";
 import {
     aesDecrypt,
     aesEncrypt,
-    b642buf,
+    base64ToBuffer,
     decodeBase32,
     deriveSecrets,
-    str2ab,
+    stringToArrayBuffer,
 } from "./utils";
 
 export class StorageApi {
@@ -27,7 +27,7 @@ export class StorageApi {
 
         const encryptedData = await aesEncrypt(
             JSON.stringify(backupData),
-            b642buf(key)
+            base64ToBuffer(key)
         );
 
         if (encryptedData === null) {
@@ -53,7 +53,10 @@ export class StorageApi {
             id: id,
         });
 
-        const decryptedData = await aesDecrypt(encryptedBackup, b642buf(key));
+        const decryptedData = await aesDecrypt(
+            encryptedBackup,
+            base64ToBuffer(key)
+        );
 
         return parseUntrustedJSON<Backup>(decryptedData);
     }
@@ -87,6 +90,6 @@ export class StorageApi {
     }
 
     protected deriveSecret(secret: string) {
-        return deriveSecrets(str2ab(decodeBase32(secret)), 32, 2);
+        return deriveSecrets(stringToArrayBuffer(decodeBase32(secret)), 32, 2);
     }
 }

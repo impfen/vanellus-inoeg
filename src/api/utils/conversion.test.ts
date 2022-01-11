@@ -1,6 +1,11 @@
 import { Buffer } from "buffer";
 import { decodeBase32, encodeBase32 } from ".";
-import { ab2str, b642buf, buf2b64, str2ab } from "./conversion";
+import {
+    arrayBufferToString,
+    base64ToBuffer,
+    bufferToBase64,
+    stringToArrayBuffer,
+} from "./conversion";
 
 describe("conversions", () => {
     it("encodeBase32", () => {
@@ -22,34 +27,34 @@ describe("conversions", () => {
         );
     });
 
-    it("str2ab", () => {
-        const arrayBuffer = str2ab("This is my teststring");
+    it("stringToArrayBuffer", () => {
+        const arrayBuffer = stringToArrayBuffer("This is my teststring");
 
         expect(Buffer.from(arrayBuffer).toString()).toMatchInlineSnapshot(
             `"This is my teststring"`
         );
     });
 
-    it("ab2str", () => {
+    it("arrayBufferToString", () => {
         const arrayBuffer = new TextEncoder().encode("This is my testbuffer");
 
-        const string = ab2str(arrayBuffer);
+        const string = arrayBufferToString(arrayBuffer);
 
         expect(string).toMatchInlineSnapshot(`"This is my testbuffer"`);
     });
 
-    it("buf2b64", () => {
+    it("bufferToBase64", () => {
         const buffer = Buffer.from("This is my testbuffer");
 
-        const string = buf2b64(buffer);
+        const string = bufferToBase64(buffer);
 
         expect(string).toMatchInlineSnapshot(`"VGhpcyBpcyBteSB0ZXN0YnVmZmVy"`);
     });
 
-    it("b642buf", () => {
+    it("base64ToBuffer", () => {
         const base64 = "VGhpcyBpcyBteSB0ZXN0YnVmZmVy";
 
-        const buffer2 = b642buf(base64);
+        const buffer2 = base64ToBuffer(base64);
 
         expect(buffer2.toString()).toMatchInlineSnapshot(
             `"This is my testbuffer"`

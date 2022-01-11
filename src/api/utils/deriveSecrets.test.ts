@@ -3,12 +3,12 @@
 // README.md contains license information.
 
 import { deriveSecrets, randomBytes } from ".";
-import { b642buf } from "./conversion";
+import { base64ToBuffer } from "./conversion";
 
 describe("Crypto.deriveSecrets()", () => {
     it("should be able to derive secrets", async () => {
         const passcode = randomBytes(16);
-        const idAndKey = await deriveSecrets(b642buf(passcode), 32, 2);
+        const idAndKey = await deriveSecrets(base64ToBuffer(passcode), 32, 2);
 
         expect(idAndKey[0]).toHaveLength(44);
     });

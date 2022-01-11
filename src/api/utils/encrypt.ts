@@ -3,7 +3,12 @@
 // README.md contains license information.
 
 import { AESData, ECDHData, KeyPair } from "../interfaces";
-import { ab2str, b642buf, buf2b64, str2ab } from "./conversion";
+import {
+    arrayBufferToString,
+    base64ToBuffer,
+    bufferToBase64,
+    stringToArrayBuffer,
+} from "./conversion";
 import { salt } from "./deriveSecrets";
 import { generateECDHKeyPair } from "./generateKey";
 
@@ -11,7 +16,7 @@ export async function aesEncrypt(
     rawData: string,
     secret: ArrayBuffer
 ): Promise<AESData> {
-    const data = str2ab(rawData);
+    const data = stringToArrayBuffer(rawData);
 
     const secretKey = await crypto.subtle.importKey(
         "raw",
@@ -42,8 +47,8 @@ export async function aesEncrypt(
     )) as Buffer;
 
     return {
-        iv: buf2b64(iv),
-        data: buf2b64(encryptedData),
+        iv: bufferToBase64(iv),
+        data: bufferToBase64(encryptedData),
     };
 }
 
@@ -71,13 +76,13 @@ export async function aesDecrypt(
         {
             name: "AES-GCM",
             tagLength: 128,
-            iv: b642buf(data.iv),
+            iv: base64ToBuffer(data.iv),
         },
         symmetricKey,
-        b642buf(data.data)
+        base64ToBuffer(data.data)
     )) as Buffer;
 
-    return ab2str(decryptedData);
+    return arrayBufferToString(decryptedData);
 }
 
 export async function ecdhEncrypt(
@@ -85,11 +90,11 @@ export async function ecdhEncrypt(
     keyPair: KeyPair,
     publicKeyData: string
 ): Promise<ECDHData> {
-    const data = str2ab(rawData);
+    const data = stringToArrayBuffer(rawData);
 
     const publicKey = await crypto.subtle.importKey(
         "spki",
-        b642buf(publicKeyData),
+        base64ToBuffer(publicKeyData),
         { name: "ECDH", namedCurve: "P-256" },
         true,
         []
@@ -130,8 +135,8 @@ export async function ecdhEncrypt(
     )) as Buffer;
 
     return {
-        iv: buf2b64(iv),
-        data: buf2b64(encryptedData),
+        iv: bufferToBase64(iv),
+        data: bufferToBase64(encryptedData),
         publicKey: keyPair.publicKey,
     };
 }
@@ -140,14 +145,14 @@ export async function ephemeralECDHEncrypt(
     rawData: string,
     publicKeyData: string
 ): Promise<[ECDHData, JsonWebKey]> {
-    const data = str2ab(rawData);
+    const data = stringToArrayBuffer(rawData);
 
     // we generate an ephemeral ECDH key pair
     const ephemeralKeyPair = await generateECDHKeyPair();
 
     const publicKey = await crypto.subtle.importKey(
         "spki",
-        b642buf(publicKeyData),
+        base64ToBuffer(publicKeyData),
         { name: "ECDH", namedCurve: "P-256" },
         true,
         []
@@ -191,8 +196,8 @@ export async function ephemeralECDHEncrypt(
     // the symmetric key using his/her private key)
     return [
         {
-            iv: buf2b64(iv),
-            data: buf2b64(encryptedData),
+            iv: bufferToBase64(iv),
+            data: bufferToBase64(encryptedData),
             publicKey: ephemeralKeyPair.publicKey,
         },
         ephemeralKeyPair.privateKey,
@@ -213,7 +218,7 @@ export async function ecdhDecrypt(
 
     const publicKey = await crypto.subtle.importKey(
         "spki",
-        b642buf(ecdhData.publicKey),
+        base64ToBuffer(ecdhData.publicKey),
         { name: "ECDH", namedCurve: "P-256" },
         true,
         []
@@ -237,11 +242,11 @@ export async function ecdhDecrypt(
         {
             name: "AES-GCM",
             tagLength: 128,
-            iv: b642buf(ecdhData.iv),
+            iv: base64ToBuffer(ecdhData.iv),
         },
         symmetricKey,
-        b642buf(ecdhData.data)
+        base64ToBuffer(ecdhData.data)
     )) as Buffer;
 
-    return ab2str(decryptedData);
+    return arrayBufferToString(decryptedData);
 }

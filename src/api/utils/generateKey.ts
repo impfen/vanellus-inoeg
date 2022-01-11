@@ -4,7 +4,7 @@
 
 import { ApiError } from "../errors";
 import { KeyPair } from "../interfaces";
-import { buf2b64 } from "./conversion";
+import { bufferToBase64 } from "./conversion";
 
 export async function generateSymmetricKey(): Promise<string> {
     const key = await crypto.subtle.generateKey(
@@ -18,7 +18,7 @@ export async function generateSymmetricKey(): Promise<string> {
 
     const keyBytes = await crypto.subtle.exportKey("raw", key);
 
-    return buf2b64(keyBytes);
+    return bufferToBase64(keyBytes);
 }
 
 export async function generateECDSAKeyPair(): Promise<KeyPair> {
@@ -35,7 +35,7 @@ export async function generateECDSAKeyPair(): Promise<KeyPair> {
     const pubKey = await crypto.subtle.exportKey("spki", key.publicKey);
     const privKey = await crypto.subtle.exportKey("jwk", key.privateKey);
 
-    return { publicKey: buf2b64(pubKey), privateKey: privKey };
+    return { publicKey: bufferToBase64(pubKey), privateKey: privKey };
 }
 
 export async function generateECDHKeyPair(): Promise<KeyPair> {
@@ -52,5 +52,5 @@ export async function generateECDHKeyPair(): Promise<KeyPair> {
     const pubKey = await crypto.subtle.exportKey("spki", key.publicKey);
     const privKey = await crypto.subtle.exportKey("jwk", key.privateKey);
 
-    return { publicKey: buf2b64(pubKey), privateKey: privKey };
+    return { publicKey: bufferToBase64(pubKey), privateKey: privKey };
 }

@@ -3,7 +3,7 @@
 // README.md contains license information.
 
 import { SignedData } from "../interfaces";
-import { buf2b64, str2ab } from "./conversion";
+import { bufferToBase64, stringToArrayBuffer } from "./conversion";
 
 export const sign = async (
     rawData: string,
@@ -22,11 +22,11 @@ export const sign = async (
     const result = await crypto.subtle.sign(
         { name: "ECDSA", hash: "SHA-256" },
         privateKey,
-        str2ab(rawData)
+        stringToArrayBuffer(rawData)
     );
 
     const signedData: SignedData = {
-        signature: buf2b64(result),
+        signature: bufferToBase64(result),
         data: rawData,
         publicKey: publicKeyData,
     };

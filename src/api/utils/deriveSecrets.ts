@@ -2,10 +2,14 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { b642buf, buf2b64, str2ab } from "./conversion";
+import {
+    base64ToBuffer,
+    bufferToBase64,
+    stringToArrayBuffer,
+} from "./conversion";
 
 // salt for the key derivation (public information)
-export const salt = b642buf(
+export const salt = base64ToBuffer(
     "tlsfpYaKiH/WZUnWkoeE2g==" // 16 bytes
 );
 
@@ -27,13 +31,13 @@ export const deriveSecrets = async (
                 name: "HKDF",
                 hash: "SHA-256",
                 salt: salt, // this is public information
-                info: str2ab(i.toString()), // we use a number string here for simplicity
+                info: stringToArrayBuffer(i.toString()), // we use a number string here for simplicity
             },
             baseKey,
             length * 8
         );
 
-        secrets.push(buf2b64(secret));
+        secrets.push(bufferToBase64(secret));
     }
 
     return secrets;

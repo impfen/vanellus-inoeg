@@ -2,15 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { b642buf, str2ab } from ".";
+import { base64ToBuffer, stringToArrayBuffer } from ".";
 import { SignedData } from "../interfaces";
 
 export const verify = async (keys: string[], signedData: SignedData) => {
-    const signature = b642buf(signedData.signature);
-    const data = str2ab(signedData.data);
+    const signature = base64ToBuffer(signedData.signature);
+    const data = stringToArrayBuffer(signedData.data);
 
     for (const keyData of keys) {
-        const keyDataBuffer = b642buf(keyData);
+        const keyDataBuffer = base64ToBuffer(keyData);
 
         try {
             // we import the key data

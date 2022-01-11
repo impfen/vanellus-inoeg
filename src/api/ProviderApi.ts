@@ -25,7 +25,7 @@ import {
 import { ProviderApiInterface } from "./ProviderApiInterface";
 import { StorageApi } from "./StorageApi";
 import {
-    b642buf,
+    base64ToBuffer,
     ecdhDecrypt,
     ecdhEncrypt,
     encodeBase32,
@@ -239,6 +239,7 @@ export class ProviderApi extends AbstractApi<
             unpublishedAppointments.map(async (unpublishedAppointment) => {
                 const apiAppointment = unenrichAppointment({
                     ...unpublishedAppointment,
+                    // we set the publicKey of the current provider. Just to be 100% sure.
                     publicKey: providerKeyPairs.encryption.publicKey,
                 });
 
@@ -432,7 +433,7 @@ export class ProviderApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return encodeBase32(b642buf(randomBytes(15)));
+        return encodeBase32(base64ToBuffer(randomBytes(15)));
     }
 
     /**

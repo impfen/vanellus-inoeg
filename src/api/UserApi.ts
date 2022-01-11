@@ -14,7 +14,7 @@ import {
 import { StorageApi } from "./StorageApi";
 import { UserApiInterface } from "./UserApiInterface";
 import {
-    b642buf,
+    base64ToBuffer,
     encodeBase32,
     ephemeralECDHEncrypt,
     generateECDHKeyPair,
@@ -166,7 +166,7 @@ export class UserApi extends AbstractApi<
      * @returns string
      */
     public generateSecret() {
-        return encodeBase32(b642buf(randomBytes(10)));
+        return encodeBase32(base64ToBuffer(randomBytes(10)));
     }
 
     /**

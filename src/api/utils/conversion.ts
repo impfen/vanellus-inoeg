@@ -13,18 +13,18 @@ export const decodeBase32 = (base32: string) => {
     return Buffer.from(base32Decode(base32, "Crockford")).toString();
 };
 
-export const buf2b64 = (buffer: ArrayBufferLike) => {
+export const bufferToBase64 = (buffer: ArrayBufferLike) => {
     return Buffer.from(buffer).toString("base64");
 };
 
-export const b642buf = (base64: string) => {
+export const base64ToBuffer = (base64: string) => {
     return Buffer.from(base64, "base64");
 };
 
-export const str2ab = (str: string) => {
+export const stringToArrayBuffer = (str: string) => {
     return new TextEncoder().encode(str);
 };
 
-export const ab2str = (buf: ArrayBufferLike) => {
+export const arrayBufferToString = (buf: ArrayBufferLike) => {
     return new TextDecoder().decode(new Uint8Array(buf));
 };

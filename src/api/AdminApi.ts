@@ -10,7 +10,7 @@ import {
 } from "./interfaces";
 import { StorageApi } from "./StorageApi";
 import {
-    b642buf,
+    base64ToBuffer,
     generateECDHKeyPair,
     generateECDSAKeyPair,
     sign,
@@ -129,7 +129,7 @@ const extractAdminKeyPair = async (adminConfig: AdminConfig, name: string) => {
 
     const importedKey = await crypto.subtle.importKey(
         "pkcs8",
-        b642buf(keyData.privateKey),
+        base64ToBuffer(keyData.privateKey),
         {
             name: keyData.type === "ecdh" ? "ECDH" : "ECDSA",
             namedCurve: "P-256",
