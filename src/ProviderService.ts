@@ -75,8 +75,8 @@ export class ProviderService {
     }
 
     public async createAppointmentSeries(
-        startDate: Date,
-        endDate: Date,
+        startAt: Date,
+        endAt: Date,
         interval: number,
         vaccine: Vaccine,
         lanes: number
@@ -88,8 +88,8 @@ export class ProviderService {
         }
 
         return this.providerApi.createAppointmentSeries(
-            startDate,
-            endDate,
+            startAt,
+            endAt,
             interval,
             lanes,
             vaccine,
