@@ -5,6 +5,7 @@ import { Appointment, Config, ContactData, UserQueueToken } from "./interfaces";
 export class UserService {
     protected userApi: UserApi;
     protected anonymousApi: AnonymousApi;
+
     protected secret?: string;
     protected userQueueToken?: UserQueueToken;
 

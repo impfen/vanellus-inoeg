@@ -1,6 +1,5 @@
 import { AbstractApi } from "./AbstractApi";
 import { AdminApiInterface } from "./AdminApiInterface";
-import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import { UnexpectedError } from "./errors";
 import {
     AdminConfig,
@@ -9,6 +8,7 @@ import {
     MediatorKeyData,
     MediatorKeyPairs,
 } from "./interfaces";
+import { StorageApi } from "./StorageApi";
 import {
     b642buf,
     generateECDHKeyPair,
@@ -16,10 +16,7 @@ import {
     sign,
 } from "./utils";
 
-export class AdminApi extends AbstractApi<
-    AnonymousApiInterface & AdminApiInterface,
-    AdminKeyPairs
-> {
+export class AdminApi extends AbstractApi<AdminApiInterface, AdminKeyPairs> {
     /**
      * Resets the appointment-db. Mainly used for testing
      *
@@ -37,6 +34,17 @@ export class AdminApi extends AbstractApi<
         }
 
         return true;
+    }
+
+    /**
+     * Resets the storage-db. Mainly used for testing
+     *
+     * @returns Promise<boolean>
+     */
+    async resetStorage(adminKeyPairs: AdminKeyPairs) {
+        const storage = new StorageApi(this.config);
+
+        return storage.resetDb(adminKeyPairs);
     }
 
     /**

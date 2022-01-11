@@ -47,6 +47,8 @@ export interface Transport<
         params: MethodParamsIfExists<Api, K> extends undefined
             ? undefined
             : MethodParamsIfExists<Api, K>,
-        keyPair: KP extends ActorKeyPairs ? KP["signing"] : undefined
+        keyPair: KP extends ActorKeyPairs
+            ? KP["signing"]
+            : undefined | ActorKeyPairs["signing"]
     ): Promise<ReturnTypeOfMethodIfExists<Api, K>>;
 }

@@ -1,6 +1,7 @@
 import { Config } from "../interfaces";
 import { parseUntrustedJSON } from "../utils";
 import { UnexpectedError } from "./errors";
+import { AdminKeyPairs } from "./interfaces";
 import { StorageApiInterface } from "./StorageApiInterface";
 import { JsonRpcTransport, Transport } from "./transports";
 import {
@@ -66,6 +67,20 @@ export class StorageApi {
 
         if ("ok" !== response) {
             throw new UnexpectedError("Couldn't delete backup");
+        }
+
+        return true;
+    }
+
+    public async resetDb(adminKeyPairs: AdminKeyPairs) {
+        const result = await this.transport.call(
+            "resetDB",
+            undefined,
+            adminKeyPairs.signing
+        );
+
+        if ("ok" !== result) {
+            throw new UnexpectedError("Could not add reset storage");
         }
 
         return true;

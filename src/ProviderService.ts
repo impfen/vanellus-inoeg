@@ -10,8 +10,8 @@ import {
 
 export class ProviderService {
     protected providerApi: ProviderApi;
-    protected keyPairs: ProviderKeyPairs | undefined;
-    protected secret: string | undefined;
+    protected keyPairs?: ProviderKeyPairs;
+    protected secret?: string;
 
     public constructor(readonly config: Config) {
         this.providerApi = new ProviderApi(config);
