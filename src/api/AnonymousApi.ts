@@ -8,7 +8,7 @@ import {
     Appointment,
     PublicProvider,
 } from "./interfaces";
-import { enrichAppointment } from "./utils/appointment";
+import { enrichAppointment } from "./utils";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**

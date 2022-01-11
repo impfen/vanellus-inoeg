@@ -5,8 +5,8 @@ import {
     Config,
     ProviderInput,
     ProviderKeyPairs,
+    Vaccine,
 } from "./interfaces";
-import { Vaccine } from "./interfaces/Vaccine";
 
 export class ProviderService {
     protected providerApi: ProviderApi;

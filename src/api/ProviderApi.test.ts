@@ -183,7 +183,7 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            expect(appointmentSeries).toHaveLength(192);
+            expect(appointmentSeries.appointments).toHaveLength(192);
 
             const result = await providerApi.publishAppointments(
                 appointmentSeries.appointments,
@@ -191,7 +191,7 @@ describe("ProviderApi", () => {
             );
 
             expect(result).toHaveLength(192);
-            expect(result).toEqual(appointmentSeries);
+            expect(result).toEqual(appointmentSeries.appointments);
 
             expect(result[0].properties.seriesId).toEqual(
                 appointmentSeries.appointments[0].properties.seriesId
