@@ -103,6 +103,8 @@ export class ProviderApi extends AbstractApi<
 
         const appointments: Appointment[] = [];
 
+        const seriesId = randomBytes(16);
+
         do {
             appointments.push(
                 this.createAppointment(
@@ -111,7 +113,10 @@ export class ProviderApi extends AbstractApi<
                     vaccine,
                     slotCount,
                     provider,
-                    providerKeyPairs
+                    providerKeyPairs,
+                    {
+                        seriesId,
+                    }
                 )
             );
 
