@@ -106,7 +106,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
     /**
      * Returns the basic configurable settings which are relevant for the ui.
-     *
      * Espacially requestable timeframes and vaccines.
      *
      * @returns Promise<Configurables>

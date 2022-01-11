@@ -18,7 +18,7 @@ export class MediatorApi extends AbstractApi<
     MediatorKeyPairs
 > {
     /**
-     * Verify a given, unverified provider
+     * Confirm a given, unverified provider
      *
      * @return Promise<Provider>
      */
@@ -72,13 +72,13 @@ export class MediatorApi extends AbstractApi<
         };
 
         // we encrypt the data with the public key supplied by the provider
-        const [verifiedProviderData] = await ephemeralECDHEncrypt(
+        const [encryptedProviderData] = await ephemeralECDHEncrypt(
             JSON.stringify(providerSignedData),
             provider.publicKeys.data
         );
 
-        const signedVerifiedProviderData = await sign(
-            JSON.stringify(verifiedProviderData),
+        const signedEncryptedProviderData = await sign(
+            JSON.stringify(encryptedProviderData),
             mediatorKeyPairs.signing.privateKey,
             mediatorKeyPairs.signing.publicKey
         );
@@ -86,7 +86,7 @@ export class MediatorApi extends AbstractApi<
         const result = await this.transport.call(
             "confirmProvider",
             {
-                confirmedProviderData: signedVerifiedProviderData,
+                confirmedProviderData: signedEncryptedProviderData,
                 publicProviderData: signedPublicProviderData,
                 signedKeyData: signedKeyData,
             },
@@ -123,6 +123,8 @@ export class MediatorApi extends AbstractApi<
 
     /**
      * Returns the decrypted list of all verified providers
+     *
+     * A provider is verified after confirmation of a mediator.
      *
      * @return Promise<Provider[]>
      */
