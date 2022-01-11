@@ -2,6 +2,7 @@ import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
+    AggregatedAppointment,
     ApiAppointment,
     ApiProviderAppointments,
     Appointment,
@@ -29,16 +30,15 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     }
 
     /**
-     * @todo: verify based on key chain
+     * @todo: verify based on key chain?
      *
      * @return Promise<Appointment[]>
      */
-    public async getAppointmentsByZipCode(
+    public async getAppointments(
         zipCode: string,
         from: Date,
         to: Date,
-        radius = 50,
-        aggregate = false
+        radius = 50
     ) {
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
@@ -47,7 +47,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 from: dayjs(from).toISOString(),
                 to: dayjs(to).toISOString(),
                 radius,
-                aggregate,
             }
         );
 
@@ -59,12 +58,47 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             );
         }
 
-        // why ???
-        // appointments.sort((a, b) =>
-        //     a.provider.name > b.provider.name ? 1 : -1
-        // );
-
         return appointments;
+    }
+
+    /**
+     * @return Promise<AggregatedAppointment[]>
+     */
+    public async getAggregatedAppointments(
+        zipCode: string,
+        from: Date,
+        to: Date,
+        radius = 50
+    ) {
+        const ApiAggregatedAppointments = await this.transport.call(
+            "getAppointmentsAggregated",
+            {
+                zipCode,
+                from: dayjs(from).toISOString(),
+                to: dayjs(to).toISOString(),
+                radius,
+            }
+        );
+
+        const aggregatedAppointments: AggregatedAppointment[] = [];
+
+        for (const apiAggregatedAppointment of ApiAggregatedAppointments) {
+            for (const aggregatedAppointment of apiAggregatedAppointment.appointments) {
+                aggregatedAppointments.push({
+                    ...aggregatedAppointment,
+                    provider: apiAggregatedAppointment.provider,
+                    startDate: dayjs(aggregatedAppointment.timestamp)
+                        .utc()
+                        .toDate(),
+                    endDate: dayjs(aggregatedAppointment.timestamp)
+                        .utc()
+                        .add(aggregatedAppointment.duration, "minutes")
+                        .toDate(),
+                });
+            }
+        }
+
+        return aggregatedAppointments;
     }
 
     /**

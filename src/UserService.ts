@@ -70,18 +70,13 @@ export class UserService {
         return this.anonymousApi.getAppointment(appointmentId, providerID);
     }
 
-    public async getAppointmentsByZipCode(
+    public async getAppointments(
         zipCode: string,
         from: Date,
         to: Date,
         radius = 50
     ) {
-        return this.anonymousApi.getAppointmentsByZipCode(
-            zipCode,
-            from,
-            to,
-            radius
-        );
+        return this.anonymousApi.getAppointments(zipCode, from, to, radius);
     }
 
     public async getProvidersByZipCode(zipFrom: string, zipTo?: string) {

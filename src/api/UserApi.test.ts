@@ -91,7 +91,7 @@ describe("UserApi", () => {
     });
 
     it("should fetch the published appointment", async () => {
-        const appointments1 = await anonApi.getAppointmentsByZipCode(
+        const appointments1 = await anonApi.getAppointments(
             "10707",
             from,
             to,

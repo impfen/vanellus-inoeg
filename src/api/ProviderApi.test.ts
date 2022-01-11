@@ -94,7 +94,7 @@ describe("ProviderApi", () => {
         });
 
         it("should not retrieve canceled appointments", async () => {
-            const appointments3 = await anonymousApi.getAppointmentsByZipCode(
+            const appointments3 = await anonymousApi.getAppointments(
                 "10707",
                 from,
                 to,

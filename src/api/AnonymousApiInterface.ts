@@ -1,4 +1,5 @@
 import {
+    ApiAggregatedProviderAppointment,
     ApiProviderAppointments,
     ApiSignedProviderData,
     BackendPublicKeys,
@@ -20,14 +21,25 @@ export interface AnonymousApiInterface extends StorageApiInterface {
         from,
         to,
         radius,
-        aggregate,
+    }: {
+        zipCode: string;
+        from: string;
+        to: string;
+        radius?: number;
+    }) => ApiProviderAppointments[];
+
+    getAppointmentsAggregated: ({
+        zipCode,
+        from,
+        to,
+        radius,
     }: {
         zipCode: string;
         from: string;
         to: string;
         radius?: number;
         aggregate?: boolean;
-    }) => ApiProviderAppointments[];
+    }) => ApiAggregatedProviderAppointment[];
 
     getProvidersByZipCode: ({
         zipFrom,

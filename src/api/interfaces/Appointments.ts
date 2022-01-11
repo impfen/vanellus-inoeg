@@ -2,10 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { Slot } from "../../interfaces";
+import { PublicProvider, Slot } from "../../interfaces";
 import { ApiEncryptedBooking } from "./Booking";
 import { SignedData } from "./crypto";
 import { ApiSignedProviderData } from "./Provider";
+
 export interface ApiSignedAppointment extends SignedData {
     bookedSlots: Slot[];
     updatedAt: string;
@@ -26,16 +27,24 @@ export interface ApiProviderAppointments {
     keyChain: ApiAppointmentKeyChain;
 }
 
+export interface ApiAggregatedProviderAppointment {
+    provider: PublicProvider;
+    appointments: ApiAggregatedAppointment[];
+}
+
 export interface ApiProviderProviderAppointments {
     provider: ApiSignedProviderData;
     appointments: ApiSignedProviderAppointment[];
 }
 
-export interface ApiAppointment {
+export interface ApiAggregatedAppointment {
     id: string;
     timestamp: string;
     duration: number;
     properties: Record<string, unknown>;
-    publicKey: string;
+}
+
+export interface ApiAppointment extends ApiAggregatedAppointment {
     slotData: Slot[];
+    publicKey: string;
 }

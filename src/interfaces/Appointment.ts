@@ -3,16 +3,19 @@ import { PublicProvider } from "./Provider";
 
 export interface Slot {
     id: string;
-    open?: boolean;
+    open: boolean;
 }
 
-export interface Appointment {
+export interface AggregatedAppointment {
     id: string;
     provider: PublicProvider;
     startDate: Date;
     endDate: Date;
     duration: number;
     properties: Record<string, unknown>;
+}
+
+export interface Appointment extends AggregatedAppointment {
     slotData: Slot[];
     publicKey: string;
 }

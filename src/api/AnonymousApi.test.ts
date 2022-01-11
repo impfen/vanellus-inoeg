@@ -75,10 +75,19 @@ describe("AnonymousApi", () => {
         const from = dayjs().utc().toDate();
         const to = dayjs().utc().add(1, "days").toDate();
 
-        const providerAppointments =
-            await anonymousApi.getAppointmentsByZipCode("10707", from, to, 10);
+        const providerAppointments = await anonymousApi.getAppointments(
+            "10707",
+            from,
+            to,
+            10
+        );
 
         expect(providerAppointments).toHaveLength(1);
+
+        const aggregatedAppointments =
+            await anonymousApi.getAggregatedAppointments("10707", from, to, 10);
+
+        expect(aggregatedAppointments).toHaveLength(1);
 
         const appointment = await anonymousApi.getAppointment(
             providerAppointments[0].id,
