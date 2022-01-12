@@ -9,7 +9,7 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
-        it("should get the public keys anonymously", async () => {
+        it("should get public keys of the system", async () => {
             const publicKeys = await context.anonymousApi.getKeys();
 
             expect(publicKeys.rootKey).toEqual(
@@ -30,7 +30,8 @@ describe("AnonymousApi", () => {
         beforeEach(async () => {
             context = await TestContext.createContext();
         });
-        it("should get the configurables", async () => {
+
+        it("should get configurables", async () => {
             const configurables = await context.anonymousApi.getConfigurables();
 
             expect(configurables).toHaveProperty("vaccines");
@@ -49,7 +50,7 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
-        it("should get a single appointment", async () => {
+        it("should get single appointment", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
@@ -110,64 +111,71 @@ describe("AnonymousApi", () => {
 
             expect(appointment.id).toEqual(unpublishedAppointment.id);
         });
+    });
 
-        it("should get correct providers", async () => {
-            const { provider: p1 } = await context.createUnverifiedProvider();
+    describe("Providers", () => {
+        let context: TestContext;
 
-            expect(p1).toHaveProperty("id");
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
 
-            const { provider: p2 } = await context.createUnverifiedProvider({
+        it("shouldn't get unverified providers", async () => {
+            await context.createUnverifiedProvider({
                 zipCode: 60312,
             });
 
-            expect(p2).toHaveProperty("id");
-            expect(p2.zipCode).toEqual(60312);
-
-            const { provider: p3 } = await context.createUnverifiedProvider({
-                zipCode: 65936,
-            });
-
-            expect(p3).toHaveProperty("id");
-            expect(p3.zipCode).toEqual(65936);
-
-            const { provider: p4 } = await context.createUnverifiedProvider({
-                zipCode: 96050,
-            });
-
-            expect(p4).toHaveProperty("id");
-            expect(p4.zipCode).toEqual(96050);
-
-            // query providers
             const noProviders = await context.anonymousApi.getProviders(
                 60000,
                 69999
             );
 
             expect(noProviders).toHaveLength(0);
+        });
 
-            // verify providers
-            const unverifiedProviders =
-                await context.mediatorApi.getPendingProviders(
-                    context.mediatorKeyPairs
-                );
+        it("shouldn get verified providers", async () => {
+            const { provider } = await context.createVerifiedProvider({
+                zipCode: 60312,
+            });
 
-            for (const unverifiedProvider of unverifiedProviders) {
-                const verifiedResult =
-                    await context.mediatorApi.confirmProvider(
-                        unverifiedProvider,
-                        context.mediatorKeyPairs
-                    );
-
-                expect(verifiedResult).toEqual(unverifiedProvider);
-            }
-
-            // query providers
             const providers = await context.anonymousApi.getProviders(
-                "60000",
-                "69999"
+                60000,
+                69999
+            );
+
+            expect(providers[0].id).toEqual(provider.id);
+        });
+
+        it("should get providers based on zip", async () => {
+            const { provider: p1 } = await context.createVerifiedProvider();
+
+            expect(p1.zipCode).toEqual(context.defaultProviderData.zipCode);
+
+            const { provider: p2 } = await context.createVerifiedProvider({
+                zipCode: 60312,
+            });
+
+            expect(p2.zipCode).toEqual(60312);
+
+            const { provider: p3 } = await context.createVerifiedProvider({
+                zipCode: 65936,
+            });
+
+            expect(p3.zipCode).toEqual(65936);
+
+            const { provider: p4 } = await context.createVerifiedProvider({
+                zipCode: 96050,
+            });
+
+            expect(p4.zipCode).toEqual(96050);
+
+            const providers = await context.anonymousApi.getProviders(
+                60000,
+                69999
             );
 
             expect(providers).toHaveLength(2);
+
             expect(
                 providers.map((provider) => provider.zipCode).sort()
             ).toEqual(["60312", "65936"]);

@@ -28,7 +28,7 @@ describe("ProviderApi", () => {
         });
     });
 
-    describe("Provider", () => {
+    describe("Providers", () => {
         let context: TestContext;
 
         beforeEach(async () => {
@@ -254,32 +254,32 @@ describe("ProviderApi", () => {
         });
     });
 
-    describe("appointment-series", () => {
+    describe("AppointmentSeries", () => {
         let context: TestContext;
 
         beforeEach(async () => {
             context = await TestContext.createContext();
         });
 
+        const startAt = dayjs()
+            .utc()
+            .add(1, "day")
+            .hour(7)
+            .minute(0)
+            .second(0)
+            .toDate();
+
+        const endAt = dayjs()
+            .utc()
+            .add(1, "day")
+            .hour(23)
+            .minute(0)
+            .second(0)
+            .toDate();
+
         it("should create and publish series", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
-
-            const startAt = dayjs()
-                .utc()
-                .add(1, "day")
-                .hour(7)
-                .minute(0)
-                .second(0)
-                .toDate();
-
-            const endAt = dayjs()
-                .utc()
-                .add(1, "day")
-                .hour(23)
-                .minute(0)
-                .second(0)
-                .toDate();
 
             const appointmentSeries =
                 context.providerApi.createAppointmentSeries(
@@ -292,6 +292,14 @@ describe("ProviderApi", () => {
                     providerKeyPairs
                 );
 
+            expect(appointmentSeries.id).toHaveLength(24);
+            expect(appointmentSeries.startAt).toEqual(startAt);
+            expect(appointmentSeries.endAt).toEqual(endAt);
+            expect(appointmentSeries.provider.id).toEqual(provider.id);
+            expect(appointmentSeries.appointments[0].slotData).toHaveLength(5);
+            expect(
+                appointmentSeries.appointments[0].properties.vaccine
+            ).toEqual("biontech");
             expect(appointmentSeries.appointments).toHaveLength(192);
 
             const result = await context.providerApi.publishAppointments(
