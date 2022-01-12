@@ -99,6 +99,12 @@ export class TestContext {
         public readonly mediatorKeyPairs: MediatorKeyPairs
     ) {}
 
+    /**
+     * Helper to create an unverified provider and store it in the system
+     *
+     * It creates and returns the provider and the associated keypair.
+     * That's, basically, all thats needed to represent a provider inside the system.
+     */
     public async createUnverifiedProvider(
         providerInput: Partial<ProviderInput> = {}
     ) {
@@ -118,6 +124,12 @@ export class TestContext {
         };
     }
 
+    /**
+     * Helper to create and confirm a provider and store it in the system
+     *
+     * It creates and returns the provider and the associated keypair.
+     * That's, basically, all thats needed to represent a provider inside the system.
+     */
     public async createVerifiedProvider(
         providerInput: Partial<ProviderInput> = {}
     ) {
@@ -135,6 +147,9 @@ export class TestContext {
         };
     }
 
+    /**
+     * Helper to create an unpublished appointment
+     */
     public createUnpublishedAppointment({
         provider,
         providerKeyPairs,
@@ -160,6 +175,9 @@ export class TestContext {
         );
     }
 
+    /**
+     * Helper to create and confirm an appointment in the system
+     */
     public async createConfirmedAppointment({
         provider,
         providerKeyPairs,
@@ -180,6 +198,10 @@ export class TestContext {
         return appointments[0];
     }
 
+    /**
+     * Helper to create both the secret and the associated QueueToken for a user.
+     * That's, basically, all thats needed to represent a user inside the system.
+     */
     public async createUserQueueToken() {
         const userSecret = this.userApi.generateSecret();
         const userQueueToken = await this.userApi.getQueueToken(userSecret);

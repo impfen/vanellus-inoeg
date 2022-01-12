@@ -29,236 +29,228 @@ describe("ProviderApi", () => {
     });
 
     describe("Provider", () => {
-        describe("verify a provider", () => {
-            let context: TestContext;
+        let context: TestContext;
 
-            beforeEach(async () => {
-                context = await TestContext.createContext();
-            });
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
 
-            const from = dayjs().utc().toDate();
-            const to = dayjs().utc().add(1, "day").toDate();
+        const from = dayjs().utc().toDate();
+        const to = dayjs().utc().add(1, "day").toDate();
 
-            it("should create new provider", async () => {
-                const providerKeyPairs =
-                    await context.providerApi.generateKeyPairs();
+        it("should create new provider", async () => {
+            const providerKeyPairs =
+                await context.providerApi.generateKeyPairs();
 
-                const provider = await context.providerApi.storeProvider(
-                    context.defaultProviderData,
-                    providerKeyPairs
-                );
+            const provider = await context.providerApi.storeProvider(
+                context.defaultProviderData,
+                providerKeyPairs
+            );
 
-                expect(provider).toHaveProperty("id");
-                expect(provider.name).toEqual(context.defaultProviderData.name);
-                expect(provider.street).toEqual(
-                    context.defaultProviderData.street
-                );
-                expect(provider.city).toEqual(context.defaultProviderData.city);
-                expect(provider.zipCode).toEqual(
-                    context.defaultProviderData.zipCode
-                );
-                expect(provider.description).toEqual(
-                    context.defaultProviderData.description
-                );
-                expect(provider.email).toEqual(
-                    context.defaultProviderData.email
-                );
-                expect(provider.accessible).toEqual(
-                    context.defaultProviderData.accessible
-                );
+            expect(provider).toHaveProperty("id");
+            expect(provider.name).toEqual(context.defaultProviderData.name);
+            expect(provider.street).toEqual(context.defaultProviderData.street);
+            expect(provider.city).toEqual(context.defaultProviderData.city);
+            expect(provider.zipCode).toEqual(
+                context.defaultProviderData.zipCode
+            );
+            expect(provider.description).toEqual(
+                context.defaultProviderData.description
+            );
+            expect(provider.email).toEqual(context.defaultProviderData.email);
+            expect(provider.accessible).toEqual(
+                context.defaultProviderData.accessible
+            );
 
-                expect(provider.name).toEqual(context.defaultProviderData.name);
-            });
+            expect(provider.name).toEqual(context.defaultProviderData.name);
+        });
 
-            it("should retrieve no data while provider is pending", async () => {
-                const { providerKeyPairs } =
-                    await context.createUnverifiedProvider();
+        it("should retrieve no data while provider is pending", async () => {
+            const { providerKeyPairs } =
+                await context.createUnverifiedProvider();
 
-                const { verifiedProvider } =
-                    await context.providerApi.checkProvider(providerKeyPairs);
+            const { verifiedProvider } =
+                await context.providerApi.checkProvider(providerKeyPairs);
 
-                expect(verifiedProvider).toBeNull();
-            });
+            expect(verifiedProvider).toBeNull();
+        });
 
-            it("should not get own appointments while provider is pending", async () => {
-                const { providerKeyPairs } =
-                    await context.createUnverifiedProvider();
+        it("should not get own appointments while provider is pending", async () => {
+            const { providerKeyPairs } =
+                await context.createUnverifiedProvider();
 
-                const result =
-                    await context.providerApi.getProviderAppointments(
-                        from,
-                        to,
-                        providerKeyPairs
-                    );
+            const result = await context.providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
 
-                expect(result).toHaveLength(0);
-            });
+            expect(result).toHaveLength(0);
+        });
 
-            it("should get pending providers", async () => {
-                const { provider } = await context.createUnverifiedProvider();
+        it("should get pending providers", async () => {
+            const { provider } = await context.createUnverifiedProvider();
 
-                const pendingProviders =
-                    await context.mediatorApi.getPendingProviders(
-                        context.mediatorKeyPairs
-                    );
-
-                expect(pendingProviders).toEqual([provider]);
-            });
-
-            it("should verify provider", async () => {
-                const { provider } = await context.createUnverifiedProvider();
-
-                const result = await context.mediatorApi.confirmProvider(
-                    provider,
+            const pendingProviders =
+                await context.mediatorApi.getPendingProviders(
                     context.mediatorKeyPairs
                 );
 
-                expect(result).toEqual(provider);
-            });
-
-            it("should get data for verified provider", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                const { verifiedProvider } =
-                    await context.providerApi.checkProvider(providerKeyPairs);
-
-                expect(verifiedProvider).toEqual(provider);
-            });
-
-            it("should update provider", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                await context.providerApi.storeProvider(
-                    {
-                        ...provider,
-                        name: "foobar",
-                    },
-                    providerKeyPairs
-                );
-
-                const providerData = await context.providerApi.checkProvider(
-                    providerKeyPairs
-                );
-
-                expect(providerData?.verifiedProvider).toEqual(provider);
-            });
+            expect(pendingProviders).toEqual([provider]);
         });
 
-        describe("Appointments", () => {
-            let context: TestContext;
+        it("should verify provider", async () => {
+            const { provider } = await context.createUnverifiedProvider();
 
-            beforeEach(async () => {
-                context = await TestContext.createContext();
+            const result = await context.mediatorApi.confirmProvider(
+                provider,
+                context.mediatorKeyPairs
+            );
+
+            expect(result).toEqual(provider);
+        });
+
+        it("should get data for verified provider", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const { verifiedProvider } =
+                await context.providerApi.checkProvider(providerKeyPairs);
+
+            expect(verifiedProvider).toEqual(provider);
+        });
+
+        it("should update provider", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            await context.providerApi.storeProvider(
+                {
+                    ...provider,
+                    name: "foobar",
+                },
+                providerKeyPairs
+            );
+
+            const providerData = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
+
+            expect(providerData?.verifiedProvider).toEqual(provider);
+        });
+    });
+
+    describe("Appointments", () => {
+        let context: TestContext;
+
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
+
+        const from = dayjs().utc().toDate();
+        const to = dayjs().utc().add(1, "day").toDate();
+
+        it("should create appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            // tomorrow 3 pm
+            const date = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(15)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const appointment = context.providerApi.createAppointment(
+                date,
+                15,
+                "moderna",
+                5,
+                provider,
+                providerKeyPairs
+            );
+
+            expect(appointment).toHaveProperty("id");
+            expect(appointment.startDate).toEqual(date);
+        });
+
+        it("should publish appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = context.createUnpublishedAppointment({
+                provider,
+                providerKeyPairs,
             });
 
-            const from = dayjs().utc().toDate();
-            const to = dayjs().utc().add(1, "day").toDate();
+            const publishResult = await context.providerApi.publishAppointments(
+                [appointment],
+                providerKeyPairs
+            );
 
-            it("should create appointments", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
+            expect(publishResult).toEqual([appointment]);
+        });
 
-                // tomorrow 3 pm
-                const date = dayjs()
-                    .utc()
-                    .add(1, "day")
-                    .hour(15)
-                    .minute(0)
-                    .second(0)
-                    .toDate();
+        it("should retrieve published appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
 
-                const appointment = context.providerApi.createAppointment(
-                    date,
-                    15,
-                    "moderna",
-                    5,
-                    provider,
-                    providerKeyPairs
-                );
-
-                expect(appointment).toHaveProperty("id");
-                expect(appointment.startDate).toEqual(date);
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
             });
 
-            it("should publish appointments", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                const appointment = context.createUnpublishedAppointment({
-                    provider,
-                    providerKeyPairs,
-                });
-
-                const publishResult =
-                    await context.providerApi.publishAppointments(
-                        [appointment],
-                        providerKeyPairs
-                    );
-
-                expect(publishResult).toEqual([appointment]);
-            });
-
-            it("should retrieve published appointments", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                const appointment = await context.createConfirmedAppointment({
-                    provider,
-                    providerKeyPairs,
-                });
-
-                const appointments =
-                    await context.providerApi.getProviderAppointments(
-                        from,
-                        to,
-                        providerKeyPairs
-                    );
-
-                expect(appointments[0].id).toEqual(appointment.id);
-            });
-
-            it("should cancel appointments", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                const appointment = await context.createConfirmedAppointment({
-                    provider,
-                    providerKeyPairs,
-                });
-
-                const result = await context.providerApi.cancelAppointment(
-                    appointment,
-                    providerKeyPairs
-                );
-
-                expect(result[0].slotData).toHaveLength(0);
-            });
-
-            it("should not retrieve canceled appointments", async () => {
-                const { provider, providerKeyPairs } =
-                    await context.createVerifiedProvider();
-
-                const appointment = await context.createConfirmedAppointment({
-                    provider,
-                    providerKeyPairs,
-                });
-
-                await context.providerApi.cancelAppointment(
-                    appointment,
-                    providerKeyPairs
-                );
-
-                const appointments = await context.anonymousApi.getAppointments(
-                    10707,
+            const appointments =
+                await context.providerApi.getProviderAppointments(
                     from,
                     to,
-                    10
+                    providerKeyPairs
                 );
 
-                expect(appointments).toHaveLength(0);
+            expect(appointments[0].id).toEqual(appointment.id);
+        });
+
+        it("should cancel appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
             });
+
+            const result = await context.providerApi.cancelAppointment(
+                appointment,
+                providerKeyPairs
+            );
+
+            expect(result[0].slotData).toHaveLength(0);
+        });
+
+        it("should not retrieve canceled appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            await context.providerApi.cancelAppointment(
+                appointment,
+                providerKeyPairs
+            );
+
+            const appointments = await context.anonymousApi.getAppointments(
+                10707,
+                from,
+                to,
+                10
+            );
+
+            expect(appointments).toHaveLength(0);
         });
     });
 
@@ -316,7 +308,7 @@ describe("ProviderApi", () => {
         });
     });
 
-    describe("backup", () => {
+    describe("Backup", () => {
         let context: TestContext;
 
         beforeEach(async () => {

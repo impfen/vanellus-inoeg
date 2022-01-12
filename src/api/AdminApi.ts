@@ -108,10 +108,16 @@ export class AdminApi extends AbstractApi<AdminApiInterface, AdminKeyPairs> {
      * @return Promise<AdminKeyPairs>
      */
     static async generateAdminKeys(adminConfig: AdminConfig) {
+        const [signing, token, provider] = await Promise.all([
+            await extractAdminKeyPair(adminConfig, "root"),
+            await extractAdminKeyPair(adminConfig, "token"),
+            await extractAdminKeyPair(adminConfig, "provider"),
+        ]);
+
         const adminKeyPairs: AdminKeyPairs = {
-            signing: await extractAdminKeyPair(adminConfig, "root"),
-            token: await extractAdminKeyPair(adminConfig, "token"),
-            provider: await extractAdminKeyPair(adminConfig, "provider"),
+            signing,
+            token,
+            provider,
         };
 
         return adminKeyPairs;

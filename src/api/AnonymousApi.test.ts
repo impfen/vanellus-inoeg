@@ -2,6 +2,46 @@ import { TestContext } from "../../tests/TestContext";
 import { dayjs } from "../utils";
 
 describe("AnonymousApi", () => {
+    describe("Keys", () => {
+        let context: TestContext;
+
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
+
+        it("should get the public keys anonymously", async () => {
+            const publicKeys = await context.anonymousApi.getKeys();
+
+            expect(publicKeys.rootKey).toEqual(
+                context.adminKeyPairs.signing.publicKey
+            );
+            expect(publicKeys.tokenKey).toEqual(
+                context.adminKeyPairs.token.publicKey
+            );
+            expect(publicKeys.providerData).toEqual(
+                context.adminKeyPairs.provider.publicKey
+            );
+        });
+    });
+
+    describe("Configurables", () => {
+        let context: TestContext;
+
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
+        it("should get the configurables", async () => {
+            const configurables = await context.anonymousApi.getConfigurables();
+
+            expect(configurables).toHaveProperty("vaccines");
+            expect(configurables).toHaveProperty("anon_max_time_window");
+            expect(configurables).toHaveProperty(
+                "anon_aggregated_max_time_window"
+            );
+            expect(configurables).toHaveProperty("provider_max_time_window");
+        });
+    });
+
     describe("Appointments", () => {
         let context: TestContext;
 
@@ -71,7 +111,7 @@ describe("AnonymousApi", () => {
             expect(appointment.id).toEqual(unpublishedAppointment.id);
         });
 
-        it("should create and verify a provider and work with appointments", async () => {
+        it("should get correct providers", async () => {
             const { provider: p1 } = await context.createUnverifiedProvider();
 
             expect(p1).toHaveProperty("id");
@@ -131,46 +171,6 @@ describe("AnonymousApi", () => {
             expect(
                 providers.map((provider) => provider.zipCode).sort()
             ).toEqual(["60312", "65936"]);
-        });
-    });
-
-    describe("Keys", () => {
-        let context: TestContext;
-
-        beforeEach(async () => {
-            context = await TestContext.createContext();
-        });
-
-        it("should get the public keys anonymously", async () => {
-            const publicKeys = await context.anonymousApi.getKeys();
-
-            expect(publicKeys.rootKey).toEqual(
-                context.adminKeyPairs.signing.publicKey
-            );
-            expect(publicKeys.tokenKey).toEqual(
-                context.adminKeyPairs.token.publicKey
-            );
-            expect(publicKeys.providerData).toEqual(
-                context.adminKeyPairs.provider.publicKey
-            );
-        });
-    });
-
-    describe("Configurables", () => {
-        let context: TestContext;
-
-        beforeEach(async () => {
-            context = await TestContext.createContext();
-        });
-        it("should get the configurables", async () => {
-            const configurables = await context.anonymousApi.getConfigurables();
-
-            expect(configurables).toHaveProperty("vaccines");
-            expect(configurables).toHaveProperty("anon_max_time_window");
-            expect(configurables).toHaveProperty(
-                "anon_aggregated_max_time_window"
-            );
-            expect(configurables).toHaveProperty("provider_max_time_window");
         });
     });
 });

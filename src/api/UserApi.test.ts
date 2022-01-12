@@ -243,7 +243,7 @@ describe("UserApi", () => {
         });
     });
 
-    describe("backup", () => {
+    describe("Backup", () => {
         let context: TestContext;
 
         beforeEach(async () => {
