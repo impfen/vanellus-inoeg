@@ -129,7 +129,7 @@ export class ProviderService {
     }
 
     protected checkProvider() {
-        return this.providerApi.checkProvider(this.getKeyPairs());
+        return this.providerApi.checkProvider(this.getKeyPairs(), true);
     }
 
     protected getKeyPairs() {

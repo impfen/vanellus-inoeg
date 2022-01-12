@@ -68,7 +68,11 @@ export class UserService {
     }
 
     public async getAppointment(appointmentId: string, providerId: string) {
-        return this.anonymousApi.getAppointment(appointmentId, providerId);
+        return this.anonymousApi.getAppointment(
+            appointmentId,
+            providerId,
+            true
+        );
     }
 
     public async getAppointments(
