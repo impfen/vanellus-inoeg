@@ -21,6 +21,7 @@ import {
     PublicProvider,
     SignedProvider,
     Slot,
+    UnpublishedPublicAppointment,
     Vaccine,
 } from "./interfaces";
 import { ProviderApiInterface } from "./ProviderApiInterface";
@@ -64,7 +65,7 @@ export class ProviderApi extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         properties?: Record<string, unknown>
     ) {
-        const appointment: PublicAppointment = {
+        const appointment: UnpublishedPublicAppointment = {
             id: randomBytes(32),
             startDate: dayjs(startDate).utc().toDate(),
             endDate: dayjs(startDate).utc().add(duration, "minutes").toDate(),
@@ -73,6 +74,7 @@ export class ProviderApi extends AbstractApi<
             slotData: this.createSlots(slotCount),
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
+            unpublished: true,
         };
 
         return appointment;
@@ -102,7 +104,7 @@ export class ProviderApi extends AbstractApi<
             throw new VanellusError("Start and end can't be equal.");
         }
 
-        const appointments: PublicAppointment[] = [];
+        const appointments: UnpublishedPublicAppointment[] = [];
 
         const seriesId = randomBytes(16);
 
@@ -228,7 +230,9 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<PublicAppointment[]>
      */
     public async publishAppointments(
-        unpublishedAppointment: PublicAppointment[] | PublicAppointment,
+        unpublishedAppointment:
+            | UnpublishedPublicAppointment[]
+            | UnpublishedPublicAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // handle single appointments as well as arrays of appointments
@@ -276,7 +280,36 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * Cancles an appointment
+     * Update an appointment
+     *
+     * ATM simply update the properties of the appointment and republish it.
+     *
+     * @todo improve logic, clearify inner logic
+     * @see  https://github.com/kiebitz-oss/services-inoeg/issues/16
+     *
+     * @return Promise<PublicAppointment>
+     */
+    public async updateAppointment(
+        appointment: PublicAppointment,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        // Little hack to use TS as typeguard on the publishAppointment()-method
+        // and get some more control over the data-flow
+        const unpublishedAppointment: UnpublishedPublicAppointment = {
+            ...appointment,
+            unpublished: true,
+        };
+
+        const canceledAppointments = await this.publishAppointments(
+            unpublishedAppointment,
+            providerKeyPairs
+        );
+
+        return canceledAppointments[0];
+    }
+
+    /**
+     * Cancle an appointment
      * This is simply done by emptying the slots of the appointment
      * and uploading it to the backend-server.
      *
@@ -286,10 +319,16 @@ export class ProviderApi extends AbstractApi<
         appointment: PublicAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        appointment.slotData = [];
+        // Little hack to use TS as typeguard on the publishAppointment()-method
+        // and get some more control over the data-flow
+        const unpublishedAppointment: UnpublishedPublicAppointment = {
+            ...appointment,
+            slotData: [],
+            unpublished: true,
+        };
 
         const canceledAppointments = await this.publishAppointments(
-            appointment,
+            unpublishedAppointment,
             providerKeyPairs
         );
 

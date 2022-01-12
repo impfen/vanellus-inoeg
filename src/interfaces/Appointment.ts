@@ -20,6 +20,10 @@ export interface PublicAppointment extends AggregatedAppointment {
     publicKey: string;
 }
 
+export interface UnpublishedPublicAppointment extends PublicAppointment {
+    unpublished: true;
+}
+
 export interface Appointment extends PublicAppointment {
     bookings: Booking[];
 }
