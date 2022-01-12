@@ -102,12 +102,12 @@ export class ProviderApi extends AbstractApi<
             throw new VanellusError("Start and end can't be equal.");
         }
 
-        let startDayjs = dayjs(startAt).utc();
-        const endDayjs = dayjs(endAt).utc();
-
         const appointments: PublicAppointment[] = [];
 
         const seriesId = randomBytes(16);
+
+        let startDayjs = dayjs(startAt).utc();
+        const endDayjs = dayjs(endAt).utc();
 
         do {
             appointments.push(
@@ -125,7 +125,7 @@ export class ProviderApi extends AbstractApi<
             );
 
             startDayjs = startDayjs.add(interval, "minutes");
-        } while (startDayjs < endDayjs);
+        } while (startDayjs <= endDayjs);
 
         const appointmentSeries: AppointmentSeries = {
             id: seriesId,
