@@ -3,6 +3,7 @@
 // README.md contains license information.
 
 export * from "./api";
+export * from "./interfaces";
 export * from "./MediatorService";
 export * from "./ProviderService";
 export * from "./UserService";
