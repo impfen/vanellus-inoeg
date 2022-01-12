@@ -50,6 +50,9 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
+        const from = dayjs().utc().toDate();
+        const to = dayjs().utc().add(1, "days").toDate();
+
         it("should get single appointment", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
@@ -72,44 +75,40 @@ describe("AnonymousApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const unpublishedAppointment = context.createUnpublishedAppointment(
-                {
-                    providerKeyPairs,
-                    provider,
-                }
+            const appointment = await context.createConfirmedAppointment({
+                providerKeyPairs,
+                provider,
+            });
+
+            const appointments = await context.anonymousApi.getAppointments(
+                10707,
+                from,
+                to
             );
 
-            const isSuccess = await context.providerApi.publishAppointments(
-                unpublishedAppointment,
-                providerKeyPairs
-            );
+            expect(appointments).toHaveLength(1);
+            expect(appointments[0].id).toEqual(appointment.id);
+        });
 
-            expect(isSuccess).toBeTruthy();
+        it("should get aggregated appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
 
-            const from = dayjs().utc().toDate();
-            const to = dayjs().utc().add(1, "days").toDate();
-
-            const providerAppointments =
-                await context.anonymousApi.getAppointments(10707, from, to, 10);
-
-            expect(providerAppointments).toHaveLength(1);
+            const appointment = await context.createConfirmedAppointment({
+                providerKeyPairs,
+                provider,
+            });
 
             const aggregatedAppointments =
                 await context.anonymousApi.getAggregatedAppointments(
                     10707,
                     from,
-                    to,
-                    10
+                    to
                 );
 
             expect(aggregatedAppointments).toHaveLength(1);
-
-            const appointment = await context.anonymousApi.getAppointment(
-                providerAppointments[0].id,
-                providerAppointments[0].provider.id
-            );
-
-            expect(appointment.id).toEqual(unpublishedAppointment.id);
+            expect(aggregatedAppointments[0].id).toEqual(appointment.id);
+            expect(aggregatedAppointments[0]).not.toHaveProperty("slotData");
         });
     });
 
@@ -133,7 +132,7 @@ describe("AnonymousApi", () => {
             expect(noProviders).toHaveLength(0);
         });
 
-        it("shouldn get verified providers", async () => {
+        it("should get verified providers", async () => {
             const { provider } = await context.createVerifiedProvider({
                 zipCode: 60312,
             });

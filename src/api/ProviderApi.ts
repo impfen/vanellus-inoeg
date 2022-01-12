@@ -107,7 +107,7 @@ export class ProviderApi extends AbstractApi<
 
         const seriesId = randomBytes(16);
 
-        do {
+        while (startDayjs < endDayjs) {
             appointments.push(
                 this.createAppointment(
                     startDayjs.toDate(),
@@ -123,7 +123,7 @@ export class ProviderApi extends AbstractApi<
             );
 
             startDayjs = startDayjs.add(interval, "minutes");
-        } while (startDayjs < endDayjs);
+        }
 
         const appointmentSeries: AppointmentSeries = {
             id: seriesId,

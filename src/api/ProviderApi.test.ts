@@ -292,6 +292,9 @@ describe("ProviderApi", () => {
                     providerKeyPairs
                 );
 
+            expect(appointmentSeries.appointments[0].startDate).toEqual(
+                startAt
+            );
             expect(appointmentSeries.id).toHaveLength(24);
             expect(appointmentSeries.startAt).toEqual(startAt);
             expect(appointmentSeries.endAt).toEqual(endAt);
