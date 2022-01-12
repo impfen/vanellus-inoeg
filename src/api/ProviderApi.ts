@@ -80,6 +80,7 @@ export class ProviderApi extends AbstractApi<
 
     /**
      * Creates a series of appointments.
+     *
      * Mostly used in large vaccination-facilities.
      */
     public createAppointmentSeries(
@@ -394,7 +395,12 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
+     * Backups relevant data of the provider into the storage backend.
+     * Used for persistance.
      *
+     * The data is automatically deleted after 30 days of inactivity.
+     *
+     * @returns Promise<ProviderBackup>
      */
     public async backupData(providerBackup: ProviderBackup, secret: string) {
         const storage = new StorageApi(this.config);
@@ -403,7 +409,10 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
+     * Restores relevant data of the provider from the storage backend.
+     * Used for persistance.
      *
+     * @returns Promise<UserBackup>
      */
     public async restoreFromBackup(secret: string) {
         const storage = new StorageApi(this.config);

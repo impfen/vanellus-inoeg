@@ -25,6 +25,75 @@ describe("UserApi", () => {
         });
     });
 
+    describe("Tokens", () => {
+        let context: TestContext;
+
+        beforeEach(async () => {
+            context = await TestContext.createContext();
+        });
+
+        it("should get a queue-token", async () => {
+            const userSecret = context.userApi.generateSecret();
+
+            expect(userSecret).toHaveLength(16);
+
+            const userQueueToken = await context.userApi.getQueueToken(
+                userSecret
+            );
+
+            expect(userQueueToken).toBeDefined();
+        });
+
+        it("should get mutliple queue-tokens from the same secret?", async () => {
+            const userSecret = context.userApi.generateSecret();
+
+            expect(userSecret).toHaveLength(16);
+
+            const userQueueToken = await context.userApi.getQueueToken(
+                userSecret
+            );
+
+            console.log(userQueueToken);
+
+            expect(userQueueToken).toBeDefined();
+
+            const userQueueToken2 = await context.userApi.getQueueToken(
+                userSecret
+            );
+
+            expect(userQueueToken2).toBeDefined();
+
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            const booking1 = await context.userApi.bookAppointment(
+                appointment,
+                userQueueToken
+            );
+
+            expect(booking1).toBeDefined();
+
+            const booking2 = await context.userApi.bookAppointment(
+                appointment,
+                userQueueToken2
+            );
+
+            expect(booking2).toBeDefined();
+
+            const bookedAppointment = await context.anonymousApi.getAppointment(
+                appointment.id,
+                appointment.provider.id
+            );
+
+            expect(bookedAppointment).toBeDefined();
+        });
+    });
+
     describe("Appointments", () => {
         let context: TestContext;
 
@@ -77,18 +146,6 @@ describe("UserApi", () => {
             );
 
             expect(appointments).toHaveLength(1);
-        });
-
-        it("should get a queue-token", async () => {
-            const userSecret = context.userApi.generateSecret();
-
-            expect(userSecret).toHaveLength(16);
-
-            const userQueueToken = await context.userApi.getQueueToken(
-                userSecret
-            );
-
-            expect(userQueueToken).toBeDefined();
         });
 
         it("should fetch published appointment", async () => {

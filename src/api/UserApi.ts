@@ -106,6 +106,13 @@ export class UserApi extends AbstractApi<
         return true;
     }
 
+    /**
+     * Checks the status of a given Booking
+     *
+     * Get's the appointment from the system, validates its signature and retuns the status
+     *
+     * @returns Promise<BookingStatus>
+     */
     public async checkBookingStatus(booking: Booking) {
         const anonApi = new AnonymousApi(this.config);
 
@@ -119,23 +126,28 @@ export class UserApi extends AbstractApi<
             (slot) => slot.id === booking.slotId
         );
 
-        if (slot && true === slot.open) {
-            return BookingStatus.USER_CANCELED;
-        }
-
         if (slot && false === slot.open) {
+            // the booking is valid
             return BookingStatus.VALID;
         }
 
+        if (slot && true === slot.open) {
+            // the user canceled the booking
+            // (or never booked in the first place and the input was bogus...)
+            return BookingStatus.USER_CANCELED;
+        }
+
         if (!slot) {
+            // the provider canceled the appointment
             return BookingStatus.PROVIDER_CANCELED;
         }
 
+        // should never occur...
         return BookingStatus.UNKNOWN;
     }
 
     /**
-     * get a token for a given queue
+     * Get a token for a given user.
      *
      * @return Promise<UserQueueToken>
      */
@@ -175,7 +187,12 @@ export class UserApi extends AbstractApi<
     }
 
     /**
+     * Backups relevant data of the user into the storage backend.
+     * Used for persistance.
      *
+     * The data is automatically deleted after 30 days of inactivity.
+     *
+     * @returns Promise<AESData>
      */
     public async backupData(userBackup: UserBackup, secret: string) {
         const storage = new StorageApi(this.config);
@@ -184,7 +201,10 @@ export class UserApi extends AbstractApi<
     }
 
     /**
+     * Restores relevant data of the user from the storage backend.
+     * Used for persistance.
      *
+     * @returns Promise<UserBackup>
      */
     public async restoreFromBackup(secret: string) {
         const storage = new StorageApi(this.config);
