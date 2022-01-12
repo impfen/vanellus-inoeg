@@ -415,7 +415,7 @@ describe("UserApi", () => {
 
             const userBackup: UserBackup = {
                 userQueueToken: userQueueToken,
-                acceptedAppointments: [],
+                bookings: [],
             };
 
             const result = await context.userApi.backupData(
