@@ -1,6 +1,7 @@
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import {
     ApiProviderProviderAppointments,
+    ApiSignedProvider,
     ECDHData,
     SignedData,
 } from "./interfaces";
@@ -32,5 +33,5 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
         code?: string;
     }) => "ok";
 
-    checkProviderData: () => SignedData;
+    checkProviderData: () => ApiSignedProvider;
 }

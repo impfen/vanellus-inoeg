@@ -16,8 +16,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
      * Returns a single, public Appointment
      *
-     * @todo: verify based on key chain
-     *
      * @return Promise<PublicAppointment | null>
      */
     public async getAppointment(
@@ -37,8 +35,6 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     }
 
     /**
-     * @todo: verify based on key chain?
-     *
      * @return Promise<PublicAppointment[]>
      */
     public async getAppointments(

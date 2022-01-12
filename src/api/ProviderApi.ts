@@ -6,6 +6,7 @@ import {
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
+    ApiSignedProvider,
     ApiSignedProviderAppointment,
     Appointment,
     AppointmentSeries,
@@ -342,20 +343,25 @@ export class ProviderApi extends AbstractApi<
      * Checks if a provider is verified and, if yes, returns the verified data.
      * If the current provider, who provided the keys, is not verified yet, null is returned.
      *
-     * @todo check signature of retrieved ProviderData
-     *
      * @return Promise<ProviderData>
      */
-    public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
+    public async checkProvider(
+        providerKeyPairs: ProviderKeyPairs,
+        doVerify = false
+    ) {
         try {
-            const signedData = await this.transport.call(
+            const signedProvider = await this.transport.call(
                 "checkProviderData",
                 undefined,
                 providerKeyPairs.signing
             );
 
+            if (doVerify) {
+                await this.verifyProvider(signedProvider, providerKeyPairs);
+            }
+
             const encryptedVerifiedProvider = parseUntrustedJSON<ECDHData>(
-                signedData.data
+                signedProvider.data
             );
 
             // decrypt retrieved data, if any, with the providers private key
@@ -485,6 +491,22 @@ export class ProviderApi extends AbstractApi<
         }
 
         return slotData;
+    }
+
+    protected async verifyProvider(
+        signedProvider: ApiSignedProvider,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        const isVerified = await verify(
+            [providerKeyPairs.signing.publicKey],
+            signedProvider
+        );
+
+        if (true !== isVerified) {
+            throw new UnexpectedError("Could not verify provider");
+        }
+
+        return true;
     }
 
     protected async verifyProviderAppointment(

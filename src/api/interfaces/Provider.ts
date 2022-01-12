@@ -4,6 +4,8 @@
 
 import { ECDHData, SignedData } from "./crypto";
 
+export type ApiSignedProvider = SignedData;
+
 export interface SignedProvider {
     signedData: SignedData;
     signedPublicData: SignedData;

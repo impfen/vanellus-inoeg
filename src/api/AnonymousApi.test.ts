@@ -126,7 +126,7 @@ describe("AnonymousApi", () => {
                 true
             );
 
-            expect(verifiedAppointment).not.toThrow();
+            await expect(verifiedAppointment).resolves.not.toThrow();
         });
     });
 
