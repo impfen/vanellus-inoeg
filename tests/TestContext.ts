@@ -1,11 +1,11 @@
 import {
+    AdminApi,
     AnonymousApi,
     MediatorApi,
     ProviderApi,
     UserApi,
     vanellusConfig,
 } from "../src";
-import { AdminApi } from "../src/api/AdminApi";
 import { AdminConfig, AdminKeyPairs } from "../src/api/interfaces";
 import { StorageApi } from "../src/api/StorageApi";
 import {
@@ -17,7 +17,21 @@ import {
 } from "../src/interfaces";
 import { dayjs } from "../src/utils";
 
+/**
+ * This class provides an isolated context for testing vanellus.
+ *
+ * It does all the tedious setup-work for the different apis, creates the keys for the
+ * different actors and adds them to the system where necessary.
+ * It also provides several helper functions to quickly create testing-scenarios.
+ *
+ * It also guarantees db-reset between individual tests so that every test gets an isolated
+ * fresh environment with no leakage of data or context between them.
+ */
 export class TestContext {
+    /**
+     * Main entrypoint to create and isolate TestContexts.
+     * It does all the heavy-lifting for you.
+     */
     public static async createContext() {
         const adminConfig = (await import(
             `${
@@ -42,7 +56,6 @@ export class TestContext {
             adminKeyPairs
         );
         await adminApi.addMediatorPublicKeys(mediatorKeyPairs, adminKeyPairs);
-        const userSecret = userApi.generateSecret();
 
         const context = new TestContext(
             config,
@@ -53,23 +66,26 @@ export class TestContext {
             userApi,
             storageApi,
             adminKeyPairs,
-            mediatorKeyPairs,
-            userSecret
+            mediatorKeyPairs
         );
 
         return context;
     }
 
     public defaultProviderData: ProviderInput = {
-        name: "Max Mustermann",
-        street: "Musterstr. 23",
+        name: "Ada Lovelace",
+        street: "Spielstraße 23",
         city: "Berlin",
         zipCode: "10707",
         description: "",
-        email: "max@mustermann.de",
+        email: "ada@lovelace.net",
         accessible: true,
     };
 
+    /**
+     * This constructor is protected as the entrypoint to this class is
+     * TestContext.createContext() and the constructor isn't meant to be directly called.
+     */
     protected constructor(
         public readonly config: Config,
         public readonly anonymousApi: AnonymousApi,
@@ -79,9 +95,7 @@ export class TestContext {
         public readonly userApi: UserApi,
         public readonly storageApi: StorageApi,
         public readonly adminKeyPairs: AdminKeyPairs,
-        public readonly mediatorKeyPairs: MediatorKeyPairs,
-
-        public readonly userSecret: string
+        public readonly mediatorKeyPairs: MediatorKeyPairs
     ) {}
 
     public async createUnverifiedProvider(
@@ -157,5 +171,15 @@ export class TestContext {
         );
 
         return appointments[0];
+    }
+
+    public async createUserQueueToken() {
+        const userSecret = this.userApi.generateSecret();
+        const userQueueToken = await this.userApi.getQueueToken(userSecret);
+
+        return {
+            userQueueToken,
+            userSecret,
+        };
     }
 }

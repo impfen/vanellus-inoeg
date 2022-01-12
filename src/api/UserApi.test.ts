@@ -56,10 +56,12 @@ describe("UserApi", () => {
         expect(appointments).toHaveLength(1);
     });
 
-    it("should get a user-token", async () => {
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
+    it("should get a user-userQueueToken", async () => {
+        const userSecret = context.userApi.generateSecret();
+
+        expect(userSecret).toHaveLength(16);
+
+        const userQueueToken = await context.userApi.getQueueToken(userSecret);
 
         expect(userQueueToken).toBeDefined();
     });
@@ -86,6 +88,9 @@ describe("UserApi", () => {
     });
 
     it("should book an appointment", async () => {
+        const { userQueueToken, userSecret } =
+            await context.createUserQueueToken();
+
         const { provider, providerKeyPairs } =
             await context.createVerifiedProvider();
 
@@ -93,10 +98,6 @@ describe("UserApi", () => {
             provider,
             providerKeyPairs,
         });
-
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
 
         const booking = await context.userApi.bookAppointment(
             appointment,
@@ -108,6 +109,8 @@ describe("UserApi", () => {
     });
 
     it("should not double book an appointment", async () => {
+        const { userQueueToken } = await context.createUserQueueToken();
+
         const { provider, providerKeyPairs } =
             await context.createVerifiedProvider();
 
@@ -115,10 +118,6 @@ describe("UserApi", () => {
             provider,
             providerKeyPairs,
         });
-
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
 
         const booking = await context.userApi.bookAppointment(
             appointment,
@@ -134,6 +133,9 @@ describe("UserApi", () => {
     });
 
     it("should save the booking into the appointment", async () => {
+        const { userQueueToken, userSecret } =
+            await context.createUserQueueToken();
+
         const { provider, providerKeyPairs } =
             await context.createVerifiedProvider();
 
@@ -141,10 +143,6 @@ describe("UserApi", () => {
             provider,
             providerKeyPairs,
         });
-
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
 
         const booking = await context.userApi.bookAppointment(
             appointment,
@@ -158,11 +156,14 @@ describe("UserApi", () => {
         );
 
         expect(appointments[0].bookings[0].code).toEqual(
-            context.userSecret.slice(0, 4)
+            userSecret.slice(0, 4)
         );
     });
 
     it("should cancel the booking", async () => {
+        const { userQueueToken, userSecret } =
+            await context.createUserQueueToken();
+
         const { provider, providerKeyPairs } =
             await context.createVerifiedProvider();
 
@@ -170,10 +171,6 @@ describe("UserApi", () => {
             provider,
             providerKeyPairs,
         });
-
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
 
         const booking = await context.userApi.bookAppointment(
             appointment,
@@ -189,6 +186,8 @@ describe("UserApi", () => {
     });
 
     it("should have no bookings after cancelation", async () => {
+        const { userQueueToken } = await context.createUserQueueToken();
+
         const { provider, providerKeyPairs } =
             await context.createVerifiedProvider();
 
@@ -196,10 +195,6 @@ describe("UserApi", () => {
             provider,
             providerKeyPairs,
         });
-
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
 
         const booking = await context.userApi.bookAppointment(
             appointment,
@@ -220,36 +215,30 @@ describe("UserApi", () => {
         expect(appointments[0].bookings).toHaveLength(0);
     });
 
-    it("should get a token", async () => {
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
+    it("should get a userQueueToken", async () => {
+        const userSecret = context.userApi.generateSecret();
+
+        const userQueueToken = await context.userApi.getQueueToken(userSecret);
 
         expect(userQueueToken.userToken.version).toEqual("0.3");
     });
 
     it("should backup and restore", async () => {
-        const userQueueToken = await context.userApi.getQueueToken(
-            context.userSecret
-        );
+        const { userQueueToken, userSecret } =
+            await context.createUserQueueToken();
 
         expect(userQueueToken.userToken.version).toEqual("0.3");
 
         const userBackup: UserBackup = {
-            userQueueToken,
+            userQueueToken: userQueueToken,
             acceptedAppointments: [],
         };
 
-        const result = await context.userApi.backupData(
-            userBackup,
-            context.userSecret
-        );
+        const result = await context.userApi.backupData(userBackup, userSecret);
 
         expect(result).toHaveProperty("data");
 
-        const restore = await context.userApi.restoreFromBackup(
-            context.userSecret
-        );
+        const restore = await context.userApi.restoreFromBackup(userSecret);
 
         expect(userBackup).toEqual(restore);
     });
