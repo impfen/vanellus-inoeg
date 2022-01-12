@@ -6,6 +6,7 @@ import {
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
+    ApiSignedProviderAppointment,
     Appointment,
     AppointmentSeries,
     Booking,
@@ -17,7 +18,6 @@ import {
     ProviderKeyPairs,
     PublicAppointment,
     PublicProvider,
-    SignedData,
     SignedProvider,
     Slot,
     Vaccine,
@@ -167,16 +167,10 @@ export class ProviderApi extends AbstractApi<
             const appointments = await Promise.all(
                 apiProviderProviderAppointments.appointments.map(
                     async (signedAppointment) => {
-                        if (
-                            !(await this.verifyAppointment(
-                                signedAppointment,
-                                providerKeyPairs
-                            ))
-                        ) {
-                            throw new UnexpectedError(
-                                "Could not verify provider-appointment"
-                            );
-                        }
+                        await this.verifyProviderAppointment(
+                            signedAppointment,
+                            providerKeyPairs
+                        );
 
                         const apiAppointment =
                             parseUntrustedJSON<ApiAppointment>(
@@ -493,10 +487,19 @@ export class ProviderApi extends AbstractApi<
         return slotData;
     }
 
-    protected async verifyAppointment(
-        signedAppointment: SignedData,
+    protected async verifyProviderAppointment(
+        signedAppointment: ApiSignedProviderAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        return verify([providerKeyPairs.signing.publicKey], signedAppointment);
+        const isVerified = await verify(
+            [providerKeyPairs.signing.publicKey],
+            signedAppointment
+        );
+
+        if (true !== isVerified) {
+            throw new UnexpectedError("Could not verify provider-appointment");
+        }
+
+        return true;
     }
 }

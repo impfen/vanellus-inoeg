@@ -120,11 +120,13 @@ describe("AnonymousApi", () => {
                 providerKeyPairs,
             });
 
-            const appointmentx = await context.anonymousApi.getAppointment(
+            const verifiedAppointment = context.anonymousApi.getAppointment(
                 appointment.id,
                 appointment.provider.id,
                 true
             );
+
+            expect(verifiedAppointment).not.toThrow();
         });
     });
 

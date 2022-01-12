@@ -1,11 +1,12 @@
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
-import { ApiError } from "./errors";
+import { UnexpectedError } from "./errors";
 import {
     AggregatedAppointment,
     ApiAppointment,
     ApiProviderAppointments,
+    ApiSignedAppointment,
     PublicAppointment,
     PublicProvider,
 } from "./interfaces";
@@ -182,16 +183,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             );
 
             if (doVerify) {
-                const isVerified = await verify(
-                    [signedAppointment.publicKey],
-                    signedAppointment
-                );
-
-                if (!isVerified) {
-                    throw new ApiError(
-                        `Validation of appointment ${apiAppointment.id} failed`
-                    );
-                }
+                await this.verifyAppointment(signedAppointment);
             }
 
             appointments.push(
@@ -206,5 +198,20 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         }
 
         return appointments;
+    }
+
+    protected async verifyAppointment(signedAppointment: ApiSignedAppointment) {
+        const isVerified = await verify(
+            [signedAppointment.publicKey],
+            signedAppointment
+        );
+
+        if (!isVerified) {
+            throw new UnexpectedError(
+                `Validation of appointment signature failed`
+            );
+        }
+
+        return true;
     }
 }
