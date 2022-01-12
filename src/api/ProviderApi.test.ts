@@ -193,6 +193,46 @@ describe("ProviderApi", () => {
             expect(publishResult).toEqual([appointment]);
         });
 
+        it("should update appointments", async () => {
+            const { userQueueToken } = await context.createUserQueueToken();
+
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            await context.userApi.bookAppointment(appointment, userQueueToken);
+
+            appointment.slotData = [
+                appointment.slotData[2],
+                appointment.slotData[1],
+                appointment.slotData[4],
+            ];
+
+            appointment.duration = 31;
+            appointment.properties.vaccine = "moderna";
+
+            const publishResult = await context.providerApi.publishAppointments(
+                [appointment],
+                providerKeyPairs
+            );
+
+            const appointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
+            expect(appointments[0].duration).toEqual(publishResult[0].duration);
+            expect(appointments[0].properties).toEqual(
+                publishResult[0].properties
+            );
+        });
+
         it("should retrieve published appointments", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();

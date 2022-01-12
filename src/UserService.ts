@@ -54,7 +54,7 @@ export class UserService {
         return this.userApi.backupData(
             {
                 userQueueToken: this.userQueueToken,
-                acceptedAppointments: [],
+                bookings: [],
             },
             this.secret
         );

@@ -1,9 +1,9 @@
 import { ContactData, QueueData, UserQueueToken } from "./";
-import { Appointment } from "./Appointment";
+import { Booking } from "./Booking";
 
 export interface UserBackup {
     userQueueToken?: UserQueueToken;
     queueData?: QueueData;
     contactData?: ContactData;
-    acceptedAppointments: Appointment[];
+    bookings: Booking[];
 }
