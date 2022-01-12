@@ -1,6 +1,6 @@
 {
     "name": "vanellus",
-    "description": "The frontend functionality of the Kiebitz appointment sheduling software",
+    "description": "Api and abstractions of the Kiebitz appointment sheduling software",
     "version": "0.7.0",
     "license": "AGPL-3.0",
     "author": "KIProtect GmbH",
