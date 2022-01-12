@@ -13,10 +13,10 @@ import {
     BookingData,
     ECDHData,
     Provider,
-    ProviderAppointment,
     ProviderBackup,
     ProviderInput,
     ProviderKeyPairs,
+    PublicAppointment,
     PublicProvider,
     SignedProvider,
     Slot,
@@ -63,7 +63,7 @@ export class ProviderApi extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         properties?: Record<string, unknown>
     ) {
-        const appointment: Appointment = {
+        const appointment: PublicAppointment = {
             id: randomBytes(32),
             startDate: dayjs(startDate).utc().toDate(),
             endDate: dayjs(startDate).utc().add(duration, "minutes").toDate(),
@@ -103,7 +103,7 @@ export class ProviderApi extends AbstractApi<
         let startDayjs = dayjs(startAt);
         const endDayjs = dayjs(endAt);
 
-        const appointments: Appointment[] = [];
+        const appointments: PublicAppointment[] = [];
 
         const seriesId = randomBytes(16);
 
@@ -195,7 +195,7 @@ export class ProviderApi extends AbstractApi<
                             })
                         );
 
-                        const appointment: ProviderAppointment = {
+                        const appointment: Appointment = {
                             ...enrichAppointment(apiAppointment, provider),
                             bookings,
                         };
@@ -222,10 +222,10 @@ export class ProviderApi extends AbstractApi<
     /**
      * Publish appointments to the backend
      *
-     * @return Promise<Appointment[]>
+     * @return Promise<PublicAppointment[]>
      */
     public async publishAppointments(
-        unpublishedAppointment: Appointment[] | Appointment,
+        unpublishedAppointment: PublicAppointment[] | PublicAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // handle single appointments as well as arrays of appointments
@@ -233,7 +233,7 @@ export class ProviderApi extends AbstractApi<
             ? unpublishedAppointment
             : [unpublishedAppointment];
 
-        const appointments: Appointment[] = [];
+        const appointments: PublicAppointment[] = [];
 
         const signedApiAppointments = await Promise.all(
             unpublishedAppointments.map(async (unpublishedAppointment) => {
@@ -277,10 +277,10 @@ export class ProviderApi extends AbstractApi<
      * This is simply done by emptying the slots of the appointment
      * and uploading it to the backend-server.
      *
-     * @return Promise<Appointment[]>
+     * @return Promise<PublicAppointment[]>
      */
     public async cancelAppointment(
-        appointment: Appointment,
+        appointment: PublicAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
         appointment.slotData = [];

@@ -3,10 +3,10 @@ import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import { TransportError, UnexpectedError } from "./errors";
 import {
-    Appointment,
     Booking,
     BookingData,
     ContactData,
+    PublicAppointment,
     UserBackup,
     UserKeyPairs,
     UserQueueToken,
@@ -33,7 +33,7 @@ export class UserApi extends AbstractApi<
      * @returns Promise<Booking | null>
      */
     public async bookAppointment(
-        appointment: Appointment,
+        appointment: PublicAppointment,
         userQueueToken: UserQueueToken
     ) {
         const providerData: BookingData = {
@@ -82,7 +82,7 @@ export class UserApi extends AbstractApi<
      * @returns Promise<boolean>
      */
     public async cancelBooking(
-        appointment: Appointment,
+        appointment: PublicAppointment,
         userQueueToken: UserQueueToken
     ) {
         const result = await this.transport.call(
@@ -180,12 +180,12 @@ export class UserApi extends AbstractApi<
             generateECDHKeyPair(),
         ]);
 
-        const keyPairs: UserKeyPairs = {
+        const userKeyPairs: UserKeyPairs = {
             signing,
             encryption,
         };
 
-        return keyPairs;
+        return userKeyPairs;
     }
 
     /**

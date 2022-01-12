@@ -38,7 +38,7 @@ export class MediatorApi extends AbstractApi<
             name: provider.name,
             street: provider.street,
             city: provider.city,
-            zipCode: provider.zipCode,
+            zipCode: provider.zipCode.toString(),
             website: provider.website,
             description: provider.description,
             accessible: provider.accessible,
@@ -185,7 +185,7 @@ export class MediatorApi extends AbstractApi<
 
     protected getQueueDataFromProvider(provider: Provider) {
         const queueData: QueueData = {
-            zipCode: provider.zipCode,
+            zipCode: provider.zipCode.toString(),
             accessible: provider.accessible,
         };
 

@@ -72,7 +72,7 @@ export class UserService {
     }
 
     public async getAppointments(
-        zipCode: string,
+        zipCode: number,
         from: Date,
         to: Date,
         radius = 50

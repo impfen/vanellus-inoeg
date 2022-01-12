@@ -8,7 +8,7 @@ export interface ProviderInput {
     name: string;
     street: string;
     city: string;
-    zipCode: string;
+    zipCode: number | string;
     description: string;
     accessible: boolean;
     website?: string;

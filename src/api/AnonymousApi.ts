@@ -5,18 +5,18 @@ import {
     AggregatedAppointment,
     ApiAppointment,
     ApiProviderAppointments,
-    Appointment,
+    PublicAppointment,
     PublicProvider,
 } from "./interfaces";
 import { enrichAppointment } from "./utils";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
-     * Returns a single Appointment
+     * Returns a single, public Appointment
      *
      * @todo: verify based on key chain
      *
-     * @return Promise<Appointment | null>
+     * @return Promise<PublicAppointment | null>
      */
     public async getAppointment(appointmentId: string, providerId: string) {
         const signedAppointments = await this.transport.call("getAppointment", {
@@ -30,10 +30,10 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
      * @todo: verify based on key chain?
      *
-     * @return Promise<Appointment[]>
+     * @return Promise<PublicAppointment[]>
      */
     public async getAppointments(
-        zipCode: string,
+        zipCode: number,
         from: Date,
         to: Date,
         radius = 50
@@ -41,14 +41,14 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
             {
-                zipCode,
+                zipCode: zipCode.toString(),
                 from: dayjs(from).toISOString(),
                 to: dayjs(to).toISOString(),
                 radius,
             }
         );
 
-        let appointments: Appointment[] = [];
+        let appointments: PublicAppointment[] = [];
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
@@ -63,7 +63,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      * @return Promise<AggregatedAppointment[]>
      */
     public async getAggregatedAppointments(
-        zipCode: string,
+        zipCode: number,
         from: Date,
         to: Date,
         radius = 50
@@ -71,7 +71,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         const ApiAggregatedAppointments = await this.transport.call(
             "getAppointmentsAggregated",
             {
-                zipCode,
+                zipCode: zipCode.toString(),
                 from: dayjs(from).toISOString(),
                 to: dayjs(to).toISOString(),
                 radius,
@@ -104,12 +104,15 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @returns Promise<PublicProvider[]>
      */
-    public async getProviders(zipFrom: string, zipTo: string) {
+    public async getProviders(
+        zipFrom: number | string,
+        zipTo: number | string
+    ) {
         const signedProviders = await this.transport.call(
             "getProvidersByZipCode",
             {
-                zipFrom,
-                zipTo,
+                zipFrom: zipFrom.toString(),
+                zipTo: zipTo.toString(),
             }
         );
 
@@ -156,7 +159,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             signedAppointments.provider.data
         );
 
-        const appointments: Appointment[] = [];
+        const appointments: PublicAppointment[] = [];
 
         for (const signedAppointment of signedAppointments.appointments) {
             const apiAppointment = parseUntrustedJSON<ApiAppointment>(

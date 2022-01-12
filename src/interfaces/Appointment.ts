@@ -15,11 +15,11 @@ export interface AggregatedAppointment {
     properties: Record<string, unknown>;
 }
 
-export interface Appointment extends AggregatedAppointment {
+export interface PublicAppointment extends AggregatedAppointment {
     slotData: Slot[];
     publicKey: string;
 }
 
-export interface ProviderAppointment extends Omit<Appointment, "provider"> {
+export interface Appointment extends PublicAppointment {
     bookings: Booking[];
 }

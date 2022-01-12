@@ -1,11 +1,15 @@
 import { dayjs } from "../../utils/dayjs";
-import { ApiAppointment, Appointment, PublicProvider } from "../interfaces";
+import {
+    ApiAppointment,
+    PublicAppointment,
+    PublicProvider,
+} from "../interfaces";
 
 export const enrichAppointment = (
     appointmentData: ApiAppointment,
     provider: PublicProvider
 ) => {
-    const appointment: Appointment = {
+    const appointment: PublicAppointment = {
         id: appointmentData.id,
         provider: provider,
         startDate: dayjs(appointmentData.timestamp).utc().toDate(),
@@ -22,7 +26,7 @@ export const enrichAppointment = (
     return appointment;
 };
 
-export const unenrichAppointment = (appointment: Appointment) => {
+export const unenrichAppointment = (appointment: PublicAppointment) => {
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
         timestamp: dayjs(appointment.startDate).utc().toISOString(),

@@ -1,5 +1,4 @@
-import { PublicProvider } from ".";
-import { Appointment } from "./Appointment";
+import { PublicAppointment, PublicProvider } from ".";
 import { Vaccine } from "./Vaccine";
 
 export interface AppointmentSeries {
@@ -10,5 +9,5 @@ export interface AppointmentSeries {
     slotCount: number;
     vaccine: Vaccine;
     provider: PublicProvider;
-    appointments: Appointment[];
+    appointments: PublicAppointment[];
 }
