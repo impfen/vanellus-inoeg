@@ -226,7 +226,7 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            expect(result[0].slotData).toHaveLength(0);
+            expect(result.slotData).toHaveLength(0);
         });
 
         it("should not retrieve canceled appointments", async () => {

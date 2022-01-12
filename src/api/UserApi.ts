@@ -61,7 +61,9 @@ export class UserApi extends AbstractApi<
             );
 
             const booking: Booking = {
-                id: apiBooking.id,
+                slotId: apiBooking.id,
+                appointmentId: appointment.id,
+                providerId: appointment.provider.id,
                 code: userQueueToken.userToken.code,
             };
 

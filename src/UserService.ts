@@ -67,8 +67,8 @@ export class UserService {
         this.userQueueToken = backup.userQueueToken;
     }
 
-    public async getAppointment(appointmentId: string, providerID: string) {
-        return this.anonymousApi.getAppointment(appointmentId, providerID);
+    public async getAppointment(appointmentId: string, providerId: string) {
+        return this.anonymousApi.getAppointment(appointmentId, providerId);
     }
 
     public async getAppointments(

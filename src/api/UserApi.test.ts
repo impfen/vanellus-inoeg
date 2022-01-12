@@ -129,12 +129,15 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking).toHaveProperty("id");
-            expect(booking?.code).toHaveLength(4);
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
         });
 
         it("should not double book an appointment", async () => {
-            const { userQueueToken } = await context.createUserQueueToken();
+            const { userQueueToken, userSecret } =
+                await context.createUserQueueToken();
 
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
@@ -148,6 +151,11 @@ describe("UserApi", () => {
                 appointment,
                 userQueueToken
             );
+
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
 
             const booking2 = await context.userApi.bookAppointment(
                 appointment,
@@ -173,6 +181,11 @@ describe("UserApi", () => {
                 appointment,
                 userQueueToken
             );
+
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
 
             const appointments =
                 await context.providerApi.getProviderAppointments(
@@ -203,6 +216,11 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
+
             const cancelResult = await context.userApi.cancelBooking(
                 appointment,
                 userQueueToken
@@ -211,8 +229,65 @@ describe("UserApi", () => {
             expect(cancelResult).toBeTruthy();
         });
 
-        it("should have no bookings after cancelation", async () => {
-            const { userQueueToken } = await context.createUserQueueToken();
+        it("should have no bookings after cancelation by the user", async () => {
+            const { userQueueToken, userSecret } =
+                await context.createUserQueueToken();
+
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            expect(appointment.slotData).toHaveLength(10);
+
+            const booking = await context.userApi.bookAppointment(
+                appointment,
+                userQueueToken
+            );
+
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
+
+            const bookedAppointment = await context.anonymousApi.getAppointment(
+                appointment.id,
+                appointment.provider.id
+            );
+
+            expect(bookedAppointment.slotData[0].open).toEqual(false);
+
+            const cancelResult = await context.userApi.cancelBooking(
+                appointment,
+                userQueueToken
+            );
+
+            expect(cancelResult).toBeTruthy();
+
+            const appointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
+            expect(appointments[0].bookings).toHaveLength(0);
+
+            const canceledAppointment =
+                await context.anonymousApi.getAppointment(
+                    appointment.id,
+                    appointment.provider.id
+                );
+
+            expect(canceledAppointment.slotData[0].open).toEqual(true);
+        });
+
+        it("should have no bookings after cancelation by the provider", async () => {
+            const { userQueueToken, userSecret } =
+                await context.createUserQueueToken();
 
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
@@ -227,19 +302,25 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            const cancelResult = await context.userApi.cancelBooking(
+            expect(booking?.slotId).toBeDefined();
+            expect(booking?.code).toEqual(userSecret.slice(0, 4));
+            expect(booking?.appointmentId).toEqual(appointment.id);
+            expect(booking?.providerId).toEqual(provider.id);
+
+            const cancelResult = await context.providerApi.cancelAppointment(
                 appointment,
-                userQueueToken
+                providerKeyPairs
             );
 
-            const appointments =
-                await context.providerApi.getProviderAppointments(
-                    from,
-                    to,
-                    providerKeyPairs
+            expect(cancelResult.id).toEqual(appointment.id);
+
+            const canceledAppointment =
+                await context.anonymousApi.getAppointment(
+                    appointment.id,
+                    appointment.provider.id
                 );
 
-            expect(appointments[0].bookings).toHaveLength(0);
+            expect(canceledAppointment.slotData).toHaveLength(0);
         });
     });
 

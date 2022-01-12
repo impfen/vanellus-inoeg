@@ -18,6 +18,7 @@ export interface AggregatedAppointment {
 export interface PublicAppointment extends AggregatedAppointment {
     slotData: Slot[];
     publicKey: string;
+    // bookedSlots: BookedSlot[];
 }
 
 export interface Appointment extends PublicAppointment {

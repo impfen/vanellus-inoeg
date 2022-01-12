@@ -70,6 +70,7 @@ export class ProviderApi extends AbstractApi<
             duration: duration,
             properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
+            // bookedSlots: [],
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
         };
@@ -190,7 +191,9 @@ export class ProviderApi extends AbstractApi<
 
                         const bookings: Booking[] = apiBookings.map(
                             (apiBooking) => ({
-                                id: apiBooking.id,
+                                slotId: apiBooking.id,
+                                appointmentId: apiAppointment.id,
+                                providerId: provider.id,
                                 code: apiBooking.userToken.code,
                             })
                         );
@@ -277,7 +280,7 @@ export class ProviderApi extends AbstractApi<
      * This is simply done by emptying the slots of the appointment
      * and uploading it to the backend-server.
      *
-     * @return Promise<PublicAppointment[]>
+     * @return Promise<PublicAppointment>
      */
     public async cancelAppointment(
         appointment: PublicAppointment,
@@ -285,7 +288,12 @@ export class ProviderApi extends AbstractApi<
     ) {
         appointment.slotData = [];
 
-        return this.publishAppointments(appointment, providerKeyPairs);
+        const canceledAppointments = await this.publishAppointments(
+            appointment,
+            providerKeyPairs
+        );
+
+        return canceledAppointments[0];
     }
 
     /**

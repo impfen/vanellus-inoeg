@@ -1,4 +1,6 @@
 export interface Booking {
-    id: string;
+    slotId: string;
+    appointmentId: string;
+    providerId: string;
     code: string;
 }

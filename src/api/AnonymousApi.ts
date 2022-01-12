@@ -152,7 +152,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
      * Parses an appointment
      *
-     * @returns Appointment[]
+     * @returns PublicAppointment[]
      */
     protected parseAppointments(signedAppointments: ApiProviderAppointments) {
         const publicProvider = parseUntrustedJSON<PublicProvider>(
@@ -167,7 +167,13 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             );
 
             appointments.push(
-                enrichAppointment(apiAppointment, publicProvider)
+                enrichAppointment(
+                    {
+                        ...apiAppointment,
+                        bookedSlots: signedAppointment.bookedSlots,
+                    },
+                    publicProvider
+                )
             );
         }
 

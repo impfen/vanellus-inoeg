@@ -7,6 +7,10 @@ import { ApiEncryptedBooking } from "./Booking";
 import { SignedData } from "./crypto";
 import { ApiSignedProviderData } from "./Provider";
 
+export interface BookedSlot {
+    id: string;
+}
+
 export interface ApiSignedAppointment extends SignedData {
     bookedSlots: Slot[];
     updatedAt: string;
@@ -46,5 +50,6 @@ export interface ApiAggregatedAppointment {
 
 export interface ApiAppointment extends ApiAggregatedAppointment {
     slotData: Slot[];
+    bookedSlots: BookedSlot[];
     publicKey: string;
 }

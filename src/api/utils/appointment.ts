@@ -1,6 +1,7 @@
 import { dayjs } from "../../utils/dayjs";
 import {
     ApiAppointment,
+    BookedSlot,
     PublicAppointment,
     PublicProvider,
 } from "../interfaces";
@@ -20,7 +21,13 @@ export const enrichAppointment = (
         duration: appointmentData.duration,
         properties: appointmentData.properties,
         publicKey: appointmentData.publicKey,
-        slotData: appointmentData.slotData,
+        slotData: appointmentData.slotData.map((slot) => ({
+            ...slot,
+            open: !appointmentData.bookedSlots?.some(
+                (aslot: BookedSlot) => aslot.id === slot.id
+            ),
+        })),
+        // bookedSlots: appointmentData.bookedSlots,
     };
 
     return appointment;
@@ -34,6 +41,7 @@ export const unenrichAppointment = (appointment: PublicAppointment) => {
         properties: appointment.properties,
         publicKey: appointment.publicKey,
         slotData: appointment.slotData,
+        bookedSlots: [],
     };
 
     return apiAppointment;
