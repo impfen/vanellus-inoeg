@@ -33,7 +33,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      * @return Promise<PublicAppointment[]>
      */
     public async getAppointments(
-        zipCode: number,
+        zipCode: number | string,
         from: Date,
         to: Date,
         radius = 50
@@ -63,7 +63,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      * @return Promise<AggregatedAppointment[]>
      */
     public async getAggregatedAppointments(
-        zipCode: number,
+        zipCode: number | string,
         from: Date,
         to: Date,
         radius = 50

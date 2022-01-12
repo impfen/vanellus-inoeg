@@ -18,14 +18,14 @@ import {
 import { dayjs } from "../src/utils";
 
 /**
- * This class provides an isolated context for testing vanellus.
+ * Provides an isolated context for testing vanellus.
  *
- * It does all the tedious setup-work for the different apis, creates the keys for the
- * different actors and adds them to the system where necessary.
+ * It does all the tedious setup-work for the different apis, creates the keys for
+ * the admin and mediator and adds those keys to the system.
  * It also provides several helper functions to quickly create testing-scenarios.
  *
- * It also guarantees db-reset between individual tests so that every test gets an isolated
- * fresh environment with no leakage of data or context between them.
+ * Additionally, it guarantees db-resets between individual tests so that every test gets an isolated,
+ * fresh environment with no leakage of data or context in between.
  */
 export class TestContext {
     /**
@@ -77,7 +77,7 @@ export class TestContext {
         street: "Spielstraße 23",
         city: "Berlin",
         zipCode: 10707,
-        description: "",
+        description: "This is dummy data",
         email: "ada@lovelace.net",
         website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
         accessible: true,
@@ -199,8 +199,9 @@ export class TestContext {
     }
 
     /**
-     * Helper to create both the secret and the associated QueueToken for a user.
-     * That's, basically, all thats needed to represent a user inside the system.
+     * Helper to create both, the secret and the associated QueueToken, for a user.
+     * That's, basically, all that's needed to represent a user inside the system and
+     * book an appointment.
      */
     public async createUserQueueToken() {
         const userSecret = this.userApi.generateSecret();

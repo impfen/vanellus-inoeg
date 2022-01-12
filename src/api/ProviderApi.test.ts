@@ -244,7 +244,7 @@ describe("ProviderApi", () => {
             );
 
             const appointments = await context.anonymousApi.getAppointments(
-                10707,
+                context.defaultProviderData.zipCode,
                 from,
                 to,
                 10

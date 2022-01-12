@@ -108,7 +108,7 @@ export class UserApi extends AbstractApi<
      * @return Promise<UserQueueToken>
      */
     public async getQueueToken(
-        secret: string,
+        userSecret: string,
         contactData: ContactData = {},
         code?: string
     ) {
@@ -118,7 +118,7 @@ export class UserApi extends AbstractApi<
 
         const userToken = {
             version: "0.3",
-            code: secret.slice(0, 4),
+            code: userSecret.slice(0, 4),
             createdAt: dayjs().utc().toISOString(),
             publicKey: keyPairs.signing.publicKey, // the signing key to control the ID
             encryptionPublicKey: keyPairs.encryption.publicKey,

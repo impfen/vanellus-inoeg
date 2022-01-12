@@ -81,7 +81,7 @@ describe("AnonymousApi", () => {
             });
 
             const appointments = await context.anonymousApi.getAppointments(
-                10707,
+                context.defaultProviderData.zipCode,
                 from,
                 to
             );
@@ -101,7 +101,7 @@ describe("AnonymousApi", () => {
 
             const aggregatedAppointments =
                 await context.anonymousApi.getAggregatedAppointments(
-                    10707,
+                    context.defaultProviderData.zipCode,
                     from,
                     to
                 );
