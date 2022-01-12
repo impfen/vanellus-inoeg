@@ -1,6 +1,6 @@
 import { TestContext } from "../../tests/TestContext";
 import { dayjs } from "../utils";
-import { UserBackup } from "./interfaces";
+import { BookingStatus, UserBackup } from "./interfaces";
 
 describe("UserApi", () => {
     describe("Keys and secret", () => {
@@ -129,10 +129,15 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking).not.toBeNull();
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
+
+            const status = await context.userApi.checkBookingStatus(booking);
+
+            expect(status).toEqual(BookingStatus.VALID);
         });
 
         it("should not double book an appointment", async () => {
@@ -152,17 +157,21 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
 
-            const booking2 = await context.userApi.bookAppointment(
+            const doubleBooking = context.userApi.bookAppointment(
                 appointment,
                 userQueueToken
             );
 
-            expect(booking2).toBeNull();
+            await expect(
+                doubleBooking
+            ).rejects.toThrowErrorMatchingInlineSnapshot(
+                `"Double booking detected"`
+            );
         });
 
         it("should save the booking into the appointment", async () => {
@@ -182,10 +191,10 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
 
             const appointments =
                 await context.providerApi.getProviderAppointments(
@@ -216,10 +225,10 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
 
             const cancelResult = await context.userApi.cancelBooking(
                 appointment,
@@ -227,6 +236,12 @@ describe("UserApi", () => {
             );
 
             expect(cancelResult).toBeTruthy();
+
+            const bookingStatus = await context.userApi.checkBookingStatus(
+                booking
+            );
+
+            expect(bookingStatus).toEqual(BookingStatus.USER_CANCELED);
         });
 
         it("should have no bookings after cancelation by the user", async () => {
@@ -248,10 +263,10 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
 
             const bookedAppointment = await context.anonymousApi.getAppointment(
                 appointment.id,
@@ -302,10 +317,10 @@ describe("UserApi", () => {
                 userQueueToken
             );
 
-            expect(booking?.slotId).toBeDefined();
-            expect(booking?.code).toEqual(userSecret.slice(0, 4));
-            expect(booking?.appointmentId).toEqual(appointment.id);
-            expect(booking?.providerId).toEqual(provider.id);
+            expect(booking.slotId).toBeDefined();
+            expect(booking.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointmentId).toEqual(appointment.id);
+            expect(booking.providerId).toEqual(provider.id);
 
             const cancelResult = await context.providerApi.cancelAppointment(
                 appointment,
@@ -321,6 +336,12 @@ describe("UserApi", () => {
                 );
 
             expect(canceledAppointment.slotData).toHaveLength(0);
+
+            const bookingStatus = await context.userApi.checkBookingStatus(
+                booking
+            );
+
+            expect(bookingStatus).toEqual(BookingStatus.PROVIDER_CANCELED);
         });
     });
 

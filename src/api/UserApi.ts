@@ -1,3 +1,4 @@
+import { AnonymousApi } from ".";
 import { dayjs } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
@@ -5,6 +6,7 @@ import { TransportError, UnexpectedError } from "./errors";
 import {
     Booking,
     BookingData,
+    BookingStatus,
     ContactData,
     PublicAppointment,
     UserBackup,
@@ -30,7 +32,7 @@ export class UserApi extends AbstractApi<
     /**
      * Book an appointment
      *
-     * @returns Promise<Booking | null>
+     * @returns Promise<Booking>
      */
     public async bookAppointment(
         appointment: PublicAppointment,
@@ -71,7 +73,7 @@ export class UserApi extends AbstractApi<
         } catch (error) {
             // Catch double bookings
             if (error instanceof TransportError && error?.code === 401) {
-                return null;
+                throw new UnexpectedError("Double booking detected");
             }
 
             throw error;
@@ -102,6 +104,34 @@ export class UserApi extends AbstractApi<
         }
 
         return true;
+    }
+
+    public async checkBookingStatus(booking: Booking) {
+        const anonApi = new AnonymousApi(this.config);
+
+        const appointment = await anonApi.getAppointment(
+            booking.appointmentId,
+            booking.providerId,
+            true
+        );
+
+        const slot = appointment.slotData.find(
+            (slot) => slot.id === booking.slotId
+        );
+
+        if (slot && true === slot.open) {
+            return BookingStatus.USER_CANCELED;
+        }
+
+        if (slot && false === slot.open) {
+            return BookingStatus.VALID;
+        }
+
+        if (!slot) {
+            return BookingStatus.PROVIDER_CANCELED;
+        }
+
+        return BookingStatus.UNKNOWN;
     }
 
     /**
