@@ -166,8 +166,6 @@ export class MediatorApi extends AbstractApi<
     /**
      * Decrypts and parses a single providerData object returned by the services
      *
-     * @todo verify provider data!
-     *
      * @return Promise<Provider>
      */
     protected async decryptProviderData(
