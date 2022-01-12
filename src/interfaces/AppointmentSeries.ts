@@ -1,7 +1,7 @@
-import { PublicAppointment, PublicProvider } from ".";
+import { PublicProvider, UnpublishedPublicAppointment } from ".";
 import { Vaccine } from "./Vaccine";
 
-export interface AppointmentSeries {
+export interface UnpublishedAppointmentSeries {
     id: string;
     startAt: Date;
     endAt: Date;
@@ -9,5 +9,5 @@ export interface AppointmentSeries {
     slotCount: number;
     vaccine: Vaccine;
     provider: PublicProvider;
-    appointments: PublicAppointment[];
+    appointments: UnpublishedPublicAppointment[];
 }

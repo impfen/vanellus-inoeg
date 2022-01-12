@@ -215,8 +215,8 @@ describe("ProviderApi", () => {
             appointment.duration = 31;
             appointment.properties.vaccine = "moderna";
 
-            const publishResult = await context.providerApi.publishAppointments(
-                [appointment],
+            const publishResult = await context.providerApi.updateAppointment(
+                appointment,
                 providerKeyPairs
             );
 
@@ -227,9 +227,9 @@ describe("ProviderApi", () => {
                     providerKeyPairs
                 );
 
-            expect(appointments[0].duration).toEqual(publishResult[0].duration);
+            expect(appointments[0].duration).toEqual(publishResult.duration);
             expect(appointments[0].properties).toEqual(
-                publishResult[0].properties
+                publishResult.properties
             );
         });
 

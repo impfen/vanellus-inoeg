@@ -9,7 +9,6 @@ import {
     ApiSignedProvider,
     ApiSignedProviderAppointment,
     Appointment,
-    AppointmentSeries,
     Booking,
     BookingData,
     ECDHData,
@@ -21,6 +20,7 @@ import {
     PublicProvider,
     SignedProvider,
     Slot,
+    UnpublishedAppointmentSeries,
     UnpublishedPublicAppointment,
     Vaccine,
 } from "./interfaces";
@@ -129,7 +129,7 @@ export class ProviderApi extends AbstractApi<
             startDayjs = startDayjs.add(interval, "minutes");
         } while (startDayjs < endDayjs);
 
-        const appointmentSeries: AppointmentSeries = {
+        const appointmentSeries: UnpublishedAppointmentSeries = {
             id: seriesId,
             startAt,
             endAt,

@@ -5,6 +5,7 @@ import {
     Config,
     ProviderInput,
     ProviderKeyPairs,
+    UnpublishedPublicAppointment,
     Vaccine,
 } from "./interfaces";
 
@@ -106,7 +107,9 @@ export class ProviderService {
         );
     }
 
-    public async publishAppointments(unpublishedAppointments: Appointment[]) {
+    public async publishAppointments(
+        unpublishedAppointments: UnpublishedPublicAppointment[]
+    ) {
         return this.providerApi.publishAppointments(
             unpublishedAppointments,
             this.getKeyPairs()
