@@ -1,7 +1,6 @@
 import { VanellusError } from "../errors";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
-import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import { ApiError, TransportError, UnexpectedError } from "./errors";
 import {
     ApiAppointment,
@@ -18,6 +17,7 @@ import {
     ProviderKeyPairs,
     PublicAppointment,
     PublicProvider,
+    SignedData,
     SignedProvider,
     Slot,
     Vaccine,
@@ -41,7 +41,7 @@ import {
 } from "./utils";
 
 export class ProviderApi extends AbstractApi<
-    AnonymousApiInterface & ProviderApiInterface,
+    ProviderApiInterface,
     ProviderKeyPairs
 > {
     /**
@@ -70,7 +70,6 @@ export class ProviderApi extends AbstractApi<
             duration: duration,
             properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
-            // bookedSlots: [],
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
         };
@@ -168,12 +167,12 @@ export class ProviderApi extends AbstractApi<
             const appointments = await Promise.all(
                 apiProviderProviderAppointments.appointments.map(
                     async (signedAppointment) => {
-                        const isVerified = await verify(
-                            [providerKeyPairs.signing.publicKey],
-                            signedAppointment
-                        );
-
-                        if (!isVerified) {
+                        if (
+                            !(await this.verifyAppointment(
+                                signedAppointment,
+                                providerKeyPairs
+                            ))
+                        ) {
                             throw new UnexpectedError(
                                 "Could not verify provider-appointment"
                             );
@@ -492,5 +491,12 @@ export class ProviderApi extends AbstractApi<
         }
 
         return slotData;
+    }
+
+    protected async verifyAppointment(
+        signedAppointment: SignedData,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        return verify([providerKeyPairs.signing.publicKey], signedAppointment);
     }
 }

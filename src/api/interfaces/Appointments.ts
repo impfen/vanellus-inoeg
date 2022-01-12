@@ -46,9 +46,11 @@ export interface ApiAggregatedAppointment {
     timestamp: string;
     duration: number;
     properties: Record<string, unknown>;
+    slotN: number;
 }
 
-export interface ApiAppointment extends ApiAggregatedAppointment {
+export interface ApiAppointment
+    extends Omit<ApiAggregatedAppointment, "slotN"> {
     slotData: Slot[];
     bookedSlots: BookedSlot[];
     publicKey: string;

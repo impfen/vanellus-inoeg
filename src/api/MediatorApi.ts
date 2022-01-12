@@ -1,6 +1,5 @@
 import { parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
-import { AnonymousApiInterface } from "./AnonymousApiInterface";
 import { UnexpectedError } from "./errors";
 import {
     ApiEncryptedProvider,
@@ -15,7 +14,7 @@ import { MediatorApiInterface } from "./MediatorApiInterface";
 import { ecdhDecrypt, ephemeralECDHEncrypt, sign } from "./utils";
 
 export class MediatorApi extends AbstractApi<
-    AnonymousApiInterface & MediatorApiInterface,
+    MediatorApiInterface,
     MediatorKeyPairs
 > {
     /**

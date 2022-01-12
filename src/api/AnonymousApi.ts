@@ -1,6 +1,7 @@
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApiInterface } from "./AnonymousApiInterface";
+import { ApiError } from "./errors";
 import {
     AggregatedAppointment,
     ApiAppointment,
@@ -8,7 +9,7 @@ import {
     PublicAppointment,
     PublicProvider,
 } from "./interfaces";
-import { enrichAppointment } from "./utils";
+import { enrichAppointment, verify } from "./utils";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
@@ -18,13 +19,20 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @return Promise<PublicAppointment | null>
      */
-    public async getAppointment(appointmentId: string, providerId: string) {
+    public async getAppointment(
+        appointmentId: string,
+        providerId: string,
+        doVerify = false
+    ) {
         const signedAppointments = await this.transport.call("getAppointment", {
             id: appointmentId,
             providerID: providerId,
         });
 
-        return this.parseAppointments(signedAppointments)[0] || null;
+        return (
+            (await this.parseAppointments(signedAppointments, doVerify))[0] ||
+            null
+        );
     }
 
     /**
@@ -36,7 +44,8 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         zipCode: number | string,
         from: Date,
         to: Date,
-        radius = 50
+        radius = 50,
+        doVerify = false
     ) {
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
@@ -52,7 +61,10 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
-                this.parseAppointments(signedProviderAppointment)
+                await this.parseAppointments(
+                    signedProviderAppointment,
+                    doVerify
+                )
             );
         }
 
@@ -154,7 +166,10 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      *
      * @returns PublicAppointment[]
      */
-    protected parseAppointments(signedAppointments: ApiProviderAppointments) {
+    protected async parseAppointments(
+        signedAppointments: ApiProviderAppointments,
+        doVerify = false
+    ) {
         const publicProvider = parseUntrustedJSON<PublicProvider>(
             signedAppointments.provider.data
         );
@@ -165,6 +180,19 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             const apiAppointment = parseUntrustedJSON<ApiAppointment>(
                 signedAppointment.data
             );
+
+            if (doVerify) {
+                const isVerified = await verify(
+                    [signedAppointment.publicKey],
+                    signedAppointment
+                );
+
+                if (!isVerified) {
+                    throw new ApiError(
+                        `Validation of appointment ${apiAppointment.id} failed`
+                    );
+                }
+            }
 
             appointments.push(
                 enrichAppointment(

@@ -27,7 +27,6 @@ export const enrichAppointment = (
                 (aslot: BookedSlot) => aslot.id === slot.id
             ),
         })),
-        // bookedSlots: appointmentData.bookedSlots,
     };
 
     return appointment;

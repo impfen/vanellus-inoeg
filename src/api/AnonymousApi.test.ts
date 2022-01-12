@@ -110,6 +110,22 @@ describe("AnonymousApi", () => {
             expect(aggregatedAppointments[0].id).toEqual(appointment.id);
             expect(aggregatedAppointments[0]).not.toHaveProperty("slotData");
         });
+
+        it("should optionally verify appointment", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            const appointmentx = await context.anonymousApi.getAppointment(
+                appointment.id,
+                appointment.provider.id,
+                true
+            );
+        });
     });
 
     describe("Providers", () => {
