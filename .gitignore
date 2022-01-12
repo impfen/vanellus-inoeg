@@ -3,3 +3,6 @@ dist
 /docs
 .DS_Store
 *.tgz
+coverage
+_bak
+_NOTES.md

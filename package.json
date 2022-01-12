@@ -1,62 +1,123 @@
 {
     "name": "vanellus",
-    "description": "The frontend functionality of the Kiebitz appointment sheduling software",
+    "description": "Api and abstractions of the Kiebitz appointment sheduling software",
     "version": "0.7.0",
     "license": "AGPL-3.0",
     "author": "KIProtect GmbH",
-    "homepage": "https://github.com/kiebitz-oss/vanellus",
+    "homepage": "https://github.com/kiebitz-oss/vanellus-inoeg",
     "repository": {
         "type": "git",
-        "url": "https://github.com/kiebitz-oss/vanellus.git"
+        "url": "https://github.com/kiebitz-oss/vanellus-inoeg.git"
     },
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
-      ".": {
-        "require": "./dist/index.js",
-        "import": "./dist/index.mjs",
-        "types": "./dist/index.d.ts"      
-      }
+        ".": {
+            "require": "./dist/index.cjs",
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
     },
     "engines": {
         "node": ">=16.0.0"
     },
     "scripts": {
         "build": "tsup",
-        "test": "mocha --require ts-node/register --extension ts src/**/*.spec.ts",
-        "prettier": "prettier --write .",
-        "lint": "eslint . --ext .ts",
-        "typecheck": "tsc --noEmit",
-        "documentation": "npx typedoc --out ./docs src",
-        "watch": "tsc -w",
-        "clean": "rm -rf dist/*"
+        "build:docs": "typedoc --out ./docs src",
+        "test": "jest --runInBand",
+        "lint": "eslint . --ext .ts --ignore-path .gitignore",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@ctrl/ts-base32": "^1.2.6",
         "dayjs": "^1.10.7"
     },
     "devDependencies": {
-        "@types/mocha": "^9.0.0",
+        "@types/jest": "^27.4.0",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
-        "cross-fetch": "^3.1.4",
         "eslint": "^8.4.1",
-        "mocha": "^9.1.3",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-jest": "^25.3.4",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-promise": "^6.0.0",
+        "jest": "^27.4.7",
+        "jest-environment-jsdom": "^27.4.6",
+        "node-fetch": "^3.1.0",
         "prettier": "^2.5.1",
-        "ts-node": "^10.4.0",
+        "ts-jest": "^27.1.2",
         "tsup": "^5.11.10",
+        "typedoc": "^0.22.10",
         "typescript": "^4.5.3"
     },
     "peerDependencies": {
         "buffer": "^6"
     },
+    "jest": {
+        "preset": "ts-jest/presets/default-esm",
+        "testEnvironment": "./tests/TestEnvironment",
+        "testMatch": [
+            "**/?(*.)+(test).[tj]s?(x)"
+        ],
+        "verbose": true
+    },
+    "eslintConfig": {
+        "env": {
+            "browser": true,
+            "es2020": true
+        },
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "project": [
+                "./tsconfig.json"
+            ]
+        },
+        "plugins": [
+            "@typescript-eslint"
+        ],
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking",
+            "plugin:promise/recommended",
+            "plugin:prettier/recommended"
+        ],
+        "rules": {},
+        "overrides": [
+            {
+                "files": [
+                    "**/*.test.js"
+                ],
+                "env": {
+                    "jest": true
+                },
+                "plugins": [
+                    "jest"
+                ],
+                "extends": [
+                    "eslint:recommended",
+                    "plugin:@typescript-eslint/recommended",
+                    "plugin:prettier/recommended",
+                    "plugin:promise/recommended",
+                    "plugin:jest/all"
+                ]
+            }
+        ]
+    },
     "tsup": {
-        "entry": ["src/index.ts"],
+        "entry": [
+            "src/index.ts"
+        ],
         "splitting": true,
         "sourcemap": true,
         "dts": true,
         "minify": true,
         "clean": true,
-        "format": ["esm", "cjs"]
+        "format": [
+            "esm",
+            "cjs"
+        ]
     }
 }

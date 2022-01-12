@@ -1,0 +1,15 @@
+{
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": [
+        "source.addMissingImports",
+        "source.organizeImports",
+        "source.fixAll"
+    ],
+    "editor.guides.bracketPairs": true,
+    "files.exclude": {
+        "node_module": true
+    }
+}
