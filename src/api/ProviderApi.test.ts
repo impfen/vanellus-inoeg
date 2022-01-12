@@ -29,12 +29,6 @@ describe("ProviderApi", () => {
     });
 
     describe("Provider", () => {
-        let context: TestContext;
-
-        beforeEach(async () => {
-            context = await TestContext.createContext();
-        });
-
         describe("verify a provider", () => {
             let context: TestContext;
 
@@ -86,7 +80,7 @@ describe("ProviderApi", () => {
                 expect(verifiedProvider).toBeNull();
             });
 
-            it("should not get own appointments while provider is unverified", async () => {
+            it("should not get own appointments while provider is pending", async () => {
                 const { providerKeyPairs } =
                     await context.createUnverifiedProvider();
 
@@ -101,14 +95,14 @@ describe("ProviderApi", () => {
             });
 
             it("should get pending providers", async () => {
-                await context.createUnverifiedProvider();
+                const { provider } = await context.createUnverifiedProvider();
 
-                const providerDatas =
+                const pendingProviders =
                     await context.mediatorApi.getPendingProviders(
                         context.mediatorKeyPairs
                     );
 
-                expect(providerDatas).toHaveLength(1);
+                expect(pendingProviders).toEqual([provider]);
             });
 
             it("should verify provider", async () => {
