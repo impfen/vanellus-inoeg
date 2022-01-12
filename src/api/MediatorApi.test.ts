@@ -2,73 +2,70 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import {
-    createUnverifiedProvider,
-    getAdminApi,
-    getMediatorApi,
-    getProviderApi,
-} from "../../tests/test-utils";
-import { MediatorKeyPairs, Provider } from "./interfaces";
-import { MediatorApi } from "./MediatorApi";
-
-let mediatorApi: MediatorApi;
-let mediatorKeyPairs: MediatorKeyPairs;
-
-beforeAll(async () => {
-    const { adminApi, adminKeyPairs } = await getAdminApi();
-
-    await adminApi.resetDb(adminKeyPairs);
-
-    const mediatorResult = await getMediatorApi({ adminKeyPairs });
-
-    mediatorApi = mediatorResult.mediatorApi;
-    mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
-});
+import { TestContext } from "../../tests/TestContext";
 
 describe("MediatorService", () => {
-    describe("verify a provider", () => {
-        let providerData: Provider;
+    describe("Provider", () => {
+        let context: TestContext;
 
-        it("should create unverified provider", async () => {
-            const { providerKeyPairs } = await getProviderApi();
-
-            providerData = await createUnverifiedProvider(providerKeyPairs);
+        beforeEach(async () => {
+            context = await TestContext.createContext();
         });
 
         it("should get pending provider", async () => {
-            expect(providerData).toHaveProperty("id");
+            const { provider } = await context.createUnverifiedProvider();
 
-            const pendingProviders = await mediatorApi.getPendingProviders(
-                mediatorKeyPairs
-            );
+            const pendingProviders =
+                await context.mediatorApi.getPendingProviders(
+                    context.mediatorKeyPairs
+                );
 
-            expect(pendingProviders).toHaveLength(1);
-            expect(pendingProviders[0]).toEqual(providerData);
+            expect(pendingProviders).toEqual([provider]);
         });
 
         it("should verify provider", async () => {
-            const verifiedProvider = await mediatorApi.confirmProvider(
-                providerData,
-                mediatorKeyPairs
+            const { provider } = await context.createUnverifiedProvider();
+
+            const verifiedProvider = await context.mediatorApi.confirmProvider(
+                provider,
+                context.mediatorKeyPairs
             );
 
-            expect(verifiedProvider).toEqual(providerData);
+            expect(verifiedProvider).toEqual(provider);
         });
 
         it("should not fetch pending providers after verification", async () => {
-            const pendingProviders = await mediatorApi.getPendingProviders(
-                mediatorKeyPairs
+            const { provider } = await context.createUnverifiedProvider();
+
+            const verifiedProvider = await context.mediatorApi.confirmProvider(
+                provider,
+                context.mediatorKeyPairs
             );
 
-            expect(pendingProviders).toHaveLength(0);
+            const pendingProviders =
+                await context.mediatorApi.getPendingProviders(
+                    context.mediatorKeyPairs
+                );
+
+            expect(verifiedProvider).toEqual(provider);
+            expect(pendingProviders).toEqual([]);
         });
 
         it("should get verified providers", async () => {
-            const verifiedProviders = await mediatorApi.getVerifiedProviders(
-                mediatorKeyPairs
+            const { provider } = await context.createUnverifiedProvider();
+
+            const verifiedProvider = await context.mediatorApi.confirmProvider(
+                provider,
+                context.mediatorKeyPairs
             );
 
-            expect(verifiedProviders).toEqual([providerData]);
+            const verifiedProviders =
+                await context.mediatorApi.getVerifiedProviders(
+                    context.mediatorKeyPairs
+                );
+
+            expect(verifiedProvider).toEqual(provider);
+            expect(verifiedProviders).toEqual([provider]);
         });
     });
 });

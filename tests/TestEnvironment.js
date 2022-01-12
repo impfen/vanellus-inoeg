@@ -3,7 +3,7 @@ import Environment from "jest-environment-jsdom";
 import fetch, { Headers, Request, Response } from "node-fetch";
 import { TextDecoder, TextEncoder } from "util";
 
-class CustomTestEnvironment extends Environment {
+class TestEnvironment extends Environment {
     async setup() {
         await super.setup();
 
@@ -20,4 +20,4 @@ class CustomTestEnvironment extends Environment {
     }
 }
 
-export default CustomTestEnvironment;
+export default TestEnvironment;

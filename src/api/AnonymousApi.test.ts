@@ -1,52 +1,17 @@
-import { AnonymousApi, MediatorApi, ProviderApi } from ".";
-import {
-    createVerifiedProvider,
-    getAdminApi,
-    getAnonymousApi,
-    getMediatorApi,
-    getProviderApi,
-} from "../../tests/test-utils";
+import { TestContext } from "../../tests/TestContext";
 import { dayjs } from "../utils";
-import {
-    AdminKeyPairs,
-    MediatorKeyPairs,
-    Provider,
-    ProviderKeyPairs,
-} from "./interfaces";
 
-let adminKeyPairs: AdminKeyPairs;
-let providerKeyPairs: ProviderKeyPairs;
-let providerApi: ProviderApi;
-let provider: Provider;
-let mediatorApi: MediatorApi;
-let mediatorKeyPairs: MediatorKeyPairs;
-let anonymousApi: AnonymousApi;
+let context: TestContext;
 
 beforeEach(async () => {
-    const adminResult = await getAdminApi();
-
-    // we reset the database
-    await adminResult.adminApi.resetDb(adminResult.adminKeyPairs);
-
-    adminKeyPairs = adminResult.adminKeyPairs;
-
-    anonymousApi = getAnonymousApi();
-
-    const providerResult = await getProviderApi();
-
-    providerKeyPairs = providerResult.providerKeyPairs;
-    providerApi = providerResult.providerApi;
-
-    const mediatorResult = await getMediatorApi({ adminKeyPairs });
-
-    mediatorApi = mediatorResult.mediatorApi;
-    mediatorKeyPairs = mediatorResult.mediatorKeyPairs;
-
-    provider = await createVerifiedProvider(providerKeyPairs, mediatorKeyPairs);
+    context = await TestContext.createContext();
 });
 
 describe("AnonymousApi", () => {
     it("should get appointments", async () => {
+        const { provider, providerKeyPairs } =
+            await context.createVerifiedProvider();
+
         // tomorrow 3 pm
         const date = dayjs()
             .utc()
@@ -56,7 +21,7 @@ describe("AnonymousApi", () => {
             .second(0)
             .toDate();
 
-        const unpublishedAppointment = providerApi.createAppointment(
+        const unpublishedAppointment = context.providerApi.createAppointment(
             date,
             15,
             "moderna",
@@ -65,8 +30,8 @@ describe("AnonymousApi", () => {
             providerKeyPairs
         );
 
-        const isSuccess = await providerApi.publishAppointments(
-            [unpublishedAppointment],
+        const isSuccess = await context.providerApi.publishAppointments(
+            unpublishedAppointment,
             providerKeyPairs
         );
 
@@ -75,7 +40,7 @@ describe("AnonymousApi", () => {
         const from = dayjs().utc().toDate();
         const to = dayjs().utc().add(1, "days").toDate();
 
-        const providerAppointments = await anonymousApi.getAppointments(
+        const providerAppointments = await context.anonymousApi.getAppointments(
             "10707",
             from,
             to,
@@ -85,11 +50,16 @@ describe("AnonymousApi", () => {
         expect(providerAppointments).toHaveLength(1);
 
         const aggregatedAppointments =
-            await anonymousApi.getAggregatedAppointments("10707", from, to, 10);
+            await context.anonymousApi.getAggregatedAppointments(
+                "10707",
+                from,
+                to,
+                10
+            );
 
         expect(aggregatedAppointments).toHaveLength(1);
 
-        const appointment = await anonymousApi.getAppointment(
+        const appointment = await context.anonymousApi.getAppointment(
             providerAppointments[0].id,
             providerAppointments[0].provider.id
         );
@@ -109,8 +79,8 @@ describe("AnonymousApi", () => {
             accessible: true,
         };
 
-        const k1 = await providerApi.generateKeyPairs();
-        const p1 = await providerApi.storeProvider(providerData, k1);
+        const k1 = await context.providerApi.generateKeyPairs();
+        const p1 = await context.providerApi.storeProvider(providerData, k1);
 
         expect(p1).toHaveProperty("id");
         expect(p1.name).toEqual(providerData.name);
@@ -122,47 +92,54 @@ describe("AnonymousApi", () => {
         expect(p1.accessible).toEqual(providerData.accessible);
 
         providerData.zipCode = "60312";
-        const k2 = await providerApi.generateKeyPairs();
-        const p2 = await providerApi.storeProvider(providerData, k2);
+        const k2 = await context.providerApi.generateKeyPairs();
+        const p2 = await context.providerApi.storeProvider(providerData, k2);
 
         expect(p2).toHaveProperty("id");
         expect(p2.zipCode).toEqual(providerData.zipCode);
 
         providerData.zipCode = "65936";
-        const k3 = await providerApi.generateKeyPairs();
-        const p3 = await providerApi.storeProvider(providerData, k3);
+        const k3 = await context.providerApi.generateKeyPairs();
+        const p3 = await context.providerApi.storeProvider(providerData, k3);
 
         expect(p3).toHaveProperty("id");
         expect(p3.zipCode).toEqual(providerData.zipCode);
 
         providerData.zipCode = "96050";
-        const k4 = await providerApi.generateKeyPairs();
-        const p4 = await providerApi.storeProvider(providerData, k4);
+        const k4 = await context.providerApi.generateKeyPairs();
+        const p4 = await context.providerApi.storeProvider(providerData, k4);
 
         expect(p4).toHaveProperty("id");
         expect(p4.zipCode).toEqual(providerData.zipCode);
 
         // query providers
-        const noProviders = await anonymousApi.getProviders("60000", "69999");
+        const noProviders = await context.anonymousApi.getProviders(
+            "60000",
+            "69999"
+        );
 
         expect(noProviders).toHaveLength(0);
 
         // verify providers
-        const unverifiedProviders = await mediatorApi.getPendingProviders(
-            mediatorKeyPairs
-        );
+        const unverifiedProviders =
+            await context.mediatorApi.getPendingProviders(
+                context.mediatorKeyPairs
+            );
 
         for (const unverifiedProvider of unverifiedProviders) {
-            const verifiedResult = await mediatorApi.confirmProvider(
+            const verifiedResult = await context.mediatorApi.confirmProvider(
                 unverifiedProvider,
-                mediatorKeyPairs
+                context.mediatorKeyPairs
             );
 
             expect(verifiedResult).toEqual(unverifiedProvider);
         }
 
         // query providers
-        const providers = await anonymousApi.getProviders("60000", "69999");
+        const providers = await context.anonymousApi.getProviders(
+            "60000",
+            "69999"
+        );
 
         expect(providers).toHaveLength(2);
         expect(providers.map((provider) => provider.zipCode).sort()).toEqual([
@@ -172,17 +149,21 @@ describe("AnonymousApi", () => {
     });
 
     it("should get the public keys anonymously", async () => {
-        const publicKeys = await anonymousApi.getKeys();
+        const publicKeys = await context.anonymousApi.getKeys();
 
-        expect(publicKeys.rootKey).toEqual(adminKeyPairs.signing.publicKey);
-        expect(publicKeys.tokenKey).toEqual(adminKeyPairs.token.publicKey);
+        expect(publicKeys.rootKey).toEqual(
+            context.adminKeyPairs.signing.publicKey
+        );
+        expect(publicKeys.tokenKey).toEqual(
+            context.adminKeyPairs.token.publicKey
+        );
         expect(publicKeys.providerData).toEqual(
-            adminKeyPairs.provider.publicKey
+            context.adminKeyPairs.provider.publicKey
         );
     });
 
     it("should get the configurables", async () => {
-        const configurables = await anonymousApi.getConfigurables();
+        const configurables = await context.anonymousApi.getConfigurables();
 
         expect(configurables).toHaveProperty("vaccines");
         expect(configurables).toHaveProperty("anon_max_time_window");

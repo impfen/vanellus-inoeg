@@ -281,11 +281,11 @@ export class ProviderApi extends AbstractApi<
      */
     public async cancelAppointment(
         appointment: Appointment,
-        keyPairs: ProviderKeyPairs
+        providerKeyPairs: ProviderKeyPairs
     ) {
         appointment.slotData = [];
 
-        return this.publishAppointments([appointment], keyPairs);
+        return this.publishAppointments(appointment, providerKeyPairs);
     }
 
     /**
@@ -302,7 +302,7 @@ export class ProviderApi extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         signupCode?: string
     ) {
-        const keys = await this.transport.call("getKeys");
+        const systemPublicKeys = await this.transport.call("getKeys");
         const id = await this.generateProviderId(providerKeyPairs);
 
         const providerData: Provider = {
@@ -318,7 +318,7 @@ export class ProviderApi extends AbstractApi<
         const encryptedData = await ecdhEncrypt(
             JSON.stringify(providerData),
             providerKeyPairs.data,
-            keys.providerData
+            systemPublicKeys.providerData
         );
 
         const result = await this.transport.call(

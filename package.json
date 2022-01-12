@@ -26,7 +26,7 @@
     "scripts": {
         "build": "tsup",
         "build:docs": "typedoc --out ./docs src",
-        "test": "jest --runInBand --verbose",
+        "test": "jest --runInBand",
         "lint": "eslint . --ext .ts --ignore-path .gitignore",
         "typecheck": "tsc --noEmit"
     },
@@ -35,7 +35,6 @@
         "dayjs": "^1.10.7"
     },
     "devDependencies": {
-        "@swc/core": "^1.2.127",
         "@types/jest": "^27.4.0",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
@@ -46,7 +45,6 @@
         "eslint-plugin-promise": "^6.0.0",
         "jest": "^27.4.7",
         "jest-environment-jsdom": "^27.4.6",
-        "jest-extended": "^1.2.0",
         "node-fetch": "^3.1.0",
         "prettier": "^2.5.1",
         "ts-jest": "^27.1.2",
@@ -59,13 +57,11 @@
     },
     "jest": {
         "preset": "ts-jest/presets/default-esm",
-        "testEnvironment": "./tests/jest.env.js",
+        "testEnvironment": "./tests/TestEnvironment",
         "testMatch": [
             "**/?(*.)+(test).[tj]s?(x)"
         ],
-        "setupFilesAfterEnv": [
-            "jest-extended/all"
-        ]
+        "verbose": true
     },
     "eslintConfig": {
         "env": {

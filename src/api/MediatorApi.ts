@@ -93,7 +93,7 @@ export class MediatorApi extends AbstractApi<
 
         if ("ok" !== result) {
             throw new UnexpectedError(
-                `Could not verify provider ${provider.id}`
+                `Couldn't verify provider ${provider.id}`
             );
         }
 
