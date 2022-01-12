@@ -3,13 +3,24 @@
 // README.md contains license information.
 
 import { base64ToBuffer, stringToArrayBuffer } from ".";
+import { UnexpectedError } from "../errors";
 import { SignedData } from "../interfaces";
 
-export const verify = async (keys: string[], signedData: SignedData) => {
+/**
+ * Verifies the signature of a given string with one or more keys
+ *
+ * @throws UnexpectedError if the validation of the signature failed for all given keys
+ *
+ * @returns true
+ */
+export const verify = async (
+    keys: string | string[],
+    signedData: SignedData
+) => {
     const signature = base64ToBuffer(signedData.signature);
     const data = stringToArrayBuffer(signedData.data);
 
-    for (const keyData of keys) {
+    for (const keyData of Array.isArray(keys) ? keys : [keys]) {
         const keyDataBuffer = base64ToBuffer(keyData);
 
         try {
@@ -29,14 +40,14 @@ export const verify = async (keys: string[], signedData: SignedData) => {
                 data
             );
 
-            if (isVerified === true) {
+            if (true === isVerified) {
                 return true;
             }
-        } catch (e) {
+        } catch (error) {
             continue;
         }
     }
 
     // no key signature was valid
-    return false;
+    throw new UnexpectedError("Could not verify signature");
 };

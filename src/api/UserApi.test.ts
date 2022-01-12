@@ -53,8 +53,6 @@ describe("UserApi", () => {
                 userSecret
             );
 
-            console.log(userQueueToken);
-
             expect(userQueueToken).toBeDefined();
 
             const userQueueToken2 = await context.userApi.getQueueToken(

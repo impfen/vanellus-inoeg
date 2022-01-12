@@ -113,7 +113,7 @@ export class MediatorApi extends AbstractApi<
         mediatorKeyPairs: MediatorKeyPairs,
         limit = 1000
     ) {
-        return this.decryptProviderDatas(
+        return this.decryptProviders(
             await this.transport.call(
                 "getPendingProviderData",
                 { limit },
@@ -137,7 +137,7 @@ export class MediatorApi extends AbstractApi<
         mediatorKeyPairs: MediatorKeyPairs,
         limit = 1000
     ) {
-        return this.decryptProviderDatas(
+        return this.decryptProviders(
             await this.transport.call(
                 "getVerifiedProviderData",
                 { limit },
@@ -152,13 +152,13 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider[]>
      */
-    protected async decryptProviderDatas(
+    protected async decryptProviders(
         encryptedProviderDatas: ApiEncryptedProvider[],
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         return Promise.all(
             encryptedProviderDatas.map(({ encryptedData }) =>
-                this.decryptProviderData(encryptedData, mediatorKeyPairs)
+                this.decryptProvider(encryptedData, mediatorKeyPairs)
             )
         );
     }
@@ -168,12 +168,12 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<Provider>
      */
-    protected async decryptProviderData(
-        encryptedProviderData: ECDHData,
+    protected async decryptProvider(
+        encryptedProvider: ECDHData,
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         const decryptedProviderDataString = await ecdhDecrypt(
-            encryptedProviderData,
+            encryptedProvider,
             mediatorKeyPairs.provider.privateKey
         );
 

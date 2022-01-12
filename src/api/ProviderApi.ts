@@ -1,7 +1,7 @@
 import { VanellusError } from "../errors";
 import { dayjs, parseUntrustedJSON } from "../utils";
 import { AbstractApi } from "./AbstractApi";
-import { ApiError, TransportError, UnexpectedError } from "./errors";
+import { ApiError, TransportError } from "./errors";
 import {
     ApiAppointment,
     ApiBooking,
@@ -160,6 +160,11 @@ export class ProviderApi extends AbstractApi<
                     to: dayjs(to).toISOString(),
                 },
                 providerKeyPairs.signing
+            );
+
+            await verify(
+                [apiProviderProviderAppointments.provider.publicKey],
+                apiProviderProviderAppointments.provider
             );
 
             const provider = parseUntrustedJSON<Provider>(
@@ -506,14 +511,7 @@ export class ProviderApi extends AbstractApi<
         signedProvider: ApiSignedProvider,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const isVerified = await verify(
-            [providerKeyPairs.signing.publicKey],
-            signedProvider
-        );
-
-        if (true !== isVerified) {
-            throw new UnexpectedError("Could not verify provider");
-        }
+        await verify([providerKeyPairs.signing.publicKey], signedProvider);
 
         return true;
     }
@@ -522,14 +520,7 @@ export class ProviderApi extends AbstractApi<
         signedAppointment: ApiSignedProviderAppointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
-        const isVerified = await verify(
-            [providerKeyPairs.signing.publicKey],
-            signedAppointment
-        );
-
-        if (true !== isVerified) {
-            throw new UnexpectedError("Could not verify provider-appointment");
-        }
+        await verify([providerKeyPairs.signing.publicKey], signedAppointment);
 
         return true;
     }
