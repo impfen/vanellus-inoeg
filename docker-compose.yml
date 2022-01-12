@@ -1,11 +1,14 @@
+## Docker-setup to quickly spawn a setup to run tests and develop against
 version: "3.7"
 
 services:
     redis:
         image: "redis"
+        ports:
+            - 6379:6379
 
     backend:
-        image: "ghcr.io/kiebitz-oss/services-inoeg:main"
+        image: "ghcr.io/kiebitz-oss/services-inoeg-main:latest"
         depends_on:
             - redis
         environment:
@@ -15,3 +18,4 @@ services:
         ports:
             - 11111:11111
             - 22222:22222
+        command: "./kiebitz --level debug run all"
