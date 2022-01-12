@@ -125,7 +125,7 @@ export class ProviderApi extends AbstractApi<
             );
 
             startDayjs = startDayjs.add(interval, "minutes");
-        } while (startDayjs <= endDayjs);
+        } while (startDayjs < endDayjs);
 
         const appointmentSeries: AppointmentSeries = {
             id: seriesId,
