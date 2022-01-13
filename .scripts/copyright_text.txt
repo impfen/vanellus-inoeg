@@ -1,3 +1,0 @@
-Kiebitz - Privacy-Friendly Appointments
-Copyright (C) 2021-{year} The Kiebitz Authors
-README.md contains license information.
