@@ -4,6 +4,7 @@
 
 export * from "./AdminApi";
 export * from "./AnonymousApi";
+export * from "./errors";
 export * from "./interfaces";
 export * from "./MediatorApi";
 export * from "./ProviderApi";
