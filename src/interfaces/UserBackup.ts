@@ -1,5 +1,9 @@
-import { ContactData, QueueData, UserQueueToken } from "./";
-import { Booking } from "./Booking";
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
+import type { ContactData, QueueData, UserQueueToken } from "./";
+import type { Booking } from "./Booking";
 
 export interface UserBackup {
     userQueueToken?: UserQueueToken;
