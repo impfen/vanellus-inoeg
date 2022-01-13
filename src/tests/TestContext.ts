@@ -39,9 +39,8 @@ export class TestContext {
      */
     public static async createContext() {
         const adminConfig = (await import(
-            `${
-                process.env.KIEBITZ_SETTINGS || "./fixtures/keys"
-            }/002_admin.json`
+            process.env.KIEBITZ_SETTINGS ||
+                `${"../../testing/fixtures/keys"}/002_admin.json`
         )) as AdminConfig;
 
         const config: VanellusConfig = vanellusConfig;

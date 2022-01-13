@@ -10,7 +10,7 @@ import {
     decodeBase32,
     encodeBase32,
     stringToArrayBuffer,
-} from "./conversion";
+} from "../../utils/conversion";
 
 describe("conversions", () => {
     it("encodeBase32", () => {

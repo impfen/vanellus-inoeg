@@ -57,7 +57,7 @@
     },
     "jest": {
         "preset": "ts-jest/presets/default-esm",
-        "testEnvironment": "./tests/TestEnvironment",
+        "testEnvironment": "./testing/TestEnvironment",
         "testMatch": [
             "**/?(*.)+(test).[tj]s?(x)"
         ],

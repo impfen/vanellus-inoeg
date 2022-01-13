@@ -2,8 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { deriveSecrets, randomBytes } from ".";
-import { base64ToBuffer } from "./conversion";
+import { base64ToBuffer, deriveSecrets, randomBytes } from "../../utils";
 
 describe("Crypto.deriveSecrets()", () => {
     it("should be able to derive secrets", async () => {
