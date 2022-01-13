@@ -68,6 +68,10 @@ const methodData: Record<
         uri: "appointments",
         method: "POST",
     },
+    getProviderAppointmentsByProperty: {
+        uri: "appointments/property",
+        method: "POST",
+    },
     getSettings: {
         uri: (p) =>
             `store/${encodeURIComponent(p.id as string | number | boolean)}`,

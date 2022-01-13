@@ -360,6 +360,92 @@ describe("ProviderApi", () => {
                 appointmentSeries.appointments[0].properties.seriesId
             );
         });
+
+        it("should retrieve specific series", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const startAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(8)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const endAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(10)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const appointmentSeries1 =
+                context.providerApi.createAppointmentSeries(
+                    startAt,
+                    endAt,
+                    5,
+                    5,
+                    "biontech",
+                    provider,
+                    providerKeyPairs
+                );
+
+            const resultPub1 = await context.providerApi.publishAppointments(
+                appointmentSeries1.appointments,
+                providerKeyPairs
+            );
+
+            expect(resultPub1).toHaveLength(24);
+
+            const appointmentSeries2 =
+                context.providerApi.createAppointmentSeries(
+                    startAt,
+                    endAt,
+                    10,
+                    5,
+                    "moderna",
+                    provider,
+                    providerKeyPairs
+                );
+
+            const resultPub2 = await context.providerApi.publishAppointments(
+                appointmentSeries2.appointments,
+                providerKeyPairs
+            );
+            expect(resultPub2).toHaveLength(12);
+
+            const resultFetch1 =
+                await context.providerApi.getProviderAppointmentsByProperty(
+                    "seriesId",
+                    appointmentSeries1.id,
+                    providerKeyPairs
+                );
+
+            expect(resultFetch1).toHaveLength(24);
+            expect(resultFetch1[0].properties.seriesId).toEqual(
+                appointmentSeries1.appointments[0].properties.seriesId
+            );
+            expect(resultFetch1[0].properties.vaccine).toEqual(
+                appointmentSeries1.appointments[0].properties.vaccine
+            );
+
+            const resultFetch2 =
+                await context.providerApi.getProviderAppointmentsByProperty(
+                    "vaccine",
+                    "moderna",
+                    providerKeyPairs
+                );
+
+            expect(resultFetch2).toHaveLength(12);
+            expect(resultFetch2[0].properties.seriesId).toEqual(
+                appointmentSeries2.appointments[0].properties.seriesId
+            );
+            expect(resultFetch2[0].properties.vaccine).toEqual(
+                appointmentSeries2.appointments[0].properties.vaccine
+            );
+        });
     });
 
     describe("Backup", () => {
