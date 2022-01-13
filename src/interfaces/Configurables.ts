@@ -16,6 +16,16 @@ export interface Configurables {
     anon_aggregated_max_time_window: number;
 
     /**
+     * value in minutes
+     */
+    appointment_duration_max: number;
+
+    /**
+     * value in minutes
+     */
+    appointment_duration_min: number;
+
+    /**
      * value in days
      */
     provider_max_time_window: number;

@@ -43,6 +43,8 @@ describe("AnonymousApi", () => {
             expect(configurables).toHaveProperty(
                 "anon_aggregated_max_time_window"
             );
+            expect(configurables).toHaveProperty("appointment_duration_min");
+            expect(configurables).toHaveProperty("appointment_duration_max");
             expect(configurables).toHaveProperty("provider_max_time_window");
         });
     });
