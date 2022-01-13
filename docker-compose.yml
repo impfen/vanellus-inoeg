@@ -3,18 +3,18 @@ version: "3.7"
 
 services:
     redis:
-        image: "redis"
+        image: "redis:alpine"
         ports:
             - 6379:6379
 
     backend:
-        image: "ghcr.io/kiebitz-oss/services-inoeg-main:latest"
+        image: "ghcr.io/kiebitz-oss/services-inoeg:latest"
         depends_on:
             - redis
         environment:
-            - KIEBITZ_SETTINGS=/settings/test
+            - KIEBITZ_SETTINGS=/settings
         volumes:
-            - "./testing/fixtures/keys:/settings/test"
+            - "./testing/fixtures/keys:/settings"
         ports:
             - 11111:11111
             - 22222:22222
