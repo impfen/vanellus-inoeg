@@ -8,6 +8,7 @@ import type {
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
+    ApiProviderProviderAppointments,
     ApiSignedProvider,
     ApiSignedProviderAppointment,
     Appointment,
@@ -168,56 +169,46 @@ export class ProviderApi extends AbstractApi<
                 providerKeyPairs.signing
             );
 
-            await verify(
-                [apiProviderProviderAppointments.provider.publicKey],
-                apiProviderProviderAppointments.provider
+            return await this.processApiAppointments(
+                apiProviderProviderAppointments,
+                providerKeyPairs
+            );
+        } catch (error) {
+            if (error instanceof TransportError && error.code === 401) {
+                // the provider is unverified
+                return [];
+            }
+
+            throw error;
+        }
+    }
+
+    /**
+     * Retrieves the appointments which belong to the provider and have a
+     * specific property.
+     * Returns an empty array if the provider is not verified.
+     *
+     * @return Promise<ProviderAppointment[]>
+     */
+    public async getProviderAppointmentsByProperty(
+        key: string,
+        value: string,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        try {
+            const apiProviderProviderAppointments = await this.transport.call(
+                "getProviderAppointmentsByProperty",
+                {
+                    key: key,
+                    value: value,
+                },
+                providerKeyPairs.signing
             );
 
-            const provider = parseUntrustedJSON<Provider>(
-                apiProviderProviderAppointments.provider.data
+            return await this.processApiAppointments(
+                apiProviderProviderAppointments,
+                providerKeyPairs
             );
-
-            const appointments = await Promise.all(
-                apiProviderProviderAppointments.appointments.map(
-                    async (signedAppointment) => {
-                        await this.verifyProviderAppointment(
-                            signedAppointment,
-                            providerKeyPairs
-                        );
-
-                        const apiAppointment =
-                            parseUntrustedJSON<ApiAppointment>(
-                                signedAppointment.data
-                            );
-
-                        const apiBookings = await this.decryptBookings(
-                            signedAppointment.bookings || [],
-                            providerKeyPairs
-                        );
-
-                        const bookings: Booking[] = apiBookings.map(
-                            (apiBooking) => ({
-                                slotId: apiBooking.id,
-                                appointmentId: apiAppointment.id,
-                                providerId: provider.id,
-                                code: apiBooking.userToken.code,
-                            })
-                        );
-
-                        const appointment: Appointment = {
-                            ...enrichAppointment(apiAppointment, provider),
-                            bookings,
-                        };
-
-                        return appointment;
-                    }
-                )
-            );
-
-            // needed as promise.all() does not guarantee order
-            appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
-
-            return appointments;
         } catch (error) {
             if (error instanceof TransportError && error.code === 401) {
                 // the provider is unverified
@@ -255,7 +246,8 @@ export class ProviderApi extends AbstractApi<
                 });
 
                 /**
-                 * we sign each appointment individually so that the client can verify that they've been posted by a valid provider
+                 * we sign each appointment individually so that the client can
+                 * verify that they've been posted by a valid provider
                  */
                 const signedApiAppointment = await sign(
                     JSON.stringify(apiAppointment),
@@ -529,6 +521,66 @@ export class ProviderApi extends AbstractApi<
                 return booking;
             })
         );
+    }
+
+    /**
+     * decrypt and verify appointments
+     *
+     * @returns ProviderAppointment[]
+     */
+    protected async processApiAppointments(
+        apiProviderProviderAppointments: ApiProviderProviderAppointments,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        await verify(
+            [apiProviderProviderAppointments.provider.publicKey],
+            apiProviderProviderAppointments.provider
+        );
+
+        const provider = parseUntrustedJSON<Provider>(
+            apiProviderProviderAppointments.provider.data
+        );
+
+        const appointments = await Promise.all(
+            apiProviderProviderAppointments.appointments.map(
+                async (signedAppointment) => {
+                    await this.verifyProviderAppointment(
+                        signedAppointment,
+                        providerKeyPairs
+                    );
+
+                    const apiAppointment = parseUntrustedJSON<ApiAppointment>(
+                        signedAppointment.data
+                    );
+
+                    const apiBookings = await this.decryptBookings(
+                        signedAppointment.bookings || [],
+                        providerKeyPairs
+                    );
+
+                    const bookings: Booking[] = apiBookings.map(
+                        (apiBooking) => ({
+                            slotId: apiBooking.id,
+                            appointmentId: apiAppointment.id,
+                            providerId: provider.id,
+                            code: apiBooking.userToken.code,
+                        })
+                    );
+
+                    const appointment: Appointment = {
+                        ...enrichAppointment(apiAppointment, provider),
+                        bookings,
+                    };
+
+                    return appointment;
+                }
+            )
+        );
+
+        // needed as promise.all() does not guarantee order
+        appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+
+        return appointments;
     }
 
     protected generateProviderId(providerKeyPairs: ProviderKeyPairs) {

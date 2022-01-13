@@ -22,6 +22,15 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
         updatedSince?: string;
     }) => ApiProviderProviderAppointments;
 
+    // get all published appointments with a specific property
+    getProviderAppointmentsByProperty: ({
+        key,
+        value,
+    }: {
+        key: string;
+        value: string;
+    }) => ApiProviderProviderAppointments;
+
     // publish all local appointments to the backend
     publishAppointments: ({
         appointments,

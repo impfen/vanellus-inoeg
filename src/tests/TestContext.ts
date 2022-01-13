@@ -39,17 +39,13 @@ export class TestContext {
      */
     public static async createContext() {
         const adminConfig = (await import(
-            process.env.KIEBITZ_SETTINGS ||
-                `${"../../testing/fixtures/keys"}/002_admin.json`
+            `${
+                process.env.KIEBITZ_SETTINGS || "../../testing/fixtures/keys"
+            }/002_admin.json`
         )) as AdminConfig;
 
         const config: VanellusConfig = vanellusConfig;
-        const anonymousApi = new AnonymousApi(config);
         const adminApi = new AdminApi(config);
-        const mediatorApi = new MediatorApi(config);
-        const providerApi = new ProviderApi(config);
-        const userApi = new UserApi(config);
-        const storageApi = new StorageApi(config);
 
         const adminKeyPairs = await AdminApi.generateAdminKeys(adminConfig);
 
@@ -59,7 +55,14 @@ export class TestContext {
         const mediatorKeyPairs = await adminApi.generateMediatorKeys(
             adminKeyPairs
         );
+
         await adminApi.addMediatorPublicKeys(mediatorKeyPairs, adminKeyPairs);
+
+        const anonymousApi = new AnonymousApi(config);
+        const mediatorApi = new MediatorApi(config);
+        const providerApi = new ProviderApi(config);
+        const userApi = new UserApi(config);
+        const storageApi = new StorageApi(config);
 
         const context = new TestContext(
             config,
