@@ -33,18 +33,22 @@ export class VanellusStorage implements Storage {
         );
     }
 
-    public getItem(key: string, defaultValue?: string): string | null {
-        const data = this.storageAdapter.getItem(this.getKey(key));
+    public getItem<T = string | null>(key: string, defaultValue?: string) {
+        try {
+            const data = this.storageAdapter.getItem(this.getKey(key));
 
-        if (data !== null) {
-            return parseUntrustedJSON(data);
+            if (data !== null) {
+                return parseUntrustedJSON<T>(data);
+            }
+
+            if (defaultValue !== undefined) {
+                return defaultValue;
+            }
+
+            return null;
+        } catch (error) {
+            return null;
         }
-
-        if (defaultValue !== undefined) {
-            return defaultValue;
-        }
-
-        return null;
     }
 
     public deleteAll(prefix: string) {
