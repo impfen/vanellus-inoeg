@@ -22,7 +22,7 @@ npm run build
 To format files, simply run
 
 ```bash
-npm run prettier
+npm run lint:fix
 ```
 
 # Development
@@ -30,7 +30,7 @@ npm run prettier
 To continuously build files and watch for changes, simply run
 
 ```bash
-npm run watch
+npm run build:watch
 ```
 
 # Testing
@@ -43,9 +43,10 @@ npm run test
 
 These tests require a running Kiebitz test instance with appointments and
 storage services, as well as a readable `002_admin.json` key file in the Kiebitz
-settings directory. The default directory is `test_backend/keys`. You can change
-the directory and service ports by setting the `KIEBITZ_SETTINGS`,
-`KIEBITZ_APPOINTMENTS_PORT` and `KIEBITZ_STORAGE_PORT` environment variables.
+settings directory. The default directory is `testing/fixtures/keys`.
 
-If you want to test with the REST insted of the JSONRPC protocol, you can do
-that by setting the `KIEBITZ_USE_REST` envionment variable to `true`.
+This repository also holds a `docker-compose.yml` which will spin up the services needed
+for testing by simply running `docker-compose up`.
+
+You can change the directory and service ports by setting the `KIEBITZ_SETTINGS`,
+`KIEBITZ_APPOINTMENTS_ENDPOINT` and `KIEBITZ_STORAGE_ENDPOINT` environment variables.
