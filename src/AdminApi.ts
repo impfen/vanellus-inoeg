@@ -3,7 +3,6 @@
 // README.md contains license information.
 
 import { AbstractApi } from "./AbstractApi";
-import type { AdminApiInterface } from "./AdminApiInterface";
 import { UnexpectedError } from "./errors";
 import type {
     AdminConfig,
@@ -12,6 +11,7 @@ import type {
     MediatorKeyData,
     MediatorKeyPairs,
 } from "./interfaces";
+import type { AdminApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
 import {
     base64ToBuffer,

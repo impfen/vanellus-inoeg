@@ -1,3 +1,4 @@
+export * from "./AdminApiInterface";
 export * from "./AnonymousApiInterface";
 export * from "./MediatorApiInterface";
 export * from "./ProviderApiInterface";
