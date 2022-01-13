@@ -1,3 +1,7 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 /**
  * Implements an in-memory Storage-interface for local testing.
  * Frontends running in a browser should use localStorage

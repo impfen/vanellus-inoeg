@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ActorKeyPairs, KeyPair } from "../api/interfaces";
+import type { ActorKeyPairs, KeyPair } from "./api";
 
 export interface MediatorKeyPairs extends ActorKeyPairs {
     encryption: KeyPair;

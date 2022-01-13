@@ -1,3 +1,7 @@
+// Kiebitz - Privacy-Friendly Appointments
+// Copyright (C) 2021-2021 The Kiebitz Authors
+// README.md contains license information.
+
 /**
  * This utility forces arbitrary json to be handled as if it would be a particular,
  * given interface in typescript.

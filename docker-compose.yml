@@ -14,7 +14,7 @@ services:
         environment:
             - KIEBITZ_SETTINGS=/settings/test
         volumes:
-            - "./tests/fixtures/keys:/settings/test"
+            - "./testing/fixtures/keys:/settings/test"
         ports:
             - 11111:11111
             - 22222:22222
