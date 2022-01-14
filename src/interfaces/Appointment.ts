@@ -10,7 +10,7 @@ export interface Slot {
     open: boolean;
 }
 
-export interface AggregatedAppointment {
+export interface AggregatedPublicAppointment {
     id: string;
     provider: PublicProvider;
     startDate: Date;
@@ -19,7 +19,7 @@ export interface AggregatedAppointment {
     properties: Record<string, unknown>;
 }
 
-export interface PublicAppointment extends AggregatedAppointment {
+export interface PublicAppointment extends AggregatedPublicAppointment {
     slotData: Slot[];
     publicKey: string;
 }

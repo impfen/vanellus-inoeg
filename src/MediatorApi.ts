@@ -28,6 +28,7 @@ export class MediatorApi extends AbstractApi<
     /**
      * Confirm a given, unverified provider
      *
+     * Workflow on server-side:
      *   - check unverifiedProvider(providerId)
      *      - not found
      *           - check verifiedProvider(providerId)
