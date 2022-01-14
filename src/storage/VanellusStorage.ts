@@ -3,11 +3,14 @@
 // README.md contains license information.
 
 import { parseUntrustedJSON } from "../utils";
-
-export class VanellusStorage implements Storage {
+import { InMemoryStorageAdapter } from "./InMemoryStorageAdapter";
+export class VanellusStorage {
     constructor(
         protected readonly prefix: string | undefined = undefined,
-        protected readonly storageAdapter: Storage = localStorage
+        protected readonly storageAdapter: Storage = typeof window !==
+        "undefined"
+            ? window.localStorage
+            : new InMemoryStorageAdapter()
     ) {}
 
     public clear(): void {
@@ -22,20 +25,17 @@ export class VanellusStorage implements Storage {
         return this.storageAdapter.removeItem(this.getKey(key));
     }
 
-    public setItem(key: string, value: string): void {
+    public set(key: string, value: unknown): void {
         if (value === null || value === undefined) {
             return this.removeItem(key);
         }
 
-        return this.storageAdapter.setItem(
-            this.getKey(key),
-            JSON.stringify(value)
-        );
+        return this.setItem(key, JSON.stringify(value));
     }
 
-    public getItem<T = string | null>(key: string, defaultValue?: string) {
+    public get<T = string | null>(key: string, defaultValue?: T) {
         try {
-            const data = this.storageAdapter.getItem(this.getKey(key));
+            const data = this.getItem(key);
 
             if (data !== null) {
                 return parseUntrustedJSON<T>(data);
@@ -71,5 +71,17 @@ export class VanellusStorage implements Storage {
 
     protected getKey(key: string) {
         return this.prefix ? `${this.prefix}::${key}` : key;
+    }
+
+    protected setItem(key: string, value: string): void {
+        if (value === null || value === undefined) {
+            return this.removeItem(key);
+        }
+
+        return this.storageAdapter.setItem(this.getKey(key), value);
+    }
+
+    protected getItem(key: string) {
+        return this.storageAdapter.getItem(this.getKey(key));
     }
 }
