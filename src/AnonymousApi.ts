@@ -82,8 +82,8 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             "getAppointmentsAggregated",
             {
                 zipCode: zipCode,
-                from: dayjs(from).toISOString(),
-                to: dayjs(to).toISOString(),
+                from: dayjs(from).utc().toISOString(),
+                to: dayjs(to).utc().toISOString(),
                 radius,
             }
         );
