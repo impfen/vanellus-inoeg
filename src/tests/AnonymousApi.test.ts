@@ -145,12 +145,12 @@ describe("AnonymousApi", () => {
 
         it("shouldn't get unverified providers", async () => {
             await context.createUnverifiedProvider({
-                zipCode: 60312,
+                zipCode: "60312",
             });
 
             const noProviders = await context.anonymousApi.getProviders(
-                60000,
-                69999
+                "60000",
+                "69999"
             );
 
             expect(noProviders).toHaveLength(0);
@@ -158,12 +158,12 @@ describe("AnonymousApi", () => {
 
         it("should get verified providers", async () => {
             const { provider } = await context.createVerifiedProvider({
-                zipCode: 60312,
+                zipCode: "60312",
             });
 
             const providers = await context.anonymousApi.getProviders(
-                60000,
-                69999
+                "60000",
+                "69999"
             );
 
             expect(providers[0].id).toEqual(provider.id);
@@ -175,26 +175,26 @@ describe("AnonymousApi", () => {
             expect(p1.zipCode).toEqual(context.defaultProviderData.zipCode);
 
             const { provider: p2 } = await context.createVerifiedProvider({
-                zipCode: 60312,
+                zipCode: "60312",
             });
 
-            expect(p2.zipCode).toEqual(60312);
+            expect(p2.zipCode).toEqual("60312");
 
             const { provider: p3 } = await context.createVerifiedProvider({
-                zipCode: 65936,
+                zipCode: "65936",
             });
 
-            expect(p3.zipCode).toEqual(65936);
+            expect(p3.zipCode).toEqual("65936");
 
             const { provider: p4 } = await context.createVerifiedProvider({
-                zipCode: 96050,
+                zipCode: "96050",
             });
 
-            expect(p4.zipCode).toEqual(96050);
+            expect(p4.zipCode).toEqual("96050");
 
             const providers = await context.anonymousApi.getProviders(
-                60000,
-                69999
+                "60000",
+                "69999"
             );
 
             expect(providers).toHaveLength(2);

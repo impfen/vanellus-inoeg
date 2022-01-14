@@ -67,6 +67,7 @@ describe("ProviderApi", () => {
             );
 
             expect(provider.name).toEqual(context.defaultProviderData.name);
+            expect(provider.verified).toEqual(false);
         });
 
         it("should retrieve no data while provider is pending", async () => {
@@ -106,12 +107,15 @@ describe("ProviderApi", () => {
         it("should verify provider", async () => {
             const { provider } = await context.createUnverifiedProvider();
 
-            const result = await context.mediatorApi.confirmProvider(
+            const verifiedProvider = await context.mediatorApi.confirmProvider(
                 provider,
                 context.mediatorKeyPairs
             );
 
-            expect(result).toEqual(provider);
+            expect(verifiedProvider).toEqual({
+                ...provider,
+                verified: true,
+            });
         });
 
         it("should get data for verified provider", async () => {
@@ -121,12 +125,48 @@ describe("ProviderApi", () => {
             const { verifiedProvider } =
                 await context.providerApi.checkProvider(providerKeyPairs);
 
-            expect(verifiedProvider).toEqual(provider);
+            expect({
+                ...provider,
+                verified: true,
+            }).toEqual(verifiedProvider);
         });
 
-        it("should update provider", async () => {
+        it("should update verified provider", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
+
+            await context.providerApi.storeProvider(
+                {
+                    ...provider,
+                    name: "New Name",
+                },
+                providerKeyPairs
+            );
+
+            const { verifiedProvider, publicProvider } =
+                await context.providerApi.checkProvider(providerKeyPairs);
+
+            expect({
+                ...verifiedProvider,
+                verified: true,
+            }).toEqual(provider);
+
+            expect(publicProvider?.id).toEqual(provider.id);
+            expect(publicProvider?.email).not.toBeDefined();
+
+            const pendingProviders =
+                await context.mediatorApi.getPendingProviders(
+                    context.mediatorKeyPairs
+                );
+
+            expect(pendingProviders[0]?.id).toEqual(provider.id);
+            expect(pendingProviders[0]?.name).toEqual("New Name");
+            expect(pendingProviders[0]?.verified).toEqual(false);
+        });
+
+        it("should update unverified provider", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createUnverifiedProvider();
 
             await context.providerApi.storeProvider(
                 {
@@ -136,11 +176,11 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            const providerData = await context.providerApi.checkProvider(
-                providerKeyPairs
-            );
+            const { verifiedProvider, publicProvider } =
+                await context.providerApi.checkProvider(providerKeyPairs);
 
-            expect(providerData?.verifiedProvider).toEqual(provider);
+            expect(verifiedProvider).toBeNull();
+            expect(publicProvider).toBeNull();
         });
     });
 

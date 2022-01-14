@@ -12,7 +12,7 @@ export interface ProviderInput {
     name: string;
     street: string;
     city: string;
-    zipCode: number | string;
+    zipCode: string;
     description: string;
     accessible: boolean;
     website?: string;
@@ -26,6 +26,7 @@ export interface PublicProvider extends Omit<ProviderInput, "email"> {
 export interface Provider extends ProviderInput {
     id: string;
     publicKeys: ProviderPublicKeys;
+    verified: boolean;
 }
 
 export interface ProviderData {

@@ -83,7 +83,7 @@ export class TestContext {
         name: "Ada Lovelace",
         street: "Spielstraße 23",
         city: "Berlin",
-        zipCode: 10707,
+        zipCode: "10707",
         description: "This is dummy data",
         email: "ada@lovelace.net",
         website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
@@ -140,13 +140,16 @@ export class TestContext {
     public async createVerifiedProvider(
         providerInput: Partial<ProviderInput> = {}
     ) {
-        const { provider, providerKeyPairs } =
+        const { provider: unverifiedProvider, providerKeyPairs } =
             await this.createUnverifiedProvider({
                 ...this.defaultProviderData,
                 ...providerInput,
             });
 
-        await this.mediatorApi.confirmProvider(provider, this.mediatorKeyPairs);
+        const provider = await this.mediatorApi.confirmProvider(
+            unverifiedProvider,
+            this.mediatorKeyPairs
+        );
 
         return {
             provider,

@@ -31,7 +31,7 @@ describe("MediatorService", () => {
                 context.mediatorKeyPairs
             );
 
-            expect(verifiedProvider).toEqual(provider);
+            expect(verifiedProvider).toEqual({ ...provider, verified: true });
         });
 
         it("should not fetch pending providers after verification", async () => {
@@ -47,7 +47,7 @@ describe("MediatorService", () => {
                     context.mediatorKeyPairs
                 );
 
-            expect(verifiedProvider).toEqual(provider);
+            expect(verifiedProvider).toEqual({ ...provider, verified: true });
             expect(pendingProviders).toEqual([]);
         });
 
@@ -64,8 +64,8 @@ describe("MediatorService", () => {
                     context.mediatorKeyPairs
                 );
 
-            expect(verifiedProvider).toEqual(provider);
-            expect(verifiedProviders).toEqual([provider]);
+            expect(verifiedProvider).toEqual({ ...provider, verified: true });
+            expect(verifiedProviders).toEqual([verifiedProvider]);
         });
     });
 });
