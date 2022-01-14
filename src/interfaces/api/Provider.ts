@@ -13,6 +13,7 @@ export interface SignedProvider {
 
 export interface ApiEncryptedProvider {
     id: string;
+    verified: boolean;
     encryptedData: ECDHData;
 }
 
