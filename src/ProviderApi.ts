@@ -54,15 +54,16 @@ export class ProviderApi extends AbstractApi<
     /**
      * creates an initial Appointment object
      *
+     * @param start     start of the appointment
      * @param duration  length of the appointment in minutes
      * @param vaccine   vaccine offered at the appointment
      * @param slotCount number of people that can be vaccinated
-     * @param startDate startDate of the appointment
+     
      *
      * @return Appointment
      */
     public createAppointment(
-        startDate: Date,
+        start: Date,
         duration: number,
         vaccine: Vaccine,
         slotCount: number,
@@ -72,8 +73,8 @@ export class ProviderApi extends AbstractApi<
     ) {
         const appointment: UnpublishedPublicAppointment = {
             id: randomBytes(32),
-            startDate: dayjs(startDate).utc().toDate(),
-            endDate: dayjs(startDate).utc().add(duration, "minutes").toDate(),
+            startDate: dayjs(start).utc().toDate(),
+            endDate: dayjs(start).utc().add(duration, "minutes").toDate(),
             duration: duration,
             properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
@@ -188,6 +189,8 @@ export class ProviderApi extends AbstractApi<
      * specific property.
      * Returns an empty array if the provider is not verified.
      *
+     * Mainly used to retrieve complete appointment-series.
+     *
      * @return Promise<ProviderAppointment[]>
      */
     public async getProviderAppointmentsByProperty(
@@ -220,7 +223,7 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * Publish appointments to the backend
+     * Publish appointments
      *
      * @return Promise<PublicAppointment[]>
      */
@@ -305,7 +308,8 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
-     * Cancle an appointment
+     * Cancel an appointment
+     *
      * This is simply done by emptying the slots of the appointment
      * and uploading it to the backend-server.
      *

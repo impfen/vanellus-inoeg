@@ -143,6 +143,17 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
+        it("shouldn get providers for single zip", async () => {
+            const { provider } = await context.createVerifiedProvider({
+                zipCode: "30636",
+            });
+
+            const providers = await context.anonymousApi.getProviders("30636");
+
+            expect(providers[0].id).toEqual(provider.id);
+            expect(providers[0].zipCode).toEqual("30636");
+        });
+
         it("shouldn't get unverified providers", async () => {
             await context.createUnverifiedProvider({
                 zipCode: "60312",
