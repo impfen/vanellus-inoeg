@@ -1,0 +1,3 @@
+[submodule "vanellus-inoeg"]
+	path = vanellus-inoeg
+	url = https://github.com/kiebitz-oss/vanellus-inoeg.git

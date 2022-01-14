@@ -28,6 +28,16 @@ export class MediatorApi extends AbstractApi<
     /**
      * Confirm a given, unverified provider
      *
+     *   - check unverifiedProvider(providerId)
+     *      - not found
+     *           - check verifiedProvider(providerId)
+     *               - if found: error
+     *       - found
+     *           - delete from unverifiedProvider
+     *           - save data to verifiedProvider
+     *           - save ConfirmedProviderData encrypted for the provider into confirmedProvider
+     *           - save PublicProviderData into publicProvider
+     *
      * @return Promise<Provider>
      */
     public async confirmProvider(
@@ -45,10 +55,24 @@ export class MediatorApi extends AbstractApi<
             name: provider.name,
             street: provider.street,
             city: provider.city,
-            zipCode: provider.zipCode.toString(),
+            zipCode: provider.zipCode,
             website: provider.website,
             description: provider.description,
             accessible: provider.accessible,
+        };
+
+        const confirmedProvider: Provider = {
+            id: provider.id,
+            name: provider.name,
+            street: provider.street,
+            city: provider.city,
+            zipCode: provider.zipCode,
+            website: provider.website,
+            description: provider.description,
+            accessible: provider.accessible,
+            publicKeys: provider.publicKeys,
+            email: provider.email,
+            verified: true,
         };
 
         const signedKeyData = await sign(
@@ -59,7 +83,7 @@ export class MediatorApi extends AbstractApi<
 
         // this will be stored for the provider, so we add the public key data
         const signedProviderData = await sign(
-            JSON.stringify(provider),
+            JSON.stringify(confirmedProvider),
             mediatorKeyPairs.signing.privateKey,
             mediatorKeyPairs.signing.publicKey
         );
@@ -104,7 +128,7 @@ export class MediatorApi extends AbstractApi<
             );
         }
 
-        return provider;
+        return confirmedProvider;
     }
 
     /**
@@ -145,7 +169,7 @@ export class MediatorApi extends AbstractApi<
         mediatorKeyPairs: MediatorKeyPairs,
         limit = 1000
     ) {
-        return this.decryptProviders(
+        const verifiedProviders = await this.decryptProviders(
             await this.transport.call(
                 "getVerifiedProviderData",
                 { limit },
@@ -153,6 +177,11 @@ export class MediatorApi extends AbstractApi<
             ),
             mediatorKeyPairs
         );
+
+        return verifiedProviders.map((provider) => ({
+            ...provider,
+            verified: true,
+        }));
     }
 
     /**
@@ -190,7 +219,7 @@ export class MediatorApi extends AbstractApi<
 
     protected getQueueDataFromProvider(provider: Provider) {
         const queueData: QueueData = {
-            zipCode: provider.zipCode.toString(),
+            zipCode: provider.zipCode,
             accessible: provider.accessible,
         };
 
