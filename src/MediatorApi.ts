@@ -185,6 +185,29 @@ export class MediatorApi extends AbstractApi<
     }
 
     /**
+     * Returns a single decrypted provider
+     *
+     * A provider is pending until it is confirmed by a mediator.
+     *
+     * @return Promise<Provider>
+     */
+    public async getProvider(
+        providerId: string,
+        mediatorKeyPairs: MediatorKeyPairs
+    ) {
+        const encryptedProvider = await this.transport.call(
+            "getProviderData",
+            { providerID: providerId },
+            mediatorKeyPairs.signing
+        );
+
+        return this.decryptProvider(
+            encryptedProvider.encryptedData,
+            mediatorKeyPairs
+        );
+    }
+
+    /**
      * Decrypts and parses an array of providerData objects returned by the services
      *
      * @return Promise<Provider[]>
