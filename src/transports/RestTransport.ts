@@ -91,6 +91,14 @@ const methodData: Record<
         uri: "db/reset",
         method: "DELETE",
     },
+    isValidMediator: {
+        uri: "mediator/isValid",
+        method: "POST",
+    },
+    isValidProvider: {
+        uri: "provider/isValid",
+        method: "POST",
+    },
     storeProviderData: {
         uri: "providers/data",
         method: "POST",

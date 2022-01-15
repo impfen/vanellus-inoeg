@@ -182,6 +182,21 @@ describe("ProviderApi", () => {
             expect(verifiedProvider).toBeNull();
             expect(publicProvider).toBeNull();
         });
+
+        it("should validate provider", async () => {
+            const unverifiedProvider =
+                await context.createUnverifiedProvider();
+
+            expect(await context.providerApi.isValid(
+              unverifiedProvider.providerKeyPairs
+            )).toEqual(false)
+
+            const verifiedProvider = await context.createVerifiedProvider()
+
+            expect(await context.providerApi.isValid(
+                verifiedProvider.providerKeyPairs
+            )).toEqual(true)
+        });
     });
 
     describe("Appointments", () => {

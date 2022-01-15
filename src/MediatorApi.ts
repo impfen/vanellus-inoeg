@@ -202,6 +202,21 @@ export class MediatorApi extends AbstractApi<
     }
 
     /**
+     * Checks if the backend recognizes our id as a mediator id
+     *
+     * @return Promise<boolean>
+     */
+    public async isValid(
+        mediatorKeyPairs: MediatorKeyPairs,
+    ) {
+        return await this.transport.call(
+            "isValidMediator",
+            undefined,
+            mediatorKeyPairs.signing
+        );
+    }
+
+    /**
      * Decrypts and parses an array of providerData objects returned by the services
      *
      * @return Promise<Provider[]>

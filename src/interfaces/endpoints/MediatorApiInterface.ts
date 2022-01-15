@@ -36,4 +36,7 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
     }) => ApiEncryptedProvider;
 
     checkProviderData: () => Provider;
+
+    // check if the provider is recognized in the backend
+    isValidMediator: () => boolean;
 }

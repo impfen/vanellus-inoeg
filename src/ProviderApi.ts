@@ -440,6 +440,21 @@ export class ProviderApi extends AbstractApi<
     }
 
     /**
+     * Checks if the backend recognizes our id as a provider id
+     *
+     * @return Promise<boolean>
+     */
+    public async isValid(
+        providerKeyPairs: ProviderKeyPairs,
+    ) {
+        return await this.transport.call(
+            "isValidProvider",
+            undefined,
+            providerKeyPairs.signing
+        );
+    }
+
+    /**
      * Backups relevant data of the provider into the storage backend.
      * Used for persistance.
      *

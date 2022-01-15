@@ -46,5 +46,9 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
         code?: string;
     }) => "ok";
 
+    // retrieve verified data of the provider
     checkProviderData: () => ApiSignedProvider;
+
+    // check if the provider is recognized in the backend
+    isValidProvider: () => boolean;
 }

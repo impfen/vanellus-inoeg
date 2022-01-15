@@ -62,7 +62,7 @@ export class JsonRpcTransport<TMethods> extends AbstractTransport<TMethods> {
             TError
         >;
 
-        if (!fetchResponse.ok || !rpcResponse.result) {
+        if (!fetchResponse.ok || rpcResponse.result === undefined) {
             // console.log(method, rpcResponse);
 
             if (rpcResponse.error) {
