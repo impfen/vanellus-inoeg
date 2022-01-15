@@ -6,7 +6,6 @@ import { AbstractApi } from "./AbstractApi";
 import { UnexpectedError } from "./errors";
 import type {
     ApiEncryptedProvider,
-    ECDHData,
     MediatorKeyPairs,
     Provider,
     PublicProvider,
@@ -179,10 +178,27 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs
         );
 
-        return verifiedProviders.map((provider) => ({
-            ...provider,
-            verified: true,
-        }));
+        return verifiedProviders;
+    }
+
+    /**
+     * Returns a single decrypted provider
+     *
+     * A provider is pending until it is confirmed by a mediator.
+     *
+     * @return Promise<Provider>
+     */
+    public async getProvider(
+        providerId: string,
+        mediatorKeyPairs: MediatorKeyPairs
+    ) {
+        const encryptedProvider = await this.transport.call(
+            "getProviderData",
+            { providerID: providerId },
+            mediatorKeyPairs.signing
+        );
+
+        return this.decryptProvider(encryptedProvider, mediatorKeyPairs);
     }
 
     /**
@@ -195,8 +211,8 @@ export class MediatorApi extends AbstractApi<
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         return Promise.all(
-            encryptedProviderDatas.map(({ encryptedData }) =>
-                this.decryptProvider(encryptedData, mediatorKeyPairs)
+            encryptedProviderDatas.map((encryptedProvider) =>
+                this.decryptProvider(encryptedProvider, mediatorKeyPairs)
             )
         );
     }
@@ -207,15 +223,22 @@ export class MediatorApi extends AbstractApi<
      * @return Promise<Provider>
      */
     protected async decryptProvider(
-        encryptedProvider: ECDHData,
+        apiProvider: ApiEncryptedProvider,
         mediatorKeyPairs: MediatorKeyPairs
     ) {
         const decryptedProviderDataString = await ecdhDecrypt(
-            encryptedProvider,
+            apiProvider.encryptedData,
             mediatorKeyPairs.provider.privateKey
         );
 
-        return parseUntrustedJSON<Provider>(decryptedProviderDataString);
+        const provider = parseUntrustedJSON<Provider>(
+            decryptedProviderDataString
+        );
+
+        return {
+            ...provider,
+            verified: apiProvider.verified,
+        };
     }
 
     protected getQueueDataFromProvider(provider: Provider) {
