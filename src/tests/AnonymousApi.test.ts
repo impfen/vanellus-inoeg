@@ -107,9 +107,8 @@ describe("AnonymousApi", () => {
 
             const aggregatedAppointments =
                 await context.anonymousApi.getAggregatedAppointments(
-                    context.defaultProviderData.zipCode,
-                    from,
-                    to
+                    appointment.startDate,
+                    context.defaultProviderData.zipCode
                 );
 
             expect(aggregatedAppointments).toHaveLength(1);

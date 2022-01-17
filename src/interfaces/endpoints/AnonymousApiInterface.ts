@@ -33,16 +33,13 @@ export interface AnonymousApiInterface extends StorageApiInterface {
     }) => ApiProviderAppointments[];
 
     getAppointmentsAggregated: ({
-        zipCode,
-        from,
-        to,
-        radius,
+        date,
+        zipFrom,
+        zipTo,
     }: {
-        zipCode: string;
-        from: string;
-        to: string;
-        radius?: number;
-        aggregate?: boolean;
+        date: string;
+        zipFrom: string;
+        zipTo: string;
     }) => ApiAggregatedProviderAppointment[];
 
     getProvidersByZipCode: ({

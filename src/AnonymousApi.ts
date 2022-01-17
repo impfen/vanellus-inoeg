@@ -73,18 +73,16 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      * @return Promise<AggregatedPublicAppointment[]>
      */
     public async getAggregatedAppointments(
-        zipCode: number | string,
-        from: Date,
-        to: Date,
-        radius = 50
+        date: Date,
+        zipFrom: number | string,
+        zipTo?: number | string
     ) {
         const ApiAggregatedAppointments = await this.transport.call(
             "getAppointmentsAggregated",
             {
-                zipCode: zipCode.toString(),
-                from: dayjs(from).utc().toISOString(),
-                to: dayjs(to).utc().toISOString(),
-                radius,
+                zipFrom: zipFrom.toString(),
+                zipTo: zipTo ? zipTo.toString() : zipFrom.toString(),
+                date: dayjs(date).utc().format("YYYY-MM-DD"),
             }
         );
 

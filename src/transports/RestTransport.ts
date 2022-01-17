@@ -45,6 +45,13 @@ const methodData: Record<
                 .join("/"),
         method: "GET",
     },
+    getAppointmentsAggregated: {
+        uri: (p) =>
+            ["appointments", "aggregated", p.zipFrom, p.zipTo, p.date]
+                .map(encodeURIComponent)
+                .join("/"),
+        method: "GET",
+    },
     getAppointmentsByZipCode: {
         uri: (p) =>
             ["appointments", "zipCode", p.zipCode, p.radius, p.from, p.to]
