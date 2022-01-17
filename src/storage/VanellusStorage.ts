@@ -13,21 +13,17 @@ export class VanellusStorage {
             : new InMemoryStorageAdapter()
     ) {}
 
-    public clear(): void {
-        return this.storageAdapter.clear();
-    }
-
     public key(index: number) {
         return this.storageAdapter.key(index);
     }
 
-    public removeItem(key: string): void {
+    public remove(key: string): void {
         return this.storageAdapter.removeItem(this.getKey(key));
     }
 
     public set(key: string, value: unknown): void {
         if (value === null || value === undefined) {
-            return this.removeItem(key);
+            return this.remove(key);
         }
 
         return this.setItem(key, JSON.stringify(value));
@@ -51,22 +47,26 @@ export class VanellusStorage {
         }
     }
 
-    public deleteAll(prefix: string) {
+    public removeAll() {
+        this.getKeys().forEach((key) => {
+            console.log(key);
+            this.remove(key);
+        });
+    }
+
+    public getKeys() {
+        const prefix = this.prefix ? `${this.prefix}::` : "";
         const keys: string[] = [];
 
         for (let i = 0; i < this.storageAdapter.length; i++) {
             const key = this.storageAdapter.key(i);
 
-            if (key !== null && key.startsWith(prefix)) {
-                keys.push(key);
+            if (key !== null && (!prefix || key.startsWith(prefix))) {
+                keys.push(key.replace(prefix, ""));
             }
         }
 
-        keys.forEach((key) => this.removeItem(key));
-    }
-
-    public get length() {
-        return this.storageAdapter.length;
+        return keys;
     }
 
     protected getKey(key: string) {
@@ -75,7 +75,7 @@ export class VanellusStorage {
 
     protected setItem(key: string, value: string): void {
         if (value === null || value === undefined) {
-            return this.removeItem(key);
+            return this.remove(key);
         }
 
         return this.storageAdapter.setItem(this.getKey(key), value);
