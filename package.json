@@ -124,6 +124,7 @@
         ],
         "sourcemap": true,
         "dts": true,
+        "minify": true,
         "clean": true,
         "format": [
             "esm"
