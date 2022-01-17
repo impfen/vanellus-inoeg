@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import destr from "destr";
+
 /**
  * Forces arbitrary JSON to be handled as if it would be a particular, given interface.
  *
@@ -14,5 +16,5 @@
  * typescript has no way to guarantee them!
  */
 export const parseUntrustedJSON = <T = unknown>(untrusted: string): T => {
-    return JSON.parse(untrusted) as T;
+    return destr(untrusted) as T;
 };
