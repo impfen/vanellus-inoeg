@@ -20,7 +20,6 @@ import type {
     VanellusConfig,
 } from "../interfaces";
 import { dayjs } from "../utils";
-import { vanellusConfig } from "../VanellusConfig";
 
 /**
  * Provides an isolated context for testing vanellus.
@@ -33,6 +32,17 @@ import { vanellusConfig } from "../VanellusConfig";
  * fresh environment with no leakage of data or context in between.
  */
 export class TestContext {
+    public static vanellusConfig: VanellusConfig = {
+        jsonrpc: {
+            appointments:
+                process.env.KIEBITZ_APPOINTMENTS_ENDPOINT ||
+                `http://127.0.0.1:22222/jsonrpc`,
+            storage:
+                process.env.KIEBITZ_STORAGE_ENDPOINT ||
+                `http://127.0.0.1:11111/jsonrpc`,
+        },
+    };
+
     /**
      * Main entrypoint to create and isolate TestContexts.
      * It does all the heavy-lifting for you.
@@ -44,7 +54,7 @@ export class TestContext {
             }/002_admin.json`
         )) as AdminConfig;
 
-        const config: VanellusConfig = vanellusConfig;
+        const config: VanellusConfig = this.vanellusConfig;
         const adminApi = new AdminApi(config);
 
         const adminKeyPairs = await AdminApi.generateAdminKeys(adminConfig);

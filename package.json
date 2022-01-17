@@ -9,22 +9,27 @@
         "type": "git",
         "url": "https://github.com/kiebitz-oss/vanellus-inoeg.git"
     },
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "sideEffects": false,
     "type": "module",
     "exports": {
+        "./testing": {
+            "import": "./dist/tests/index.js",
+            "types": "./dist/tests/index.d.ts"
+        },
         ".": {
-            "require": "./dist/index.cjs",
             "import": "./dist/index.js",
             "types": "./dist/index.d.ts"
         }
     },
-    "main": "./dist/index.cjs",
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "source": "./src/index.ts",
-    "engines": {
-        "node": ">=16.0.0"
-    },
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "tsup --watch",
         "build": "tsup",
@@ -63,7 +68,7 @@
     },
     "jest": {
         "preset": "ts-jest/presets/default-esm",
-        "testEnvironment": "./testing/TestEnvironment",
+        "testEnvironment": "./testing/TestEnvironment.mjs",
         "testMatch": [
             "**/?(*.)+(test).[tj]s?(x)"
         ],
@@ -114,16 +119,15 @@
     },
     "tsup": {
         "entry": [
-            "src/index.ts"
+            "src/index.ts",
+            "src/tests/index.ts"
         ],
-        "splitting": true,
         "sourcemap": true,
         "dts": true,
         "minify": true,
         "clean": true,
         "format": [
-            "esm",
-            "cjs"
+            "esm"
         ]
     }
 }
