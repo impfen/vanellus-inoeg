@@ -314,6 +314,40 @@ describe("ProviderApi", () => {
             expect(appointments[0].id).toEqual(appointment.id);
         });
 
+        it("should retrieve the right number of appointments", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const startAt = dayjs().utc().add(1, "day").hour(10).toDate();
+            const endAt = dayjs().utc().add(1, "day").hour(20).toDate();
+
+            const appointmentSeries =
+                context.providerApi.createAppointmentSeries(
+                    startAt,
+                    endAt,
+                    5,
+                    5,
+                    "biontech",
+                    provider,
+                    providerKeyPairs
+                );
+            await context.providerApi.publishAppointments(
+                appointmentSeries.appointments,
+                providerKeyPairs
+            );
+
+            const appointments =
+                await context.providerApi.getProviderAppointments(
+                    startAt,
+                    endAt,
+                    providerKeyPairs
+                );
+
+            expect(appointments.length).toEqual(
+                appointmentSeries.appointments.length
+            );
+        });
+
         it("should cancel appointments", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
