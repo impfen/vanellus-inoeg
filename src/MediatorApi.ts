@@ -206,9 +206,7 @@ export class MediatorApi extends AbstractApi<
      *
      * @return Promise<boolean>
      */
-    public async isValid(
-        mediatorKeyPairs: MediatorKeyPairs,
-    ) {
+    public async isValid(mediatorKeyPairs: MediatorKeyPairs) {
         return await this.transport.call(
             "isValidMediator",
             undefined,

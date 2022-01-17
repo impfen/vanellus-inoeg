@@ -184,18 +184,21 @@ describe("ProviderApi", () => {
         });
 
         it("should validate provider", async () => {
-            const unverifiedProvider =
-                await context.createUnverifiedProvider();
+            const unverifiedProvider = await context.createUnverifiedProvider();
 
-            expect(await context.providerApi.isValid(
-              unverifiedProvider.providerKeyPairs
-            )).toEqual(false)
+            expect(
+                await context.providerApi.isValid(
+                    unverifiedProvider.providerKeyPairs
+                )
+            ).toEqual(false);
 
-            const verifiedProvider = await context.createVerifiedProvider()
+            const verifiedProvider = await context.createVerifiedProvider();
 
-            expect(await context.providerApi.isValid(
-                verifiedProvider.providerKeyPairs
-            )).toEqual(true)
+            expect(
+                await context.providerApi.isValid(
+                    verifiedProvider.providerKeyPairs
+                )
+            ).toEqual(true);
         });
     });
 
