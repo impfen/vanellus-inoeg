@@ -9,7 +9,6 @@ import type {
     ApiBooking,
     ApiEncryptedBooking,
     ApiProviderProviderAppointments,
-    ApiSignedProvider,
     ApiSignedProviderAppointment,
     Appointment,
     Booking,
@@ -391,20 +390,13 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<ProviderData>
      */
-    public async checkProvider(
-        providerKeyPairs: ProviderKeyPairs,
-        doVerify = false
-    ) {
+    public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
             const signedProvider = await this.transport.call(
                 "checkProviderData",
                 undefined,
                 providerKeyPairs.signing
             );
-
-            if (doVerify) {
-                await this.verifyProvider(signedProvider, providerKeyPairs);
-            }
 
             const encryptedVerifiedProvider = parseUntrustedJSON<ECDHData>(
                 signedProvider.data
@@ -618,15 +610,6 @@ export class ProviderApi extends AbstractApi<
         }
 
         return slotData;
-    }
-
-    protected async verifyProvider(
-        signedProvider: ApiSignedProvider,
-        providerKeyPairs: ProviderKeyPairs
-    ) {
-        await verify([providerKeyPairs.signing.publicKey], signedProvider);
-
-        return true;
     }
 
     protected async verifyProviderAppointment(
