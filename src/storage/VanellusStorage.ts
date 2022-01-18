@@ -49,7 +49,6 @@ export class VanellusStorage {
 
     public removeAll() {
         this.getKeys().forEach((key) => {
-            console.log(key);
             this.remove(key);
         });
     }
