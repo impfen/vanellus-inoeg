@@ -579,6 +579,9 @@ export class ProviderApi extends AbstractApi<
 
                     const appointment: Appointment = {
                         ...enrichAppointment(apiAppointment, provider),
+                        updatedAt: dayjs(signedAppointment.updatedAt)
+                            .utc()
+                            .toDate(),
                         bookings,
                     };
 

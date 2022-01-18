@@ -266,6 +266,13 @@ describe("ProviderApi", () => {
                 providerKeyPairs,
             });
 
+            const initialAppointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
             await context.userApi.bookAppointment(appointment, userQueueToken);
 
             appointment.slotData = [
@@ -293,6 +300,10 @@ describe("ProviderApi", () => {
             expect(appointments[0].properties).toEqual(
                 publishResult.properties
             );
+            expect(appointments[0].updatedAt).not.toEqual(
+                initialAppointments[0].updatedAt
+            );
+            expect(appointments[0].id).toEqual(initialAppointments[0].id);
         });
 
         it("should retrieve published appointments", async () => {

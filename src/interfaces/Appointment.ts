@@ -30,4 +30,5 @@ export interface UnpublishedPublicAppointment extends PublicAppointment {
 
 export interface Appointment extends PublicAppointment {
     bookings: Booking[];
+    updatedAt: Date;
 }
