@@ -2,7 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { AppointmentStatus, ProviderBackup } from "../interfaces";
+import type { ProviderBackup } from "../interfaces";
+import { AppointmentStatus } from "../interfaces";
 import { dayjs } from "../utils";
 import { TestContext } from "./TestContext";
 
