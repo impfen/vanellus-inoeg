@@ -3,7 +3,12 @@
 // README.md contains license information.
 
 import { AbstractApi } from "./AbstractApi";
-import { ApiError, TransportError, VanellusError } from "./errors";
+import {
+    ApiError,
+    TransportError,
+    UnexpectedError,
+    VanellusError,
+} from "./errors";
 import {
     ApiAppointment,
     ApiBooking,
@@ -580,14 +585,34 @@ export class ProviderApi extends AbstractApi<
 
                     let status = AppointmentStatus.UNKNOWN;
 
-                    if (apiAppointment.bookedSlots.length === 0) {
-                        if (apiAppointment.slotData.length > 0) {
+                    const slotCount = apiAppointment.slotData.length;
+                    const bookedCount = apiAppointment.bookedSlots.length;
+
+                    // no booked slots yet
+                    if (bookedCount === 0) {
+                        // and slots available
+                        if (slotCount > 0) {
                             status = AppointmentStatus.OPEN;
-                        } else if (apiAppointment.slotData.length === 0) {
+                            // and no slots available
+                        } else if (slotCount === 0) {
                             status = AppointmentStatus.CANCELED;
                         }
-                    } else if (apiAppointment.bookedSlots.length > 0) {
-                        status = AppointmentStatus.BOOKINGS;
+                        // booked slots already
+                    } else if (bookedCount > 0) {
+                        // but not all slots booked
+                        if (bookedCount < slotCount) {
+                            status = AppointmentStatus.BOOKINGS;
+                            // all slots booked
+                        } else if (bookedCount === slotCount) {
+                            status = AppointmentStatus.FULL;
+                        }
+                    }
+
+                    if (status === AppointmentStatus.UNKNOWN) {
+                        // if we didn't found a valid state, something is off.
+                        throw new UnexpectedError(
+                            `Unknown booking-state of appointment "${apiAppointment.id}"`
+                        );
                     }
 
                     const appointment: Appointment = {
