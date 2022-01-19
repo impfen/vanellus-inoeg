@@ -28,7 +28,16 @@ export interface UnpublishedPublicAppointment extends PublicAppointment {
     unpublished: true;
 }
 
+export enum AppointmentStatus {
+    OPEN,
+    BOOKINGS,
+    CANCELED,
+    FULL,
+    UNKNOWN,
+}
+
 export interface Appointment extends PublicAppointment {
     bookings: Booking[];
+    status: AppointmentStatus;
     updatedAt: Date;
 }

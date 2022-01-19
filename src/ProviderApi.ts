@@ -4,13 +4,14 @@
 
 import { AbstractApi } from "./AbstractApi";
 import { ApiError, TransportError, VanellusError } from "./errors";
-import type {
+import {
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
     ApiProviderProviderAppointments,
     ApiSignedProviderAppointment,
     Appointment,
+    AppointmentStatus,
     Booking,
     BookingData,
     ECDHData,
@@ -577,11 +578,24 @@ export class ProviderApi extends AbstractApi<
                         })
                     );
 
+                    let status = AppointmentStatus.UNKNOWN;
+
+                    if (apiAppointment.bookedSlots.length === 0) {
+                        if (apiAppointment.slotData.length > 0) {
+                            status = AppointmentStatus.OPEN;
+                        } else if (apiAppointment.slotData.length === 0) {
+                            status = AppointmentStatus.CANCELED;
+                        }
+                    } else if (apiAppointment.bookedSlots.length > 0) {
+                        status = AppointmentStatus.BOOKINGS;
+                    }
+
                     const appointment: Appointment = {
                         ...enrichAppointment(apiAppointment, provider),
                         updatedAt: dayjs(signedAppointment.updatedAt)
                             .utc()
                             .toDate(),
+                        status,
                         bookings,
                     };
 
