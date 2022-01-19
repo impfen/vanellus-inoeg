@@ -187,7 +187,7 @@ describe("ProviderApi", () => {
             const unverifiedProvider = await context.createUnverifiedProvider();
 
             expect(
-                await context.providerApi.isValid(
+                await context.providerApi.isValidKeyPairs(
                     unverifiedProvider.providerKeyPairs
                 )
             ).toEqual(false);
@@ -195,7 +195,7 @@ describe("ProviderApi", () => {
             const verifiedProvider = await context.createVerifiedProvider();
 
             expect(
-                await context.providerApi.isValid(
+                await context.providerApi.isValidKeyPairs(
                     verifiedProvider.providerKeyPairs
                 )
             ).toEqual(true);

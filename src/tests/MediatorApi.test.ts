@@ -94,7 +94,9 @@ describe("MediatorService", () => {
 
         it("should validate provider", async () => {
             expect(
-                await context.mediatorApi.isValid(context.mediatorKeyPairs)
+                await context.mediatorApi.isValidKeyPairs(
+                    context.mediatorKeyPairs
+                )
             ).toEqual(true);
         });
     });
