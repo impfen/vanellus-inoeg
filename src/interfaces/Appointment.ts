@@ -29,11 +29,11 @@ export interface UnpublishedPublicAppointment extends PublicAppointment {
 }
 
 export enum AppointmentStatus {
-    OPEN,
-    BOOKINGS,
-    CANCELED,
-    FULL,
-    UNKNOWN,
+    OPEN = "OPEN",
+    BOOKINGS = "BOOKINGS",
+    CANCELED = "CANCELED",
+    FULL = "FULL",
+    UNKNOWN = "UNKNOWN",
 }
 
 export interface Appointment extends PublicAppointment {

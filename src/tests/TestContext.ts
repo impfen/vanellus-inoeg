@@ -189,7 +189,7 @@ export class TestContext {
             startDate,
             10,
             "biontech",
-            10,
+            2,
             provider,
             providerKeyPairs
         );

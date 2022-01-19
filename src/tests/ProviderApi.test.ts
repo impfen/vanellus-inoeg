@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import type { ProviderBackup } from "../interfaces";
+import { AppointmentStatus, ProviderBackup } from "../interfaces";
 import { dayjs } from "../utils";
 import { TestContext } from "./TestContext";
 
@@ -275,11 +275,7 @@ describe("ProviderApi", () => {
 
             await context.userApi.bookAppointment(appointment, userQueueToken);
 
-            appointment.slotData = [
-                appointment.slotData[2],
-                appointment.slotData[1],
-                appointment.slotData[4],
-            ];
+            appointment.slotData = [appointment.slotData[1]];
 
             appointment.duration = 31;
             appointment.properties.vaccine = "moderna";
@@ -304,6 +300,62 @@ describe("ProviderApi", () => {
                 initialAppointments[0].updatedAt
             );
             expect(appointments[0].id).toEqual(initialAppointments[0].id);
+        });
+
+        it("should have correct appointment-status", async () => {
+            const { userQueueToken } = await context.createUserQueueToken();
+
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const appointment = await context.createConfirmedAppointment({
+                provider,
+                providerKeyPairs,
+            });
+
+            const bookings = await context.providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
+
+            expect(bookings[0].status).toEqual(AppointmentStatus.OPEN);
+
+            await context.userApi.bookAppointment(appointment, userQueueToken);
+
+            const bookings2 = await context.providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
+
+            expect(bookings2[0].status).toEqual(AppointmentStatus.BOOKINGS);
+
+            const { userQueueToken: userQueueToken2 } =
+                await context.createUserQueueToken();
+
+            await context.userApi.bookAppointment(appointment, userQueueToken2);
+
+            const bookings3 = await context.providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
+
+            expect(bookings3[0].status).toEqual(AppointmentStatus.FULL);
+
+            await context.providerApi.cancelAppointment(
+                appointment,
+                providerKeyPairs
+            );
+
+            const bookings4 = await context.providerApi.getProviderAppointments(
+                from,
+                to,
+                providerKeyPairs
+            );
+
+            expect(bookings4[0].status).toEqual(AppointmentStatus.CANCELED);
         });
 
         it("should retrieve published appointments", async () => {

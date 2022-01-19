@@ -586,7 +586,7 @@ export class ProviderApi extends AbstractApi<
                     let status = AppointmentStatus.UNKNOWN;
 
                     const slotCount = apiAppointment.slotData.length;
-                    const bookedCount = apiAppointment.bookedSlots.length;
+                    const bookedCount = bookings.length;
 
                     // no booked slots yet
                     if (bookedCount === 0) {
@@ -599,12 +599,12 @@ export class ProviderApi extends AbstractApi<
                         }
                         // booked slots already
                     } else if (bookedCount > 0) {
-                        // but not all slots booked
-                        if (bookedCount < slotCount) {
-                            status = AppointmentStatus.BOOKINGS;
-                            // all slots booked
-                        } else if (bookedCount === slotCount) {
+                        // all slots booked
+                        if (slotCount === bookedCount) {
                             status = AppointmentStatus.FULL;
+                            // open slots available
+                        } else if (slotCount > bookedCount) {
+                            status = AppointmentStatus.BOOKINGS;
                         }
                     }
 

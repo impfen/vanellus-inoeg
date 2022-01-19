@@ -3,10 +3,10 @@
 // README.md contains license information.
 
 export enum BookingStatus {
-    VALID,
-    PROVIDER_CANCELED,
-    USER_CANCELED,
-    UNKNOWN,
+    VALID = "VALID",
+    PROVIDER_CANCELED = "PROVIDER_CANCELED",
+    USER_CANCELED = "USER_CANCELED",
+    UNKNOWN = "UNKNOWN",
 }
 
 export interface Booking {

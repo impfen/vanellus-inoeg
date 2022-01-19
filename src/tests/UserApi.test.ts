@@ -169,7 +169,7 @@ describe("UserApi", () => {
 
             expect(appointments[0].id).toEqual(appointment.id);
             expect(appointments[0].startDate).toEqual(appointment.startDate);
-            expect(appointments[0].slotData).toHaveLength(10);
+            expect(appointments[0].slotData).toHaveLength(2);
         });
 
         it("should book an appointment", async () => {
@@ -316,7 +316,7 @@ describe("UserApi", () => {
                 providerKeyPairs,
             });
 
-            expect(appointment.slotData).toHaveLength(10);
+            expect(appointment.slotData).toHaveLength(2);
 
             const booking = await context.userApi.bookAppointment(
                 appointment,
