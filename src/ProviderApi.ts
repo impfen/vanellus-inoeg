@@ -436,8 +436,8 @@ export class ProviderApi extends AbstractApi<
      *
      * @return Promise<boolean>
      */
-    public async isValid(providerKeyPairs: ProviderKeyPairs) {
-        return await this.transport.call(
+    public async isValidKeyPairs(providerKeyPairs: ProviderKeyPairs) {
+        return this.transport.call(
             "isValidProvider",
             undefined,
             providerKeyPairs.signing
