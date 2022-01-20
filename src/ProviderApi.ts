@@ -289,7 +289,7 @@ export class ProviderApi extends AbstractApi<
      * ATM simply update the properties of the appointment and republish it.
      *
      * @todo improve logic, clearify inner logic
-     * @see  https://github.com/kiebitz-oss/services-inoeg/issues/16
+     * @see  https://github.com/impfen/services-inoeg/issues/16
      *
      * @return Promise<PublicAppointment>
      */

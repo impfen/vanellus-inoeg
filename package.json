@@ -4,10 +4,10 @@
     "version": "0.7.0",
     "license": "AGPL-3.0",
     "author": "KIProtect GmbH",
-    "homepage": "https://github.com/kiebitz-oss/vanellus-inoeg",
+    "homepage": "https://github.com/impfen/vanellus-inoeg",
     "repository": {
         "type": "git",
-        "url": "https://github.com/kiebitz-oss/vanellus-inoeg.git"
+        "url": "https://github.com/impfen/vanellus-inoeg.git"
     },
     "engines": {
         "node": ">=16.0.0"
