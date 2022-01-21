@@ -92,14 +92,14 @@ export class UserApi extends AbstractApi<
      * @returns Promise<boolean>
      */
     public async cancelBooking(
-        appointment: PublicAppointment,
+        booking: Booking,
         userQueueToken: UserQueueToken
     ) {
         const result = await this.transport.call(
             "cancelAppointment",
             {
-                id: appointment.id,
-                providerID: appointment.provider.id,
+                id: booking.appointmentId,
+                providerID: booking.providerId,
                 signedTokenData: userQueueToken.signedToken,
             },
             userQueueToken.keyPairs.signing
