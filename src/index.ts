@@ -8,7 +8,6 @@ export * from "./errors";
 export * from "./interfaces";
 export * from "./MediatorApi";
 export * from "./ProviderApi";
-export * from "./storage";
 export * from "./StorageApi";
 export * from "./transports";
 export * from "./UserApi";
