@@ -397,10 +397,6 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs
         );
 
-        if (!appointmentSeries) {
-            return null;
-        }
-
         // Little hack to use TS as typeguard on the publishAppointment()-method
         // and get some more control over the data-flow
         const unpublishedAppointments: UnpublishedPublicAppointment[] =

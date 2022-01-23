@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { NotFoundError } from "..";
 import type { ProviderBackup } from "../interfaces";
 import { AppointmentStatus } from "../interfaces";
 import { dayjs } from "../utils";
@@ -626,6 +627,17 @@ describe("ProviderApi", () => {
             expect(resultFetch2[0].properties.vaccine).toEqual(
                 appointmentSeries2.appointments[0].properties.vaccine
             );
+        });
+
+        it("should throw on unknown series", async () => {
+            const { providerKeyPairs } = await context.createVerifiedProvider();
+
+            const shouldThrow = context.providerApi.getAppointmentSeries(
+                "non-existant",
+                providerKeyPairs
+            );
+
+            await expect(shouldThrow).rejects.toThrowError(NotFoundError);
         });
 
         it("should cancel a specific series", async () => {

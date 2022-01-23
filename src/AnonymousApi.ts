@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { NotFoundError, TransportError } from ".";
 import { AbstractApi } from "./AbstractApi";
 import type {
     AggregatedPublicAppointment,
@@ -24,15 +25,27 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
         providerId: string,
         doVerify = false
     ) {
-        const signedAppointments = await this.transport.call("getAppointment", {
-            id: appointmentId,
-            providerID: providerId,
-        });
+        try {
+            const signedAppointments = await this.transport.call(
+                "getAppointment",
+                {
+                    id: appointmentId,
+                    providerID: providerId,
+                }
+            );
 
-        return (
-            (await this.parseAppointments(signedAppointments, doVerify))[0] ||
-            null
-        );
+            return (
+                await this.parseAppointments(signedAppointments, doVerify)
+            )[0];
+        } catch (error) {
+            if (error instanceof TransportError && error.code === -32602) {
+                throw new NotFoundError(
+                    `Couldn't find appointment with id ${appointmentId}`
+                );
+            }
+
+            throw error;
+        }
     }
 
     /**
