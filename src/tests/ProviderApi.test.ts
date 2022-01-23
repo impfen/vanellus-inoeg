@@ -314,49 +314,61 @@ describe("ProviderApi", () => {
                 providerKeyPairs,
             });
 
-            const bookings = await context.providerApi.getProviderAppointments(
-                from,
-                to,
-                providerKeyPairs
-            );
+            const providerAppointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
 
-            expect(bookings[0].status).toEqual(AppointmentStatus.OPEN);
+            expect(providerAppointments[0].status).toEqual(
+                AppointmentStatus.OPEN
+            );
 
             await context.userApi.bookAppointment(appointment, userQueueToken);
 
-            const bookings2 = await context.providerApi.getProviderAppointments(
-                from,
-                to,
-                providerKeyPairs
-            );
+            const providerAppointments2 =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
 
-            expect(bookings2[0].status).toEqual(AppointmentStatus.BOOKINGS);
+            expect(providerAppointments2[0].status).toEqual(
+                AppointmentStatus.BOOKINGS
+            );
 
             const { userQueueToken: userQueueToken2 } =
                 await context.createUserQueueToken();
 
             await context.userApi.bookAppointment(appointment, userQueueToken2);
 
-            const bookings3 = await context.providerApi.getProviderAppointments(
-                from,
-                to,
-                providerKeyPairs
-            );
+            const providerAppointments3 =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
 
-            expect(bookings3[0].status).toEqual(AppointmentStatus.FULL);
+            expect(providerAppointments3[0].status).toEqual(
+                AppointmentStatus.FULL
+            );
 
             await context.providerApi.cancelAppointment(
-                appointment,
+                providerAppointments[0],
                 providerKeyPairs
             );
 
-            const bookings4 = await context.providerApi.getProviderAppointments(
-                from,
-                to,
-                providerKeyPairs
-            );
+            const providerAppointments4 =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
 
-            expect(bookings4[0].status).toEqual(AppointmentStatus.CANCELED);
+            expect(providerAppointments4[0].status).toEqual(
+                AppointmentStatus.CANCELED
+            );
         });
 
         it("should retrieve published appointments", async () => {
@@ -416,13 +428,20 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const appointment = await context.createConfirmedAppointment({
+            await context.createConfirmedAppointment({
                 provider,
                 providerKeyPairs,
             });
 
+            const appointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
             const result = await context.providerApi.cancelAppointment(
-                appointment,
+                appointments[0],
                 providerKeyPairs
             );
 
@@ -433,13 +452,20 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const appointment = await context.createConfirmedAppointment({
+            await context.createConfirmedAppointment({
                 provider,
                 providerKeyPairs,
             });
 
+            const providerAppointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
             await context.providerApi.cancelAppointment(
-                appointment,
+                providerAppointments[0],
                 providerKeyPairs
             );
 

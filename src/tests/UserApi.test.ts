@@ -376,8 +376,15 @@ describe("UserApi", () => {
             expect(booking.appointment.id).toEqual(appointment.id);
             expect(booking.appointment.provider.id).toEqual(provider.id);
 
+            const providerAppointments =
+                await context.providerApi.getProviderAppointments(
+                    from,
+                    to,
+                    providerKeyPairs
+                );
+
             const cancelResult = await context.providerApi.cancelAppointment(
-                appointment,
+                providerAppointments[0],
                 providerKeyPairs
             );
 

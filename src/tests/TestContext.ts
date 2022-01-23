@@ -180,7 +180,7 @@ export class TestContext {
         const startDate = dayjs()
             .utc()
             .add(1, "day")
-            .hour(7)
+            .hour(10)
             .minute(0)
             .second(0)
             .toDate();
