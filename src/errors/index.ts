@@ -4,6 +4,7 @@
 
 export * from "./ApiError";
 export * from "./AuthError";
+export * from "./NotFoundError";
 export * from "./TransportError";
 export * from "./UnexpectedError";
 export * from "./VanellusError";

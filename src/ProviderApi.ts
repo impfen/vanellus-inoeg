@@ -5,11 +5,11 @@
 import { AbstractApi } from "./AbstractApi";
 import {
     ApiError,
+    NotFoundError,
     TransportError,
     UnexpectedError,
     VanellusError,
 } from "./errors";
-import { NotFoundError } from "./errors/NotFoundError";
 import {
     ApiAppointment,
     ApiBooking,
