@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import type { Booking } from "./Booking";
+import type { ProviderBooking } from "./Booking";
 import type { PublicProvider } from "./Provider";
 
 export interface Slot {
@@ -37,7 +37,7 @@ export enum AppointmentStatus {
 }
 
 export interface Appointment extends PublicAppointment {
-    bookings: Booking[];
+    bookings: ProviderBooking[];
     status: AppointmentStatus;
     updatedAt: Date;
 }

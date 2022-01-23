@@ -2,6 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import {
+    AggregatedPublicAppointment,
+    SignedData,
+    UserKeyPairs,
+    UserToken,
+} from ".";
+
 export enum BookingStatus {
     VALID = "VALID",
     PROVIDER_CANCELED = "PROVIDER_CANCELED",
@@ -9,9 +16,13 @@ export enum BookingStatus {
     UNKNOWN = "UNKNOWN",
 }
 
-export interface Booking {
+export interface ProviderBooking {
     slotId: string;
-    appointmentId: string;
-    providerId: string;
-    code: string;
+    appointment: AggregatedPublicAppointment;
+    token: UserToken;
+    signedToken: SignedData;
+}
+
+export interface Booking extends ProviderBooking {
+    keyPairs: UserKeyPairs;
 }
