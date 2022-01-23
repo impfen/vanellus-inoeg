@@ -321,7 +321,7 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<PublicAppointment>
      */
     public async cancelAppointment(
-        appointment: PublicAppointment,
+        appointment: Appointment,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // Little hack to use TS as typeguard on the publishAppointment()-method
@@ -332,12 +332,18 @@ export class ProviderApi extends AbstractApi<
             unpublished: true,
         };
 
-        const canceledAppointments = await this.publishAppointments(
+        const updatedAppointments = await this.publishAppointments(
             unpublishedAppointment,
             providerKeyPairs
         );
 
-        return canceledAppointments[0];
+        const canceledAppointment: Appointment = {
+            ...appointment,
+            ...updatedAppointments[0],
+            status: AppointmentStatus.CANCELED,
+        };
+
+        return canceledAppointment;
     }
 
     /**
