@@ -9,6 +9,7 @@ import {
     UnexpectedError,
     VanellusError,
 } from "./errors";
+import { NotFoundError } from "./errors/NotFoundError";
 import {
     ApiAppointment,
     ApiBooking,
@@ -16,6 +17,7 @@ import {
     ApiProviderProviderAppointments,
     ApiSignedProviderAppointment,
     Appointment,
+    AppointmentSeries,
     AppointmentStatus,
     BookingData,
     ECDHData,
@@ -344,6 +346,84 @@ export class ProviderApi extends AbstractApi<
         };
 
         return canceledAppointment;
+    }
+
+    /**
+     * Retrieves a appointment-series
+     *
+     * @TODO handle updates between creation and fetch. At the moment, we will blindly assume no changes.
+     *
+     * @throws NotFoundError
+     */
+    public async getAppointmentSeries(
+        appointmentSeriesId: string,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        const appointments = await this.getProviderAppointmentsByProperty(
+            "seriesId",
+            appointmentSeriesId,
+            providerKeyPairs
+        );
+
+        if (!appointments[0]) {
+            throw new NotFoundError(
+                `Couldn't find appointment-series with id ${appointmentSeriesId}`
+            );
+        }
+
+        const appointmentSeries: AppointmentSeries = {
+            id: appointmentSeriesId,
+            startAt: appointments[0].startDate,
+            endAt: appointments[0].endDate,
+            interval: appointments[0].duration,
+            vaccine: appointments[0].properties?.vaccine as string,
+            slotCount: appointments[0].slotData.length,
+            provider: appointments[0].provider,
+            appointments,
+        };
+
+        return appointmentSeries;
+    }
+
+    /**
+     * Cancel a complete appointment-series
+     */
+    public async cancelAppointmentSeries(
+        appointmentSeriesId: string,
+        providerKeyPairs: ProviderKeyPairs
+    ) {
+        const appointmentSeries = await this.getAppointmentSeries(
+            appointmentSeriesId,
+            providerKeyPairs
+        );
+
+        if (!appointmentSeries) {
+            return null;
+        }
+
+        // Little hack to use TS as typeguard on the publishAppointment()-method
+        // and get some more control over the data-flow
+        const unpublishedAppointments: UnpublishedPublicAppointment[] =
+            appointmentSeries.appointments.map((appointment) => ({
+                ...appointment,
+                slotData: [],
+                unpublished: true,
+            }));
+
+        await this.publishAppointments(
+            unpublishedAppointments,
+            providerKeyPairs
+        );
+
+        appointmentSeries.appointments = appointmentSeries.appointments.map(
+            (updatedAppointment) => ({
+                ...updatedAppointment,
+                slotData: [],
+                status: AppointmentStatus.CANCELED,
+            })
+        );
+
+        return appointmentSeries;
     }
 
     /**

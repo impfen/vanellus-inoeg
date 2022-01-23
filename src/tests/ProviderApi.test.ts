@@ -390,7 +390,7 @@ describe("ProviderApi", () => {
             expect(appointments[0].id).toEqual(appointment.id);
         });
 
-        it("should retrieve the right number of appointments", async () => {
+        it("should retrieve the correct number of appointments", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
@@ -407,6 +407,7 @@ describe("ProviderApi", () => {
                     provider,
                     providerKeyPairs
                 );
+
             await context.providerApi.publishAppointments(
                 appointmentSeries.appointments,
                 providerKeyPairs
@@ -598,18 +599,16 @@ describe("ProviderApi", () => {
             );
             expect(resultPub2).toHaveLength(12);
 
-            const resultFetch1 =
-                await context.providerApi.getProviderAppointmentsByProperty(
-                    "seriesId",
-                    appointmentSeries1.id,
-                    providerKeyPairs
-                );
+            const resultFetch1 = await context.providerApi.getAppointmentSeries(
+                appointmentSeries1.id,
+                providerKeyPairs
+            );
 
-            expect(resultFetch1).toHaveLength(24);
-            expect(resultFetch1[0].properties.seriesId).toEqual(
+            expect(resultFetch1.appointments).toHaveLength(24);
+            expect(resultFetch1.id).toEqual(
                 appointmentSeries1.appointments[0].properties.seriesId
             );
-            expect(resultFetch1[0].properties.vaccine).toEqual(
+            expect(resultFetch1.vaccine).toEqual(
                 appointmentSeries1.appointments[0].properties.vaccine
             );
 
@@ -626,6 +625,56 @@ describe("ProviderApi", () => {
             );
             expect(resultFetch2[0].properties.vaccine).toEqual(
                 appointmentSeries2.appointments[0].properties.vaccine
+            );
+        });
+
+        it("should cancel a specific series", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const startAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(8)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const endAt = dayjs()
+                .utc()
+                .add(1, "day")
+                .hour(10)
+                .minute(0)
+                .second(0)
+                .toDate();
+
+            const appointmentSeries1 =
+                context.providerApi.createAppointmentSeries(
+                    startAt,
+                    endAt,
+                    5,
+                    5,
+                    "biontech",
+                    provider,
+                    providerKeyPairs
+                );
+
+            const resultPub1 = await context.providerApi.publishAppointments(
+                appointmentSeries1.appointments,
+                providerKeyPairs
+            );
+
+            expect(resultPub1).toHaveLength(24);
+
+            const canceledSeries =
+                await context.providerApi.cancelAppointmentSeries(
+                    appointmentSeries1.id,
+                    providerKeyPairs
+                );
+
+            expect(canceledSeries?.appointments).toHaveLength(24);
+            expect(canceledSeries?.appointments[0].status).toEqual(
+                AppointmentStatus.CANCELED
             );
         });
     });
