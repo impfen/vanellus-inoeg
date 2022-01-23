@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { NotFoundError } from "..";
 import { dayjs } from "../utils";
 import { TestContext } from "./TestContext";
 
@@ -75,6 +76,35 @@ describe("AnonymousApi", () => {
             );
 
             expect(appointment.id).toEqual(confirmedAppointment.id);
+        });
+
+        it("should throw on non-existant appointment-id", async () => {
+            const { provider } = await context.createVerifiedProvider();
+
+            const shouldThrow = context.anonymousApi.getAppointment(
+                "non-existant",
+                provider.id
+            );
+
+            await expect(shouldThrow).rejects.toThrowError(NotFoundError);
+        });
+
+        it("should throw on non-existant provider-id", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            const confirmedAppointment =
+                await context.createConfirmedAppointment({
+                    providerKeyPairs,
+                    provider,
+                });
+
+            const shouldThrow = context.anonymousApi.getAppointment(
+                confirmedAppointment.id,
+                "non-existant"
+            );
+
+            await expect(shouldThrow).rejects.toThrowError(NotFoundError);
         });
 
         it("should get appointments", async () => {
