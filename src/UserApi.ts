@@ -70,9 +70,10 @@ export class UserApi extends AbstractApi<
 
             const booking: Booking = {
                 slotId: apiBooking.id,
-                appointmentId: appointment.id,
-                providerId: appointment.provider.id,
-                code: userQueueToken.userToken.code,
+                token: userQueueToken.userToken,
+                signedToken: userQueueToken.signedToken,
+                keyPairs: userQueueToken.keyPairs,
+                appointment,
             };
 
             return booking;
@@ -91,18 +92,15 @@ export class UserApi extends AbstractApi<
      *
      * @returns Promise<boolean>
      */
-    public async cancelBooking(
-        booking: Booking,
-        userQueueToken: UserQueueToken
-    ) {
+    public async cancelBooking(booking: Booking) {
         const result = await this.transport.call(
             "cancelAppointment",
             {
-                id: booking.appointmentId,
-                providerID: booking.providerId,
-                signedTokenData: userQueueToken.signedToken,
+                id: booking.appointment.id,
+                providerID: booking.appointment.provider.id,
+                signedTokenData: booking.signedToken,
             },
-            userQueueToken.keyPairs.signing
+            booking.keyPairs.signing
         );
 
         if ("ok" !== result) {
@@ -123,8 +121,8 @@ export class UserApi extends AbstractApi<
         const anonApi = new AnonymousApi(this.config);
 
         const appointment = await anonApi.getAppointment(
-            booking.appointmentId,
-            booking.providerId,
+            booking.appointment.id,
+            booking.appointment.provider.id,
             true
         );
 

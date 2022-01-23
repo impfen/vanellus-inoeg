@@ -17,11 +17,11 @@ import {
     ApiSignedProviderAppointment,
     Appointment,
     AppointmentStatus,
-    Booking,
     BookingData,
     ECDHData,
     Provider,
     ProviderBackup,
+    ProviderBooking,
     ProviderInput,
     ProviderKeyPairs,
     PublicAppointment,
@@ -574,12 +574,17 @@ export class ProviderApi extends AbstractApi<
                         providerKeyPairs
                     );
 
-                    const bookings: Booking[] = apiBookings.map(
+                    const enrichedAppointment = enrichAppointment(
+                        apiAppointment,
+                        provider
+                    );
+
+                    const bookings: ProviderBooking[] = apiBookings.map(
                         (apiBooking) => ({
                             slotId: apiBooking.id,
-                            appointmentId: apiAppointment.id,
-                            providerId: provider.id,
-                            code: apiBooking.userToken.code,
+                            appointment: enrichedAppointment,
+                            token: apiBooking.userToken,
+                            signedToken: apiBooking.signedToken,
                         })
                     );
 
@@ -616,7 +621,7 @@ export class ProviderApi extends AbstractApi<
                     }
 
                     const appointment: Appointment = {
-                        ...enrichAppointment(apiAppointment, provider),
+                        ...enrichedAppointment,
                         updatedAt: dayjs(signedAppointment.updatedAt)
                             .utc()
                             .toDate(),

@@ -191,9 +191,9 @@ describe("UserApi", () => {
 
             expect(booking).not.toBeNull();
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
             const status = await context.userApi.checkBookingStatus(booking);
 
@@ -218,9 +218,9 @@ describe("UserApi", () => {
             );
 
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
             const doubleBooking = context.userApi.bookAppointment(
                 appointment,
@@ -252,9 +252,9 @@ describe("UserApi", () => {
             );
 
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
             const appointments =
                 await context.providerApi.getProviderAppointments(
@@ -263,7 +263,7 @@ describe("UserApi", () => {
                     providerKeyPairs
                 );
 
-            expect(appointments[0].bookings[0].code).toEqual(
+            expect(appointments[0].bookings[0].token.code).toEqual(
                 userSecret.slice(0, 4)
             );
         });
@@ -286,14 +286,11 @@ describe("UserApi", () => {
             );
 
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
-            const cancelResult = await context.userApi.cancelBooking(
-                booking,
-                userQueueToken
-            );
+            const cancelResult = await context.userApi.cancelBooking(booking);
 
             expect(cancelResult).toBeTruthy();
 
@@ -324,9 +321,9 @@ describe("UserApi", () => {
             );
 
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
             const bookedAppointment = await context.anonymousApi.getAppointment(
                 appointment.id,
@@ -335,10 +332,7 @@ describe("UserApi", () => {
 
             expect(bookedAppointment.slotData[0].open).toEqual(false);
 
-            const cancelResult = await context.userApi.cancelBooking(
-                booking,
-                userQueueToken
-            );
+            const cancelResult = await context.userApi.cancelBooking(booking);
 
             expect(cancelResult).toBeTruthy();
 
@@ -378,9 +372,9 @@ describe("UserApi", () => {
             );
 
             expect(booking.slotId).toBeDefined();
-            expect(booking.code).toEqual(userSecret.slice(0, 4));
-            expect(booking.appointmentId).toEqual(appointment.id);
-            expect(booking.providerId).toEqual(provider.id);
+            expect(booking.token.code).toEqual(userSecret.slice(0, 4));
+            expect(booking.appointment.id).toEqual(appointment.id);
+            expect(booking.appointment.provider.id).toEqual(provider.id);
 
             const cancelResult = await context.providerApi.cancelAppointment(
                 appointment,
