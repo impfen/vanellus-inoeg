@@ -13,6 +13,7 @@ export const decodeBase32 = (base32: string) => {
     return Buffer.from(base32Decode(base32, "Crockford")).toString();
 };
 
+// https://base64.guru/standards/base64url
 export const encodeBase64url = (string: string | Buffer) => {
     return Buffer.from(string)
         .toString("base64")
@@ -22,11 +23,14 @@ export const encodeBase64url = (string: string | Buffer) => {
 };
 
 export const decodeBase64url = (base64url: string) => {
-    const string = Buffer.from(base64url, "base64").toString();
-
-    return (string + "===".slice((string.length + 3) % 4))
-        .replace(/-/g, "+")
-        .replace(/_/g, "/");
+    return Buffer.from(
+        base64url +
+            "==="
+                .slice((base64url.length + 3) % 4)
+                .replace(/-/g, "+")
+                .replace(/_/g, "/"),
+        "base64"
+    ).toString();
 };
 
 export const bufferToBase64 = (buffer: ArrayBufferLike) => {
