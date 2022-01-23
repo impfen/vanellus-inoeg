@@ -11,3 +11,4 @@ export * from "./ProviderApi";
 export * from "./StorageApi";
 export * from "./transports";
 export * from "./UserApi";
+export * from "./utils/base64url";

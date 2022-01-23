@@ -8,9 +8,7 @@ import {
     base64ToBuffer,
     bufferToBase64,
     decodeBase32,
-    decodeBase64url,
     encodeBase32,
-    encodeBase64url,
     stringToArrayBuffer,
 } from "../../utils/conversion";
 
@@ -32,22 +30,6 @@ describe("conversions", () => {
         expect(result.toString()).toMatchInlineSnapshot(
             `"This is my testbuffer"`
         );
-    });
-
-    it("encodeBase64url", () => {
-        const base64url = encodeBase64url("This is my testbuffer");
-
-        expect(base64url).toMatchInlineSnapshot(
-            `"VGhpcyBpcyBteSB0ZXN0YnVmZmVy"`
-        );
-    });
-
-    it("decodeBase64url", () => {
-        const base64url = encodeBase64url("This is my testbuffer");
-
-        const result = decodeBase64url(base64url);
-
-        expect(result).toMatchInlineSnapshot(`"This is my testbuffer"`);
     });
 
     it("stringToArrayBuffer", () => {
