@@ -31,6 +31,7 @@ export const enrichAppointment = (
                 (aslot: BookedSlot) => aslot.id === slot.id
             ),
         })),
+        vaccine: appointmentData.vaccine,
     };
 
     return appointment;
@@ -44,6 +45,7 @@ export const unenrichAppointment = (appointment: PublicAppointment) => {
         properties: appointment.properties,
         publicKey: appointment.publicKey,
         slotData: appointment.slotData,
+        vaccine: appointment.vaccine,
         bookedSlots: [],
     };
 

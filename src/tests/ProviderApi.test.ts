@@ -517,9 +517,9 @@ describe("ProviderApi", () => {
             expect(appointmentSeries.endAt).toEqual(endAt);
             expect(appointmentSeries.provider.id).toEqual(provider.id);
             expect(appointmentSeries.appointments[0].slotData).toHaveLength(5);
-            expect(
-                appointmentSeries.appointments[0].properties.vaccine
-            ).toEqual("biontech");
+            expect(appointmentSeries.appointments[0].vaccine).toEqual(
+                "biontech"
+            );
             expect(appointmentSeries.appointments).toHaveLength(60);
 
             const result = await context.providerApi.publishAppointments(
@@ -596,14 +596,14 @@ describe("ProviderApi", () => {
             expect(resultFetch1.id).toEqual(
                 appointmentSeries1.appointments[0].properties.seriesId
             );
-            expect(resultFetch1.vaccine).toEqual(
-                appointmentSeries1.appointments[0].properties.vaccine
+            expect(resultFetch1.appointments[0].vaccine).toEqual(
+                appointmentSeries1.appointments[0].vaccine
             );
 
             const resultFetch2 =
                 await context.providerApi.getProviderAppointmentsByProperty(
-                    "vaccine",
-                    "moderna",
+                    "seriesId",
+                    appointmentSeries2.id,
                     providerKeyPairs
                 );
 
@@ -611,8 +611,8 @@ describe("ProviderApi", () => {
             expect(resultFetch2[0].properties.seriesId).toEqual(
                 appointmentSeries2.appointments[0].properties.seriesId
             );
-            expect(resultFetch2[0].properties.vaccine).toEqual(
-                appointmentSeries2.appointments[0].properties.vaccine
+            expect(resultFetch2[0].vaccine).toEqual(
+                appointmentSeries2.appointments[0].vaccine
             );
         });
 

@@ -5,6 +5,7 @@
 import type { Dayjs } from "dayjs";
 import type { ProviderBooking } from "./Booking";
 import type { PublicProvider } from "./Provider";
+import type { Vaccine } from "./Vaccine";
 
 export interface Slot {
     id: string;
@@ -17,6 +18,7 @@ export interface AggregatedPublicAppointment {
     startDate: Dayjs;
     endDate: Dayjs;
     duration: number;
+    vaccine: Vaccine;
     properties: Record<string, unknown>;
 }
 
