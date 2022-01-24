@@ -244,14 +244,12 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.provider.privateKey
         );
 
-        const provider = parseUntrustedJSON<Provider>(
-            decryptedProviderDataString
-        );
-
-        return {
-            ...provider,
+        const provider: Provider = {
+            ...parseUntrustedJSON<Provider>(decryptedProviderDataString),
             verified: apiProvider.verified,
         };
+
+        return provider;
     }
 
     protected getQueueDataFromProvider(provider: Provider) {
