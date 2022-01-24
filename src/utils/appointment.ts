@@ -37,8 +37,6 @@ export const enrichAppointment = (
 };
 
 export const unenrichAppointment = (appointment: PublicAppointment) => {
-    console.log("utc", appointment.startDate.utc().toISOString());
-    console.log("non", appointment.startDate.toISOString());
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
         timestamp: appointment.startDate.utc().toISOString(),

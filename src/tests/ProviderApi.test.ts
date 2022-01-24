@@ -231,8 +231,6 @@ describe("ProviderApi", () => {
 
             expect(appointment).toHaveProperty("id");
             expect(appointment.startDate).toEqual(date);
-            expect(appointment.startDate.isUTC()).toBeTruthy();
-            expect(appointment.endDate.isUTC()).toBeTruthy();
         });
 
         it("should publish appointments", async () => {

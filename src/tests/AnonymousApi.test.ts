@@ -123,8 +123,6 @@ describe("AnonymousApi", () => {
             );
 
             expect(appointments).toHaveLength(1);
-            expect(appointments[0].startDate.isUTC()).toBeTruthy();
-            expect(appointments[0].endDate.isUTC()).toBeTruthy();
             expect(appointments[0].id).toEqual(appointment.id);
         });
 
@@ -144,8 +142,6 @@ describe("AnonymousApi", () => {
                 );
 
             expect(aggregatedAppointments).toHaveLength(1);
-            expect(aggregatedAppointments[0].startDate.isUTC()).toBeTruthy();
-            expect(aggregatedAppointments[0].endDate.isUTC()).toBeTruthy();
             expect(aggregatedAppointments[0].id).toEqual(appointment.id);
             expect(aggregatedAppointments[0]).not.toHaveProperty("slotData");
         });
