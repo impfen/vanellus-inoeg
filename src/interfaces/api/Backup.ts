@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { AESData } from "./crypto";
+import type { AESData } from "./crypto";
 
 export interface Backup {
     createdAt: string;

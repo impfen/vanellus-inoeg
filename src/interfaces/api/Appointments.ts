@@ -2,10 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { PublicProvider, Slot } from "..";
-import { ApiEncryptedBooking } from "./Booking";
-import { SignedData } from "./crypto";
-import { ApiSignedProviderData } from "./Provider";
+import type { Slot } from "../Appointment";
+import type { PublicProvider } from "../Provider";
+import type { ApiEncryptedBooking } from "./Booking";
+import type { SignedData } from "./crypto";
+import type { ApiSignedProviderData } from "./Provider";
 
 export interface BookedSlot {
     id: string;

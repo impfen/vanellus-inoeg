@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
 import {
     AdminApi,
     AnonymousApi,
@@ -19,7 +20,6 @@ import type {
     ProviderKeyPairs,
     VanellusConfig,
 } from "../interfaces";
-import { dayjs } from "../utils";
 
 /**
  * Provides an isolated context for testing vanellus.
@@ -177,13 +177,12 @@ export class TestContext {
         provider: Provider;
         providerKeyPairs: ProviderKeyPairs;
     }) {
-        const startDate = dayjs()
+        const startDate = dayjs
             .utc()
             .add(1, "day")
             .hour(10)
             .minute(0)
-            .second(0)
-            .toDate();
+            .second(0);
 
         return this.providerApi.createAppointment(
             startDate,

@@ -2,13 +2,13 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
 import type {
     ApiAppointment,
     BookedSlot,
     PublicAppointment,
     PublicProvider,
 } from "../interfaces";
-import { dayjs } from "./dayjs";
 
 export const enrichAppointment = (
     appointmentData: ApiAppointment,
@@ -17,11 +17,10 @@ export const enrichAppointment = (
     const appointment: PublicAppointment = {
         id: appointmentData.id,
         provider: provider,
-        startDate: dayjs(appointmentData.timestamp).utc().toDate(),
-        endDate: dayjs(appointmentData.timestamp)
-            .utc()
-            .add(appointmentData.duration, "minutes")
-            .toDate(),
+        startDate: dayjs.utc(appointmentData.timestamp),
+        endDate: dayjs
+            .utc(appointmentData.timestamp)
+            .add(appointmentData.duration, "minutes"),
         duration: appointmentData.duration,
         properties: appointmentData.properties,
         publicKey: appointmentData.publicKey,
@@ -39,7 +38,7 @@ export const enrichAppointment = (
 export const unenrichAppointment = (appointment: PublicAppointment) => {
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
-        timestamp: dayjs(appointment.startDate).utc().toISOString(),
+        timestamp: dayjs.utc(appointment.startDate).toISOString(),
         duration: appointment.duration,
         properties: appointment.properties,
         publicKey: appointment.publicKey,

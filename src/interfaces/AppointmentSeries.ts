@@ -2,11 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import type {
-    Appointment,
-    PublicProvider,
-    UnpublishedPublicAppointment,
-} from ".";
+import type { Dayjs } from "dayjs";
+import type { Appointment, UnpublishedPublicAppointment } from "./Appointment";
+import type { PublicProvider } from "./Provider";
 import type { Vaccine } from "./Vaccine";
 
 // export enum AppointmentSeriesStatus {
@@ -18,8 +16,8 @@ import type { Vaccine } from "./Vaccine";
 
 interface BaseAppointmentSeries {
     id: string;
-    startAt: Date;
-    endAt: Date;
+    startAt: Dayjs;
+    endAt: Dayjs;
     interval: number;
     slotCount: number;
     vaccine: Vaccine;

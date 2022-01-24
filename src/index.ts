@@ -2,6 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+
 export * from "./AdminApi";
 export * from "./AnonymousApi";
 export * from "./errors";

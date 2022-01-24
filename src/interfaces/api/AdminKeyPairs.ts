@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ActorKeyPairs } from "./ActorKeyPairs";
-import { KeyPair } from "./crypto";
+import type { ActorKeyPairs } from "./ActorKeyPairs";
+import type { KeyPair } from "./crypto";
 
 export interface AdminKeyPairs extends ActorKeyPairs {
     signing: KeyPair;

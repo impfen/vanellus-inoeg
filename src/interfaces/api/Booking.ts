@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { UserToken } from "..";
-import { ECDHData, SignedData } from "./crypto";
+import type { UserToken } from "..";
+import type { ECDHData, SignedData } from "./crypto";
 
 export interface ApiEncryptedBooking {
     id: string;

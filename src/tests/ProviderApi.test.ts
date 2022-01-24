@@ -2,10 +2,10 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { NotFoundError } from "..";
+import dayjs from "dayjs";
+import { NotFoundError } from "../errors";
 import type { ProviderBackup } from "../interfaces";
 import { AppointmentStatus } from "../interfaces";
-import { dayjs } from "../utils";
 import { TestContext } from "./TestContext";
 
 describe("ProviderApi", () => {
@@ -41,8 +41,8 @@ describe("ProviderApi", () => {
             context = await TestContext.createContext();
         });
 
-        const from = dayjs().utc().toDate();
-        const to = dayjs().utc().add(1, "day").toDate();
+        const from = dayjs.utc();
+        const to = dayjs.utc().add(1, "day");
 
         it("should create new provider", async () => {
             const providerKeyPairs =
@@ -211,22 +211,15 @@ describe("ProviderApi", () => {
             context = await TestContext.createContext();
         });
 
-        const from = dayjs().utc().toDate();
-        const to = dayjs().utc().add(1, "day").toDate();
+        const from = dayjs.utc();
+        const to = dayjs.utc().add(1, "day");
 
         it("should create appointments", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
             // tomorrow 3 pm
-            const date = dayjs()
-                .utc()
-                .add(1, "day")
-                .hour(15)
-                .minute(0)
-                .second(0)
-                .toDate();
-
+            const date = dayjs.utc().add(1, "day").hour(15).minute(0).second(0);
             const appointment = context.providerApi.createAppointment(
                 date,
                 15,
@@ -238,6 +231,8 @@ describe("ProviderApi", () => {
 
             expect(appointment).toHaveProperty("id");
             expect(appointment.startDate).toEqual(date);
+            expect(appointment.startDate.isUTC()).toBeTruthy();
+            expect(appointment.endDate.isUTC()).toBeTruthy();
         });
 
         it("should publish appointments", async () => {
@@ -395,8 +390,8 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const startAt = dayjs().utc().add(1, "day").hour(10).toDate();
-            const endAt = dayjs().utc().add(1, "day").hour(20).toDate();
+            const startAt = dayjs.utc().add(1, "day").hour(10);
+            const endAt = dayjs.utc().add(1, "day").hour(20);
 
             const appointmentSeries =
                 context.providerApi.createAppointmentSeries(
@@ -492,21 +487,18 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const startAt = dayjs()
+            const startAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(10)
                 .minute(0)
-                .second(0)
-                .toDate();
-
-            const endAt = dayjs()
+                .second(0);
+            const endAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(15)
                 .minute(0)
-                .second(0)
-                .toDate();
+                .second(0);
 
             const appointmentSeries =
                 context.providerApi.createAppointmentSeries(
@@ -549,21 +541,18 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const startAt = dayjs()
+            const startAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(8)
                 .minute(0)
-                .second(0)
-                .toDate();
-
-            const endAt = dayjs()
+                .second(0);
+            const endAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(10)
                 .minute(0)
-                .second(0)
-                .toDate();
+                .second(0);
 
             const appointmentSeries1 =
                 context.providerApi.createAppointmentSeries(
@@ -644,21 +633,18 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const startAt = dayjs()
+            const startAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(8)
                 .minute(0)
-                .second(0)
-                .toDate();
-
-            const endAt = dayjs()
+                .second(0);
+            const endAt = dayjs
                 .utc()
                 .add(1, "day")
                 .hour(10)
                 .minute(0)
-                .second(0)
-                .toDate();
+                .second(0);
 
             const appointmentSeries1 =
                 context.providerApi.createAppointmentSeries(

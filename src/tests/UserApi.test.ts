@@ -2,9 +2,9 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
 import type { UserBackup } from "../interfaces";
 import { BookingStatus } from "../interfaces";
-import { dayjs } from "../utils";
 import { TestContext } from "./TestContext";
 
 describe("UserApi", () => {
@@ -104,23 +104,15 @@ describe("UserApi", () => {
             context = await TestContext.createContext();
         });
 
-        const from = dayjs().utc().toDate();
-
-        // 24 hours in the future
-        const to = dayjs().utc().add(1, "days").toDate();
+        const from = dayjs.utc();
+        const to = dayjs.utc().add(1, "days");
 
         it("should create an appointment", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
             // tomorrow 3 pm
-            const date = dayjs()
-                .utc()
-                .add(1, "day")
-                .hour(15)
-                .minute(0)
-                .second(0)
-                .toDate();
+            const date = dayjs.utc().add(1, "day").hour(15).minute(0).second(0);
 
             const appointment = context.providerApi.createAppointment(
                 date,
@@ -168,8 +160,10 @@ describe("UserApi", () => {
             );
 
             expect(appointments[0].id).toEqual(appointment.id);
+            expect(appointments[0].startDate.isUTC()).toBeTruthy();
             expect(appointments[0].startDate).toEqual(appointment.startDate);
             expect(appointments[0].slotData).toHaveLength(2);
+            expect(appointments[0].endDate.isUTC()).toBeTruthy();
         });
 
         it("should book an appointment", async () => {
