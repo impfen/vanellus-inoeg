@@ -160,10 +160,8 @@ describe("UserApi", () => {
             );
 
             expect(appointments[0].id).toEqual(appointment.id);
-            expect(appointments[0].startDate.isUTC()).toBeTruthy();
             expect(appointments[0].startDate).toEqual(appointment.startDate);
             expect(appointments[0].slotData).toHaveLength(2);
-            expect(appointments[0].endDate.isUTC()).toBeTruthy();
         });
 
         it("should book an appointment", async () => {
