@@ -17,10 +17,11 @@ export const enrichAppointment = (
     const appointment: PublicAppointment = {
         id: appointmentData.id,
         provider: provider,
-        startDate: dayjs.utc(appointmentData.timestamp),
-        endDate: dayjs
-            .utc(appointmentData.timestamp)
-            .add(appointmentData.duration, "minutes"),
+        startDate: dayjs(appointmentData.timestamp),
+        endDate: dayjs(appointmentData.timestamp).add(
+            appointmentData.duration,
+            "minutes"
+        ),
         duration: appointmentData.duration,
         properties: appointmentData.properties,
         publicKey: appointmentData.publicKey,
@@ -36,9 +37,11 @@ export const enrichAppointment = (
 };
 
 export const unenrichAppointment = (appointment: PublicAppointment) => {
+    console.log("utc", appointment.startDate.utc().toISOString());
+    console.log("non", appointment.startDate.toISOString());
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
-        timestamp: dayjs.utc(appointment.startDate).toISOString(),
+        timestamp: appointment.startDate.utc().toISOString(),
         duration: appointment.duration,
         properties: appointment.properties,
         publicKey: appointment.publicKey,

@@ -81,8 +81,8 @@ export class ProviderApi extends AbstractApi<
     ) {
         const appointment: UnpublishedPublicAppointment = {
             id: randomBytes(32),
-            startDate: startAt.utc(),
-            endDate: startAt.utc().add(duration, "minutes"),
+            startDate: startAt,
+            endDate: startAt.add(duration, "minutes"),
             duration,
             properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
