@@ -231,6 +231,7 @@ describe("ProviderApi", () => {
 
             expect(appointment).toHaveProperty("id");
             expect(appointment.startDate).toEqual(date);
+            expect(appointment.startDate.isUTC()).toBeTruthy();
         });
 
         it("should publish appointments", async () => {
@@ -291,6 +292,7 @@ describe("ProviderApi", () => {
             expect(appointments[0].properties).toEqual(
                 publishResult.properties
             );
+            expect(appointments[0].updatedAt.isUTC()).toBeTruthy();
             expect(appointments[0].updatedAt).not.toEqual(
                 initialAppointments[0].updatedAt
             );
@@ -512,6 +514,9 @@ describe("ProviderApi", () => {
             expect(appointmentSeries.appointments[0].startDate).toEqual(
                 startAt
             );
+            expect(
+                appointmentSeries.appointments[0].startDate.isUTC()
+            ).toBeTruthy();
             expect(appointmentSeries.id).toHaveLength(24);
             expect(appointmentSeries.startAt).toEqual(startAt);
             expect(appointmentSeries.endAt).toEqual(endAt);

@@ -17,11 +17,10 @@ export const enrichAppointment = (
     const appointment: PublicAppointment = {
         id: appointmentData.id,
         provider: provider,
-        startDate: dayjs(appointmentData.timestamp),
-        endDate: dayjs(appointmentData.timestamp).add(
-            appointmentData.duration,
-            "minutes"
-        ),
+        startDate: dayjs.utc(appointmentData.timestamp),
+        endDate: dayjs
+            .utc(appointmentData.timestamp)
+            .add(appointmentData.duration, "minutes"),
         duration: appointmentData.duration,
         properties: appointmentData.properties,
         publicKey: appointmentData.publicKey,
