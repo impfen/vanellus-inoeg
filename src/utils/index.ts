@@ -4,7 +4,6 @@
 
 export * from "./appointment";
 export * from "./conversion";
-export * from "./dayjs";
 export * from "./deriveSecrets";
 export * from "./encrypt";
 export * from "./generateKey";

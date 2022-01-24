@@ -9,7 +9,7 @@
 import { TransportError } from "../errors";
 import type { KeyPair } from "../interfaces";
 import { AbstractTransport } from "./AbstractTransport";
-import { MethodParamsIfExists } from "./Transport";
+import type { MethodParamsIfExists } from "./Transport";
 
 const methodData: Record<
     any,

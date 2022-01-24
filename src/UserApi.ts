@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
 import { AbstractApi } from "./AbstractApi";
 import { AnonymousApi } from "./AnonymousApi";
 import { TransportError, UnexpectedError } from "./errors";
@@ -22,7 +23,6 @@ import type {
 import { StorageApi } from "./StorageApi";
 import {
     base64ToBuffer,
-    dayjs,
     encodeBase32,
     ephemeralECDHEncrypt,
     generateECDHKeyPair,
@@ -167,7 +167,7 @@ export class UserApi extends AbstractApi<
         const userToken = {
             version: "0.3",
             code: userSecret.slice(0, 4),
-            createdAt: dayjs().utc().toISOString(),
+            createdAt: dayjs.utc().toISOString(),
             publicKey: keyPairs.signing.publicKey, // the signing key to control the ID
             encryptionPublicKey: keyPairs.encryption.publicKey,
         };
@@ -179,7 +179,7 @@ export class UserApi extends AbstractApi<
         });
 
         const userQueueToken: UserQueueToken = {
-            createdAt: dayjs().utc().toISOString(),
+            createdAt: dayjs.utc().toISOString(),
             signedToken: signedToken,
             keyPairs,
             hashNonce: nonce,

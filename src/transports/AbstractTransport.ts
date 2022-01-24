@@ -2,9 +2,10 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import dayjs from "dayjs";
 import type { KeyPair } from "../interfaces";
-import { dayjs, sign } from "../utils";
-import {
+import { sign } from "../utils";
+import type {
     MethodParamsIfExists,
     ReturnTypeOfMethodIfExists,
     Transport,
@@ -32,7 +33,7 @@ export abstract class AbstractTransport<TMethods>
 
     protected async signParams(params: unknown, keyPair: KeyPair) {
         const dataToSign = Object.assign({}, params || {}, {
-            timestamp: dayjs().utc().toISOString(),
+            timestamp: dayjs.utc().toISOString(),
         });
 
         return sign(

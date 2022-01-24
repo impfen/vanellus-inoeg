@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { NotFoundError, TransportError } from ".";
 import { AbstractApi } from "./AbstractApi";
 import type {
@@ -12,7 +14,7 @@ import type {
     PublicProvider,
 } from "./interfaces";
 import type { AnonymousApiInterface } from "./interfaces/endpoints/AnonymousApiInterface";
-import { dayjs, enrichAppointment, parseUntrustedJSON, verify } from "./utils";
+import { enrichAppointment, parseUntrustedJSON, verify } from "./utils";
 
 export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
     /**
@@ -53,8 +55,8 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      */
     public async getAppointments(
         zipCode: number | string,
-        from: Date,
-        to: Date,
+        from: Dayjs,
+        to: Dayjs,
         radius = 50,
         doVerify = false
     ) {
@@ -62,8 +64,8 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             "getAppointmentsByZipCode",
             {
                 zipCode: zipCode.toString(),
-                from: dayjs(from).toISOString(),
-                to: dayjs(to).toISOString(),
+                from: from.utc().toISOString(),
+                to: to.utc().toISOString(),
                 radius,
             }
         );
@@ -86,7 +88,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
      * @return Promise<AggregatedPublicAppointment[]>
      */
     public async getAggregatedAppointments(
-        date: Date,
+        date: Dayjs,
         zipFrom: number | string,
         zipTo?: number | string
     ) {
@@ -95,7 +97,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             {
                 zipFrom: zipFrom.toString(),
                 zipTo: zipTo ? zipTo.toString() : zipFrom.toString(),
-                date: dayjs(date).utc().format("YYYY-MM-DD"),
+                date: date.utc().format("YYYY-MM-DD"),
             }
         );
 
@@ -106,13 +108,10 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
                 aggregatedAppointments.push({
                     ...aggregatedAppointment,
                     provider: apiAggregatedAppointment.provider,
-                    startDate: dayjs(aggregatedAppointment.timestamp)
-                        .utc()
-                        .toDate(),
-                    endDate: dayjs(aggregatedAppointment.timestamp)
-                        .utc()
-                        .add(aggregatedAppointment.duration, "minutes")
-                        .toDate(),
+                    startDate: dayjs.utc(aggregatedAppointment.timestamp),
+                    endDate: dayjs
+                        .utc(aggregatedAppointment.timestamp)
+                        .add(aggregatedAppointment.duration, "minutes"),
                 });
             }
         }

@@ -2,8 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { NotFoundError } from "..";
-import { dayjs } from "../utils";
+import dayjs from "dayjs";
+import { NotFoundError } from "../errors";
 import { TestContext } from "./TestContext";
 
 describe("AnonymousApi", () => {
@@ -57,8 +57,8 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
-        const from = dayjs().utc().toDate();
-        const to = dayjs().utc().add(1, "days").toDate();
+        const from = dayjs.utc();
+        const to = dayjs.utc().add(1, "days");
 
         it("should get single appointment", async () => {
             const { provider, providerKeyPairs } =
@@ -123,6 +123,8 @@ describe("AnonymousApi", () => {
             );
 
             expect(appointments).toHaveLength(1);
+            expect(appointments[0].startDate.isUTC()).toBeTruthy();
+            expect(appointments[0].endDate.isUTC()).toBeTruthy();
             expect(appointments[0].id).toEqual(appointment.id);
         });
 
@@ -142,6 +144,8 @@ describe("AnonymousApi", () => {
                 );
 
             expect(aggregatedAppointments).toHaveLength(1);
+            expect(aggregatedAppointments[0].startDate.isUTC()).toBeTruthy();
+            expect(aggregatedAppointments[0].endDate.isUTC()).toBeTruthy();
             expect(aggregatedAppointments[0].id).toEqual(appointment.id);
             expect(aggregatedAppointments[0]).not.toHaveProperty("slotData");
         });

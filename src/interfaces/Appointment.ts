@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import type { Dayjs } from "dayjs";
 import type { ProviderBooking } from "./Booking";
 import type { PublicProvider } from "./Provider";
 
@@ -13,8 +14,8 @@ export interface Slot {
 export interface AggregatedPublicAppointment {
     id: string;
     provider: PublicProvider;
-    startDate: Date;
-    endDate: Date;
+    startDate: Dayjs;
+    endDate: Dayjs;
     duration: number;
     properties: Record<string, unknown>;
 }
@@ -39,5 +40,5 @@ export enum AppointmentStatus {
 export interface Appointment extends PublicAppointment {
     bookings: ProviderBooking[];
     status: AppointmentStatus;
-    updatedAt: Date;
+    updatedAt: Dayjs;
 }

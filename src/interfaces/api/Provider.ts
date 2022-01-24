@@ -2,7 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { ECDHData, SignedData } from "./crypto";
+import type { ECDHData, SignedData } from "./crypto";
 
 export type ApiSignedProvider = SignedData;
 

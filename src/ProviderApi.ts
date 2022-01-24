@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { AbstractApi } from "./AbstractApi";
 import {
     ApiError,
@@ -38,7 +40,6 @@ import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
 import {
     base64ToBuffer,
-    dayjs,
     ecdhDecrypt,
     ecdhEncrypt,
     encodeBase32,
@@ -70,7 +71,7 @@ export class ProviderApi extends AbstractApi<
      * @return Appointment
      */
     public createAppointment(
-        start: Date,
+        startAt: Dayjs,
         duration: number,
         vaccine: Vaccine,
         slotCount: number,
@@ -80,9 +81,9 @@ export class ProviderApi extends AbstractApi<
     ) {
         const appointment: UnpublishedPublicAppointment = {
             id: randomBytes(32),
-            startDate: dayjs(start).utc().toDate(),
-            endDate: dayjs(start).utc().add(duration, "minutes").toDate(),
-            duration: duration,
+            startDate: startAt.utc(),
+            endDate: startAt.utc().add(duration, "minutes"),
+            duration,
             properties: { ...properties, vaccine },
             slotData: this.createSlots(slotCount),
             publicKey: providerKeyPairs.encryption.publicKey,
@@ -99,8 +100,8 @@ export class ProviderApi extends AbstractApi<
      * Mostly used in large vaccination-facilities.
      */
     public createAppointmentSeries(
-        startAt: Date,
-        endAt: Date,
+        startAt: Dayjs,
+        endAt: Dayjs,
         interval: number,
         slotCount: number,
         vaccine: Vaccine,
@@ -121,13 +122,12 @@ export class ProviderApi extends AbstractApi<
 
         const seriesId = randomBytes(16);
 
-        let startDayjs = dayjs(startAt).utc();
-        const endDayjs = dayjs(endAt).utc();
+        let appointmentAt = startAt.utc();
 
         do {
             appointments.push(
                 this.createAppointment(
-                    startDayjs.toDate(),
+                    appointmentAt,
                     interval,
                     vaccine,
                     slotCount,
@@ -139,8 +139,8 @@ export class ProviderApi extends AbstractApi<
                 )
             );
 
-            startDayjs = startDayjs.add(interval, "minutes");
-        } while (startDayjs.isBefore(endDayjs, "minutes"));
+            appointmentAt = appointmentAt.add(interval, "minutes");
+        } while (appointmentAt.isBefore(endAt, "minutes"));
 
         const appointmentSeries: UnpublishedAppointmentSeries = {
             id: seriesId,
@@ -163,16 +163,16 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<ProviderAppointment[]>
      */
     public async getProviderAppointments(
-        from: Date,
-        to: Date,
+        from: Dayjs,
+        to: Dayjs,
         providerKeyPairs: ProviderKeyPairs
     ) {
         try {
             const apiProviderProviderAppointments = await this.transport.call(
                 "getProviderAppointments",
                 {
-                    from: dayjs(from).toISOString(),
-                    to: dayjs(to).toISOString(),
+                    from: from.utc().toISOString(),
+                    to: to.utc().toISOString(),
                 },
                 providerKeyPairs.signing
             );
@@ -704,9 +704,7 @@ export class ProviderApi extends AbstractApi<
 
                     const appointment: Appointment = {
                         ...enrichedAppointment,
-                        updatedAt: dayjs(signedAppointment.updatedAt)
-                            .utc()
-                            .toDate(),
+                        updatedAt: dayjs.utc(signedAppointment.updatedAt),
                         status,
                         bookings,
                     };
@@ -717,7 +715,9 @@ export class ProviderApi extends AbstractApi<
         );
 
         // needed as promise.all() does not guarantee order
-        appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+        appointments.sort((a, b) =>
+            a.startDate.isAfter(b.startDate, "minute") ? 1 : -1
+        );
 
         return appointments;
     }

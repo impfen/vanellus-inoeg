@@ -12,6 +12,7 @@
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist",
         "resolveJsonModule": true,
-        "pretty": true
+        "pretty": true,
+        "importsNotUsedAsValues": "error"
     }
 }
