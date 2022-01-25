@@ -137,14 +137,14 @@ describe("AnonymousApi", () => {
 
             const aggregatedAppointments =
                 await context.anonymousApi.getAggregatedAppointments(
-                    appointment.startDate,
+                    appointment.startAt,
                     context.defaultProviderData.zipCode
                 );
 
             expect(aggregatedAppointments).toHaveLength(1);
             expect(aggregatedAppointments[0].id).toEqual(appointment.id);
             expect(aggregatedAppointments[0]).not.toHaveProperty("slotData");
-            expect(aggregatedAppointments[0].startDate.isUTC()).toBeTruthy();
+            expect(aggregatedAppointments[0].startAt.isUTC()).toBeTruthy();
         });
 
         it("should optionally verify appointment", async () => {

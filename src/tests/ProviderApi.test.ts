@@ -230,8 +230,8 @@ describe("ProviderApi", () => {
             );
 
             expect(appointment).toHaveProperty("id");
-            expect(appointment.startDate).toEqual(date);
-            expect(appointment.startDate.isUTC()).toBeTruthy();
+            expect(appointment.startAt).toEqual(date);
+            expect(appointment.startAt.isUTC()).toBeTruthy();
         });
 
         it("should publish appointments", async () => {
@@ -511,11 +511,9 @@ describe("ProviderApi", () => {
                     providerKeyPairs
                 );
 
-            expect(appointmentSeries.appointments[0].startDate).toEqual(
-                startAt
-            );
+            expect(appointmentSeries.appointments[0].startAt).toEqual(startAt);
             expect(
-                appointmentSeries.appointments[0].startDate.isUTC()
+                appointmentSeries.appointments[0].startAt.isUTC()
             ).toBeTruthy();
             expect(appointmentSeries.id).toHaveLength(24);
             expect(appointmentSeries.startAt).toEqual(startAt);

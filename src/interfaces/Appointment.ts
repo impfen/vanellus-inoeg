@@ -14,8 +14,8 @@ export interface Slot {
 export interface AggregatedPublicAppointment<Vaccine = string> {
     id: string;
     provider: PublicProvider;
-    startDate: Dayjs;
-    endDate: Dayjs;
+    startAt: Dayjs;
+    endAt: Dayjs;
     duration: number;
     vaccine: Vaccine;
     properties: Record<string, unknown>;

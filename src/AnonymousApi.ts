@@ -113,8 +113,8 @@ export class AnonymousApi<
                     vaccine:
                         aggregatedAppointment.vaccine as unknown as Vaccine,
                     provider: apiAggregatedAppointment.provider,
-                    startDate: dayjs.utc(aggregatedAppointment.timestamp),
-                    endDate: dayjs
+                    startAt: dayjs.utc(aggregatedAppointment.timestamp),
+                    endAt: dayjs
                         .utc(aggregatedAppointment.timestamp)
                         .add(aggregatedAppointment.duration, "minutes"),
                 });
