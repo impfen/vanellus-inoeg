@@ -17,8 +17,8 @@ export const enrichAppointment = <Vaccine = string>(
     const appointment: PublicAppointment<Vaccine> = {
         id: appointmentData.id,
         provider: provider,
-        startDate: dayjs.utc(appointmentData.timestamp),
-        endDate: dayjs
+        startAt: dayjs.utc(appointmentData.timestamp),
+        endAt: dayjs
             .utc(appointmentData.timestamp)
             .add(appointmentData.duration, "minutes"),
         duration: appointmentData.duration,
@@ -41,7 +41,7 @@ export const unenrichAppointment = <Vaccine = string>(
 ) => {
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
-        timestamp: appointment.startDate.utc().toISOString(),
+        timestamp: appointment.startAt.utc().toISOString(),
         duration: appointment.duration,
         properties: appointment.properties,
         publicKey: appointment.publicKey,

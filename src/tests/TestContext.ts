@@ -177,15 +177,10 @@ export class TestContext {
         provider: Provider;
         providerKeyPairs: ProviderKeyPairs;
     }) {
-        const startDate = dayjs
-            .utc()
-            .add(1, "day")
-            .hour(10)
-            .minute(0)
-            .second(0);
+        const startAt = dayjs.utc().add(1, "day").hour(10).minute(0).second(0);
 
         return this.providerApi.createAppointment(
-            startDate,
+            startAt,
             10,
             "biontech",
             2,

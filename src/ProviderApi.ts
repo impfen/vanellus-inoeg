@@ -80,8 +80,8 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     ) {
         const appointment: UnpublishedPublicAppointment<Vaccine> = {
             id: randomBytes(32),
-            startDate: startAt.utc(),
-            endDate: startAt.utc().add(duration, "minutes"),
+            startAt: startAt.utc(),
+            endAt: startAt.utc().add(duration, "minutes"),
             duration,
             vaccine: vaccine,
             properties: { ...properties },
@@ -280,7 +280,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         );
 
         // needed as promise.all() does not guarantee order
-        appointments.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
+        appointments.sort((a, b) => (a.startAt > b.startAt ? 1 : -1));
 
         return appointments;
     }
@@ -373,8 +373,8 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
 
         const appointmentSeries: AppointmentSeries<Vaccine> = {
             id: appointmentSeriesId,
-            startAt: appointments[0].startDate,
-            endAt: appointments[0].endDate,
+            startAt: appointments[0].startAt,
+            endAt: appointments[0].endAt,
             interval: appointments[0].duration,
             vaccine: appointments[0].vaccine,
             slotCount: appointments[0].slotData.length,
@@ -715,7 +715,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
 
         // needed as promise.all() does not guarantee order
         appointments.sort((a, b) =>
-            a.startDate.isAfter(b.startDate, "minute") ? 1 : -1
+            a.startAt.isAfter(b.startAt, "minute") ? 1 : -1
         );
 
         return appointments;
