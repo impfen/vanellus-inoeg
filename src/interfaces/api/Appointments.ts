@@ -4,7 +4,6 @@
 
 import type { Slot } from "../Appointment";
 import type { PublicProvider } from "../Provider";
-import type { Vaccine } from "../Vaccine";
 import type { ApiEncryptedBooking } from "./Booking";
 import type { SignedData } from "./crypto";
 import type { ApiSignedProviderData } from "./Provider";
@@ -49,7 +48,7 @@ export interface ApiAggregatedAppointment {
     duration: number;
     properties: Record<string, unknown>;
     slotN: number;
-    vaccine: Vaccine;
+    vaccine: string;
 }
 
 export interface ApiAppointment

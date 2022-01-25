@@ -274,7 +274,7 @@ describe("ProviderApi", () => {
             appointment.slotData = [appointment.slotData[1]];
 
             appointment.duration = 31;
-            appointment.properties.vaccine = "moderna";
+            appointment.vaccine = "moderna";
 
             const publishResult = await context.providerApi.updateAppointment(
                 appointment,

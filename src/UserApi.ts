@@ -31,7 +31,7 @@ import {
     sha256,
 } from "./utils";
 
-export class UserApi extends AbstractApi<
+export class UserApi<Vaccine = string> extends AbstractApi<
     AnonymousApiInterface & UserApiInterface,
     UserKeyPairs
 > {
@@ -41,7 +41,7 @@ export class UserApi extends AbstractApi<
      * @returns Promise<Booking>
      */
     public async bookAppointment(
-        appointment: PublicAppointment,
+        appointment: PublicAppointment<Vaccine>,
         userQueueToken: UserQueueToken
     ) {
         const providerData: BookingData = {
@@ -68,7 +68,7 @@ export class UserApi extends AbstractApi<
                 userQueueToken.keyPairs.signing
             );
 
-            const booking: Booking = {
+            const booking: Booking<Vaccine> = {
                 slotId: apiBooking.id,
                 token: userQueueToken.userToken,
                 signedToken: userQueueToken.signedToken,
@@ -92,7 +92,7 @@ export class UserApi extends AbstractApi<
      *
      * @returns Promise<boolean>
      */
-    public async cancelBooking(booking: Booking) {
+    public async cancelBooking(booking: Booking<Vaccine>) {
         const result = await this.transport.call(
             "cancelAppointment",
             {
@@ -117,7 +117,7 @@ export class UserApi extends AbstractApi<
      *
      * @returns Promise<BookingStatus>
      */
-    public async checkBookingStatus(booking: Booking) {
+    public async checkBookingStatus(booking: Booking<Vaccine>) {
         const anonApi = new AnonymousApi(this.config);
 
         const appointment = await anonApi.getAppointment(

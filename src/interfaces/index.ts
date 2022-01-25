@@ -17,5 +17,4 @@ export * from "./QueueData";
 export * from "./UserBackup";
 export * from "./UserKeyPairs";
 export * from "./UserQueueToken";
-export * from "./Vaccine";
 export * from "./VanellusConfig";
