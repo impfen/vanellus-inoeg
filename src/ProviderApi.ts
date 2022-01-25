@@ -34,7 +34,6 @@ import {
     Slot,
     UnpublishedAppointmentSeries,
     UnpublishedPublicAppointment,
-    Vaccine,
 } from "./interfaces";
 import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
@@ -55,7 +54,7 @@ import {
     verify,
 } from "./utils";
 
-export class ProviderApi extends AbstractApi<
+export class ProviderApi<Vaccine = string> extends AbstractApi<
     ProviderApiInterface,
     ProviderKeyPairs
 > {
@@ -79,7 +78,7 @@ export class ProviderApi extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         properties?: Record<string, unknown>
     ) {
-        const appointment: UnpublishedPublicAppointment = {
+        const appointment: UnpublishedPublicAppointment<Vaccine> = {
             id: randomBytes(32),
             startDate: startAt.utc(),
             endDate: startAt.utc().add(duration, "minutes"),
@@ -119,7 +118,7 @@ export class ProviderApi extends AbstractApi<
             throw new VanellusError("Start and end can't be equal.");
         }
 
-        const appointments: UnpublishedPublicAppointment[] = [];
+        const appointments: UnpublishedPublicAppointment<Vaccine>[] = [];
 
         const seriesId = randomBytes(16);
 
@@ -143,7 +142,7 @@ export class ProviderApi extends AbstractApi<
             appointmentAt = appointmentAt.add(interval, "minutes");
         } while (appointmentAt.isBefore(endAt, "minutes"));
 
-        const appointmentSeries: UnpublishedAppointmentSeries = {
+        const appointmentSeries: UnpublishedAppointmentSeries<Vaccine> = {
             id: seriesId,
             startAt,
             endAt,
@@ -237,8 +236,8 @@ export class ProviderApi extends AbstractApi<
      */
     public async publishAppointments(
         unpublishedAppointment:
-            | UnpublishedPublicAppointment[]
-            | UnpublishedPublicAppointment,
+            | UnpublishedPublicAppointment<Vaccine>[]
+            | UnpublishedPublicAppointment<Vaccine>,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // handle single appointments as well as arrays of appointments
@@ -246,11 +245,11 @@ export class ProviderApi extends AbstractApi<
             ? unpublishedAppointment
             : [unpublishedAppointment];
 
-        const appointments: PublicAppointment[] = [];
+        const appointments: PublicAppointment<Vaccine>[] = [];
 
         const signedApiAppointments = await Promise.all(
             unpublishedAppointments.map(async (unpublishedAppointment) => {
-                const apiAppointment = unenrichAppointment({
+                const apiAppointment = unenrichAppointment<Vaccine>({
                     ...unpublishedAppointment,
                     // we set the publicKey of the current provider. Just to be 100% sure.
                     publicKey: providerKeyPairs.encryption.publicKey,
@@ -297,12 +296,12 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<PublicAppointment>
      */
     public async updateAppointment(
-        appointment: PublicAppointment,
+        appointment: PublicAppointment<Vaccine>,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // Little hack to use TS as typeguard on the publishAppointment()-method
         // and get some more control over the data-flow
-        const unpublishedAppointment: UnpublishedPublicAppointment = {
+        const unpublishedAppointment: UnpublishedPublicAppointment<Vaccine> = {
             ...appointment,
             unpublished: true,
         };
@@ -324,12 +323,12 @@ export class ProviderApi extends AbstractApi<
      * @return Promise<PublicAppointment>
      */
     public async cancelAppointment(
-        appointment: Appointment,
+        appointment: Appointment<Vaccine>,
         providerKeyPairs: ProviderKeyPairs
     ) {
         // Little hack to use TS as typeguard on the publishAppointment()-method
         // and get some more control over the data-flow
-        const unpublishedAppointment: UnpublishedPublicAppointment = {
+        const unpublishedAppointment: UnpublishedPublicAppointment<Vaccine> = {
             ...appointment,
             slotData: [],
             unpublished: true,
@@ -340,7 +339,7 @@ export class ProviderApi extends AbstractApi<
             providerKeyPairs
         );
 
-        const canceledAppointment: Appointment = {
+        const canceledAppointment: Appointment<Vaccine> = {
             ...appointment,
             ...updatedAppointments[0],
             status: AppointmentStatus.CANCELED,
@@ -372,12 +371,12 @@ export class ProviderApi extends AbstractApi<
             );
         }
 
-        const appointmentSeries: AppointmentSeries = {
+        const appointmentSeries: AppointmentSeries<Vaccine> = {
             id: appointmentSeriesId,
             startAt: appointments[0].startDate,
             endAt: appointments[0].endDate,
             interval: appointments[0].duration,
-            vaccine: appointments[0].properties?.vaccine as string,
+            vaccine: appointments[0].vaccine,
             slotCount: appointments[0].slotData.length,
             provider: appointments[0].provider,
             appointments,
@@ -400,7 +399,7 @@ export class ProviderApi extends AbstractApi<
 
         // Little hack to use TS as typeguard on the publishAppointment()-method
         // and get some more control over the data-flow
-        const unpublishedAppointments: UnpublishedPublicAppointment[] =
+        const unpublishedAppointments: UnpublishedPublicAppointment<Vaccine>[] =
             appointmentSeries.appointments.map((appointment) => ({
                 ...appointment,
                 slotData: [],
@@ -657,19 +656,18 @@ export class ProviderApi extends AbstractApi<
                         providerKeyPairs
                     );
 
-                    const enrichedAppointment = enrichAppointment(
+                    const enrichedAppointment = enrichAppointment<Vaccine>(
                         apiAppointment,
                         provider
                     );
 
-                    const bookings: ProviderBooking[] = apiBookings.map(
-                        (apiBooking) => ({
+                    const bookings: ProviderBooking<Vaccine>[] =
+                        apiBookings.map((apiBooking) => ({
                             slotId: apiBooking.id,
                             appointment: enrichedAppointment,
                             token: apiBooking.userToken,
                             signedToken: apiBooking.signedToken,
-                        })
-                    );
+                        }));
 
                     let status = AppointmentStatus.UNKNOWN;
 
@@ -703,7 +701,7 @@ export class ProviderApi extends AbstractApi<
                         );
                     }
 
-                    const appointment: Appointment = {
+                    const appointment: Appointment<Vaccine> = {
                         ...enrichedAppointment,
                         updatedAt: dayjs.utc(signedAppointment.updatedAt),
                         status,

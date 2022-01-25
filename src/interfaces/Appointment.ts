@@ -5,14 +5,13 @@
 import type { Dayjs } from "dayjs";
 import type { ProviderBooking } from "./Booking";
 import type { PublicProvider } from "./Provider";
-import type { Vaccine } from "./Vaccine";
 
 export interface Slot {
     id: string;
     open: boolean;
 }
 
-export interface AggregatedPublicAppointment {
+export interface AggregatedPublicAppointment<Vaccine = string> {
     id: string;
     provider: PublicProvider;
     startDate: Dayjs;
@@ -22,12 +21,14 @@ export interface AggregatedPublicAppointment {
     properties: Record<string, unknown>;
 }
 
-export interface PublicAppointment extends AggregatedPublicAppointment {
+export interface PublicAppointment<Vaccine = string>
+    extends AggregatedPublicAppointment<Vaccine> {
     slotData: Slot[];
     publicKey: string;
 }
 
-export interface UnpublishedPublicAppointment extends PublicAppointment {
+export interface UnpublishedPublicAppointment<Vaccine = string>
+    extends PublicAppointment<Vaccine> {
     unpublished: true;
 }
 
@@ -39,8 +40,9 @@ export enum AppointmentStatus {
     UNKNOWN = "UNKNOWN",
 }
 
-export interface Appointment extends PublicAppointment {
-    bookings: ProviderBooking[];
+export interface Appointment<Vaccine = string>
+    extends PublicAppointment<Vaccine> {
+    bookings: ProviderBooking<Vaccine>[];
     status: AppointmentStatus;
     updatedAt: Dayjs;
 }

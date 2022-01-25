@@ -260,13 +260,4 @@ export class MediatorApi extends AbstractApi<
 
         return queueData;
     }
-
-    // /**
-    //  *
-    //  * @param params
-    //  * @returns
-    //  */
-    // protected async getStats(params: any) {
-    //     return this.backend.getStats(params)
-    // }
 }

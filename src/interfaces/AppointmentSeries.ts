@@ -5,7 +5,6 @@
 import type { Dayjs } from "dayjs";
 import type { Appointment, UnpublishedPublicAppointment } from "./Appointment";
 import type { PublicProvider } from "./Provider";
-import type { Vaccine } from "./Vaccine";
 
 // export enum AppointmentSeriesStatus {
 //     UNPUBLISHED = "UNPUBLISHED",
@@ -14,7 +13,7 @@ import type { Vaccine } from "./Vaccine";
 //     UNKNOWN = "UNKNOWN",
 // }
 
-interface BaseAppointmentSeries {
+interface BaseAppointmentSeries<Vaccine = string> {
     id: string;
     startAt: Dayjs;
     endAt: Dayjs;
@@ -24,10 +23,12 @@ interface BaseAppointmentSeries {
     provider: PublicProvider;
 }
 
-export interface UnpublishedAppointmentSeries extends BaseAppointmentSeries {
-    appointments: UnpublishedPublicAppointment[];
+export interface UnpublishedAppointmentSeries<Vaccine = string>
+    extends BaseAppointmentSeries<Vaccine> {
+    appointments: UnpublishedPublicAppointment<Vaccine>[];
 }
 
-export interface AppointmentSeries extends BaseAppointmentSeries {
-    appointments: Appointment[];
+export interface AppointmentSeries<Vaccine = string>
+    extends BaseAppointmentSeries<Vaccine> {
+    appointments: Appointment<Vaccine>[];
 }

@@ -16,13 +16,13 @@ export enum BookingStatus {
     UNKNOWN = "UNKNOWN",
 }
 
-export interface ProviderBooking {
+export interface ProviderBooking<Vaccine = string> {
     slotId: string;
-    appointment: AggregatedPublicAppointment;
+    appointment: AggregatedPublicAppointment<Vaccine>;
     token: UserToken;
     signedToken: SignedData;
 }
 
-export interface Booking extends ProviderBooking {
+export interface Booking<Vaccine = string> extends ProviderBooking<Vaccine> {
     keyPairs: UserKeyPairs;
 }

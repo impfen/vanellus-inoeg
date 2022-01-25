@@ -10,11 +10,11 @@ import type {
     PublicProvider,
 } from "../interfaces";
 
-export const enrichAppointment = (
+export const enrichAppointment = <Vaccine = string>(
     appointmentData: ApiAppointment,
     provider: PublicProvider
 ) => {
-    const appointment: PublicAppointment = {
+    const appointment: PublicAppointment<Vaccine> = {
         id: appointmentData.id,
         provider: provider,
         startDate: dayjs.utc(appointmentData.timestamp),
@@ -30,13 +30,15 @@ export const enrichAppointment = (
                 (aslot: BookedSlot) => aslot.id === slot.id
             ),
         })),
-        vaccine: appointmentData.vaccine,
+        vaccine: appointmentData.vaccine as unknown as Vaccine,
     };
 
     return appointment;
 };
 
-export const unenrichAppointment = (appointment: PublicAppointment) => {
+export const unenrichAppointment = <Vaccine = string>(
+    appointment: PublicAppointment<Vaccine>
+) => {
     const apiAppointment: ApiAppointment = {
         id: appointment.id,
         timestamp: appointment.startDate.utc().toISOString(),
@@ -44,7 +46,7 @@ export const unenrichAppointment = (appointment: PublicAppointment) => {
         properties: appointment.properties,
         publicKey: appointment.publicKey,
         slotData: appointment.slotData,
-        vaccine: appointment.vaccine,
+        vaccine: appointment.vaccine as unknown as string,
         bookedSlots: [],
     };
 

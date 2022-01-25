@@ -16,7 +16,9 @@ import type {
 import type { AnonymousApiInterface } from "./interfaces/endpoints/AnonymousApiInterface";
 import { enrichAppointment, parseUntrustedJSON, verify } from "./utils";
 
-export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
+export class AnonymousApi<
+    Vaccine = string
+> extends AbstractApi<AnonymousApiInterface> {
     /**
      * Returns a single, public Appointment
      *
@@ -70,7 +72,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
         );
 
-        let appointments: PublicAppointment[] = [];
+        let appointments: PublicAppointment<Vaccine>[] = [];
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
@@ -101,12 +103,15 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
         );
 
-        const aggregatedAppointments: AggregatedPublicAppointment[] = [];
+        const aggregatedAppointments: AggregatedPublicAppointment<Vaccine>[] =
+            [];
 
         for (const apiAggregatedAppointment of ApiAggregatedAppointments) {
             for (const aggregatedAppointment of apiAggregatedAppointment.appointments) {
                 aggregatedAppointments.push({
                     ...aggregatedAppointment,
+                    vaccine:
+                        aggregatedAppointment.vaccine as unknown as Vaccine,
                     provider: apiAggregatedAppointment.provider,
                     startDate: dayjs.utc(aggregatedAppointment.timestamp),
                     endDate: dayjs
@@ -182,7 +187,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             signedAppointments.provider.data
         );
 
-        const appointments: PublicAppointment[] = [];
+        const appointments: PublicAppointment<Vaccine>[] = [];
 
         for (const signedAppointment of signedAppointments.appointments) {
             const apiAppointment = parseUntrustedJSON<ApiAppointment>(
@@ -194,7 +199,7 @@ export class AnonymousApi extends AbstractApi<AnonymousApiInterface> {
             }
 
             appointments.push(
-                enrichAppointment(
+                enrichAppointment<Vaccine>(
                     {
                         ...apiAppointment,
                         bookedSlots: signedAppointment.bookedSlots,
