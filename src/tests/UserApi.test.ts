@@ -95,6 +95,22 @@ describe("UserApi", () => {
 
             expect(bookedAppointment).toBeDefined();
         });
+
+        it("should be able to validate against the backend", async () => {
+            const userSecret = context.userApi.generateSecret();
+
+            expect(userSecret).toHaveLength(16);
+
+            const userQueueToken = await context.userApi.getQueueToken(
+                userSecret
+            );
+
+            expect(userQueueToken).toBeDefined();
+
+            const isValid = await context.userApi.isValidToken(userQueueToken);
+
+            expect(isValid).toEqual(true);
+        });
     });
 
     describe("Appointments", () => {

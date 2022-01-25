@@ -192,12 +192,24 @@ describe("ProviderApi", () => {
                 await context.providerApi.isValidKeyPairs(
                     unverifiedProvider.providerKeyPairs
                 )
+            ).toEqual(true);
+
+            expect(
+                await context.providerApi.isValidatedKeyPairs(
+                    unverifiedProvider.providerKeyPairs
+                )
             ).toEqual(false);
 
             const verifiedProvider = await context.createVerifiedProvider();
 
             expect(
                 await context.providerApi.isValidKeyPairs(
+                    verifiedProvider.providerKeyPairs
+                )
+            ).toEqual(true);
+
+            expect(
+                await context.providerApi.isValidatedKeyPairs(
                     verifiedProvider.providerKeyPairs
                 )
             ).toEqual(true);

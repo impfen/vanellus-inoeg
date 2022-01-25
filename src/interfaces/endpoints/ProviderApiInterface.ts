@@ -51,4 +51,7 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
 
     // check if the provider is recognized in the backend
     isValidProvider: () => boolean;
+
+    // check if the provider is recognized in the backend and validated
+    isValidatedProvider: () => boolean;
 }

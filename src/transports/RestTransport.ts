@@ -106,6 +106,14 @@ const methodData: Record<
         uri: "provider/isValid",
         method: "POST",
     },
+    isValidatedProvider: {
+        uri: "provider/isValid",
+        method: "POST",
+    },
+    isValidUser: {
+        uri: "provider/isValid",
+        method: "POST",
+    },
     storeProviderData: {
         uri: "providers/data",
         method: "POST",

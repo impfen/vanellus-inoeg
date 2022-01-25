@@ -533,6 +533,20 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
+     * Checks if the backend recognizes our id as a provider id that has been
+     * validated by a mediator
+     *
+     * @return Promise<boolean>
+     */
+    public async isValidatedKeyPairs(providerKeyPairs: ProviderKeyPairs) {
+        return this.transport.call(
+            "isValidatedProvider",
+            undefined,
+            providerKeyPairs.signing
+        );
+    }
+
+    /**
      * Backups relevant data of the provider into the storage backend.
      * Used for persistance.
      *

@@ -38,4 +38,10 @@ export interface UserApiInterface extends AnonymousApiInterface {
         publicKey: string;
         code?: string;
     }) => SignedData;
+
+    isValidUser: ({
+        signedTokenData,
+    }: {
+        signedTokenData: SignedData;
+    }) => boolean;
 }

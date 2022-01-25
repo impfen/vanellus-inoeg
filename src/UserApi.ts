@@ -191,6 +191,23 @@ export class UserApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
+     * checks if the backend recognizes the signed user token
+     *
+     * @returns Promise<boolean>
+     */
+    public async isValidToken(userQueueToken: UserQueueToken) {
+        const result = await this.transport.call(
+            "isValidUser",
+            {
+                signedTokenData: userQueueToken.signedToken,
+            },
+            userQueueToken.keyPairs.signing
+        );
+
+        return result;
+    }
+
+    /**
      * Backups relevant data of the user into the storage backend.
      * Used for persistance.
      *

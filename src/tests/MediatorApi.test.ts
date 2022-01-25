@@ -92,7 +92,7 @@ describe("MediatorService", () => {
             expect(provider).toEqual(unverifiedProvider);
         });
 
-        it("should validate provider", async () => {
+        it("should validate mediator", async () => {
             expect(
                 await context.mediatorApi.isValidKeyPairs(
                     context.mediatorKeyPairs
