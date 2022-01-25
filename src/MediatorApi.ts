@@ -186,7 +186,7 @@ export class MediatorApi extends AbstractApi<
      *
      * A provider is pending until it is confirmed by a mediator.
      *
-     * @return Promise<Provider>
+     * @return Promise<ProviderPair>
      */
     public async getProvider(
         providerId: string,
@@ -198,7 +198,22 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing
         );
 
-        return this.decryptProvider(encryptedProvider, mediatorKeyPairs);
+        const unverifiedData = await this.decryptProvider(
+            encryptedProvider.unverifiedData,
+            mediatorKeyPairs
+        );
+
+        const verifiedData = encryptedProvider.verifiedData
+            ? await this.decryptProvider(
+                  encryptedProvider.verifiedData,
+                  mediatorKeyPairs
+              )
+            : undefined;
+
+        return {
+            unverifiedProvider: unverifiedData,
+            verifiedProvider: verifiedData,
+        };
     }
 
     /**

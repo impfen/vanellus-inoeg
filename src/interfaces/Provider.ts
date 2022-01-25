@@ -29,6 +29,11 @@ export interface Provider extends ProviderInput {
     verified: boolean;
 }
 
+export interface ProviderPair {
+    unverifiedProvider: Provider;
+    verifiedProvider?: Provider;
+}
+
 export interface ProviderData {
     verifiedProvider: Provider | null;
     publicProvider: PublicProvider | null;

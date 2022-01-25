@@ -2,7 +2,11 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import type { ApiEncryptedProvider, SignedData } from "../api";
+import type {
+    ApiEncryptedProvider,
+    ApiProviderDataPair,
+    SignedData,
+} from "../api";
 import type { Provider } from "../Provider";
 import type { AnonymousApiInterface } from "./AnonymousApiInterface";
 
@@ -33,7 +37,7 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
         providerID,
     }: {
         providerID: string;
-    }) => ApiEncryptedProvider;
+    }) => ApiProviderDataPair;
 
     checkProviderData: () => Provider;
 

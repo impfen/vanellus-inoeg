@@ -69,15 +69,34 @@ describe("MediatorService", () => {
         });
 
         it("should get single verified provider", async () => {
-            const { provider: verifiedProvider } =
-                await context.createVerifiedProvider();
+            const {
+                provider: verifiedProvider,
+                providerKeyPairs: verifiedProviderKeyPairs,
+            } = await context.createVerifiedProvider();
 
-            const provider = await context.mediatorApi.getProvider(
+            let provider = await context.mediatorApi.getProvider(
                 verifiedProvider.id,
                 context.mediatorKeyPairs
             );
 
-            expect(provider).toEqual(verifiedProvider);
+            expect(provider.verifiedProvider).toEqual(verifiedProvider);
+            expect(provider.unverifiedProvider).toEqual(verifiedProvider);
+
+            await context.providerApi.storeProvider(
+                {
+                    ...verifiedProvider,
+                    name: "New Name",
+                },
+                verifiedProviderKeyPairs
+            );
+
+            provider = await context.mediatorApi.getProvider(
+                verifiedProvider.id,
+                context.mediatorKeyPairs
+            );
+
+            expect(provider.verifiedProvider).toEqual(verifiedProvider);
+            expect(provider.unverifiedProvider.name).toEqual("New Name");
         });
 
         it("should get single unverified provider", async () => {
@@ -89,7 +108,8 @@ describe("MediatorService", () => {
                 context.mediatorKeyPairs
             );
 
-            expect(provider).toEqual(unverifiedProvider);
+            expect(provider.unverifiedProvider).toEqual(unverifiedProvider);
+            expect(provider.verifiedProvider).toEqual(undefined);
         });
 
         it("should validate mediator", async () => {

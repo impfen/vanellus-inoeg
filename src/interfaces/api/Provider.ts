@@ -17,6 +17,11 @@ export interface ApiEncryptedProvider {
     encryptedData: ECDHData;
 }
 
+export interface ApiProviderDataPair {
+    unverifiedData: ApiEncryptedProvider;
+    verifiedData?: ApiEncryptedProvider;
+}
+
 export interface ApiSignedProviderData extends SignedData {
     id: string;
 }
