@@ -32,7 +32,6 @@ export interface PublicProvider extends Omit<ProviderInput, "email"> {
 export interface Provider extends ProviderInput {
     id: string;
     publicKeys: ProviderPublicKeys;
-    verified: boolean;
 }
 
 export interface ProviderPair {
