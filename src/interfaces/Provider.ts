@@ -2,6 +2,12 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+export enum ProviderStatus {
+    UNVERIFIED = "UNVERIFIED",
+    VERIFIED = "VERIFIED",
+    UPDATED = "UPDATED",
+}
+
 export interface ProviderPublicKeys {
     signing: string;
     encryption: string;
@@ -32,9 +38,5 @@ export interface Provider extends ProviderInput {
 export interface ProviderPair {
     unverifiedProvider: Provider;
     verifiedProvider?: Provider;
-}
-
-export interface ProviderData {
-    verifiedProvider: Provider | null;
-    publicProvider: PublicProvider | null;
+    status: ProviderStatus;
 }
