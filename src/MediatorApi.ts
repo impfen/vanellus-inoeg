@@ -74,7 +74,6 @@ export class MediatorApi extends AbstractApi<
             accessible: provider.accessible,
             publicKeys: provider.publicKeys,
             email: provider.email,
-            verified: true,
         };
 
         const signedKeyData = await sign(
@@ -280,7 +279,6 @@ export class MediatorApi extends AbstractApi<
 
         const provider: Provider = {
             ...parseUntrustedJSON<Provider>(decryptedProviderDataString),
-            verified: apiProvider.verified,
         };
 
         return provider;

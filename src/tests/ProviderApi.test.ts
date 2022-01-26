@@ -4,8 +4,7 @@
 
 import dayjs from "dayjs";
 import { NotFoundError } from "../errors";
-import type { ProviderBackup } from "../interfaces";
-import { AppointmentStatus } from "../interfaces";
+import { AppointmentStatus, ProviderBackup } from "../interfaces";
 import { TestContext } from "./TestContext";
 
 describe("ProviderApi", () => {
@@ -69,7 +68,6 @@ describe("ProviderApi", () => {
             );
 
             expect(provider.name).toEqual(context.defaultProviderData.name);
-            expect(provider.verified).toEqual(false);
         });
 
         it("should retrieve no data while provider is pending", async () => {
@@ -114,10 +112,7 @@ describe("ProviderApi", () => {
                 context.mediatorKeyPairs
             );
 
-            expect(verifiedProvider).toEqual({
-                ...provider,
-                verified: true,
-            });
+            expect(verifiedProvider).toEqual(provider);
         });
 
         it("should get data for verified provider", async () => {
@@ -127,10 +122,7 @@ describe("ProviderApi", () => {
             const { verifiedProvider } =
                 await context.providerApi.checkProvider(providerKeyPairs);
 
-            expect({
-                ...provider,
-                verified: true,
-            }).toEqual(verifiedProvider);
+            expect(provider).toEqual(verifiedProvider);
         });
 
         it("should update verified provider", async () => {
@@ -148,10 +140,7 @@ describe("ProviderApi", () => {
             const { verifiedProvider, publicProvider } =
                 await context.providerApi.checkProvider(providerKeyPairs);
 
-            expect({
-                ...verifiedProvider,
-                verified: true,
-            }).toEqual(provider);
+            expect(verifiedProvider).toEqual(provider);
 
             expect(publicProvider?.id).toEqual(provider.id);
             expect(publicProvider?.email).not.toBeDefined();
@@ -163,7 +152,6 @@ describe("ProviderApi", () => {
 
             expect(pendingProviders[0]?.id).toEqual(provider.id);
             expect(pendingProviders[0]?.name).toEqual("New Name");
-            expect(pendingProviders[0]?.verified).toEqual(false);
         });
 
         it("should update unverified provider", async () => {
