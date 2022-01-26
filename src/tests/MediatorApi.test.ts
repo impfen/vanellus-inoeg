@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { ProviderStatus } from "..";
 import { TestContext } from "./TestContext";
 
 describe("MediatorService", () => {
@@ -81,6 +82,7 @@ describe("MediatorService", () => {
 
             expect(provider.verifiedProvider).toEqual(verifiedProvider);
             expect(provider.unverifiedProvider).toEqual(verifiedProvider);
+            expect(provider.status).toEqual(ProviderStatus.VERIFIED);
 
             await context.providerApi.storeProvider(
                 {
@@ -97,6 +99,7 @@ describe("MediatorService", () => {
 
             expect(provider.verifiedProvider).toEqual(verifiedProvider);
             expect(provider.unverifiedProvider.name).toEqual("New Name");
+            expect(provider.status).toEqual(ProviderStatus.UPDATED);
         });
 
         it("should get single unverified provider", async () => {
@@ -110,6 +113,7 @@ describe("MediatorService", () => {
 
             expect(provider.unverifiedProvider).toEqual(unverifiedProvider);
             expect(provider.verifiedProvider).toEqual(undefined);
+            expect(provider.status).toEqual(ProviderStatus.UNVERIFIED);
         });
 
         it("should validate mediator", async () => {

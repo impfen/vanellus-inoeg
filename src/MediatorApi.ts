@@ -4,10 +4,12 @@
 
 import { AbstractApi } from "./AbstractApi";
 import { UnexpectedError } from "./errors";
-import type {
+import {
     ApiEncryptedProvider,
     MediatorKeyPairs,
     Provider,
+    ProviderPair,
+    ProviderStatus,
     PublicProvider,
     QueueData,
     SignedProvider,
@@ -198,22 +200,39 @@ export class MediatorApi extends AbstractApi<
             mediatorKeyPairs.signing
         );
 
-        const unverifiedData = await this.decryptProvider(
+        const unverifiedProvider = await this.decryptProvider(
             encryptedProvider.unverifiedData,
             mediatorKeyPairs
         );
 
-        const verifiedData = encryptedProvider.verifiedData
+        const verifiedProvider = encryptedProvider.verifiedData
             ? await this.decryptProvider(
                   encryptedProvider.verifiedData,
                   mediatorKeyPairs
               )
             : undefined;
 
-        return {
-            unverifiedProvider: unverifiedData,
-            verifiedProvider: verifiedData,
+        let status = ProviderStatus.UNVERIFIED;
+
+        if (verifiedProvider) {
+            if (
+                unverifiedProvider &&
+                JSON.stringify(unverifiedProvider) ===
+                    JSON.stringify(verifiedProvider)
+            ) {
+                status = ProviderStatus.VERIFIED;
+            } else {
+                status = ProviderStatus.UPDATED;
+            }
+        }
+
+        const providerPair: ProviderPair = {
+            unverifiedProvider,
+            verifiedProvider,
+            status,
         };
+
+        return providerPair;
     }
 
     /**

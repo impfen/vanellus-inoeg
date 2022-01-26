@@ -49,7 +49,7 @@ export class UserApi<Vaccine = string> extends AbstractApi<
             userToken: userQueueToken.userToken,
         };
 
-        // we don't care about the ephmeral key
+        // we don't care about the ephemeral key
         const [encryptedData] = await ephemeralECDHEncrypt(
             JSON.stringify(providerData),
             appointment.publicKey
