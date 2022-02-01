@@ -5,9 +5,9 @@
 import type { ContactData, QueueData, UserQueueToken } from "./";
 import type { Booking } from "./Booking";
 
-export interface UserBackup {
+export interface UserBackup<Vaccine = string> {
     userQueueToken?: UserQueueToken;
     queueData?: QueueData;
     contactData?: ContactData;
-    bookings: Booking[];
+    bookings: Booking<Vaccine>[];
 }
