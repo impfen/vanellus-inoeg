@@ -230,7 +230,7 @@ export class UserApi<Vaccine = string> extends AbstractApi<
     public async restoreFromBackup(secret: string) {
         const storage = new StorageApi(this.config);
 
-        return storage.restore<UserBackup>(secret);
+        return storage.restore<UserBackup<Vaccine>>(secret);
     }
 
     /**
