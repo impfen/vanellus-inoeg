@@ -4,7 +4,7 @@
 
 import dayjs from "dayjs";
 import { NotFoundError } from "../errors";
-import { AppointmentStatus, ProviderBackup } from "../interfaces";
+import { AppointmentStatus } from "../interfaces";
 import { TestContext } from "./TestContext";
 
 describe("ProviderApi", () => {
@@ -686,24 +686,26 @@ describe("ProviderApi", () => {
         });
 
         it("should backup and restore", async () => {
-            const { provider } = await context.createVerifiedProvider();
+            const { provider, providerKeyPairs } =
+                await context.createUnverifiedProvider();
 
             const secret = context.providerApi.generateSecret();
 
-            const providerBackup: ProviderBackup = {
-                verifiedProvider: provider,
-            };
-
-            const result = await context.providerApi.backupData(
-                providerBackup,
+            const encryptedBackup = await context.providerApi.backupData(
+                provider,
+                providerKeyPairs,
                 secret
             );
 
-            expect(result).toHaveProperty("data");
+            expect(encryptedBackup).toHaveProperty("data");
 
-            const restore = await context.providerApi.restoreFromBackup(secret);
+            const restore = await context.providerApi.restoreFromBackup(
+                encryptedBackup,
+                secret
+            );
 
-            expect(providerBackup).toEqual(restore);
+            expect(restore.publicProvider).toEqual(provider);
+            expect(restore.providerKeyPairs).toEqual(providerKeyPairs);
         });
     });
 });

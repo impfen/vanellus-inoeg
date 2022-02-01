@@ -2,9 +2,10 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import type { Provider } from "./Provider";
+import type { ProviderKeyPairs } from ".";
 
 export interface ProviderBackup {
-    verifiedProvider?: Provider;
-    unverifiedProvider?: Provider;
+    version: "0.1";
+    providerKeyPairs: ProviderKeyPairs;
+    createdAt: string;
 }
