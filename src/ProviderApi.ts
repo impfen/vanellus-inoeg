@@ -13,6 +13,7 @@ import {
     VanellusError,
 } from "./errors";
 import {
+    AESData,
     ApiAppointment,
     ApiBooking,
     ApiEncryptedBooking,
@@ -38,6 +39,8 @@ import {
 import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
 import {
+    aesDecrypt,
+    aesEncrypt,
     base64ToBuffer,
     ecdhDecrypt,
     ecdhEncrypt,
@@ -553,22 +556,57 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      *
      * @returns Promise<ProviderBackup>
      */
-    public async backupData(providerBackup: ProviderBackup, secret: string) {
+    public async backupData(
+        provider: PublicProvider,
+        providerKeyPairs: ProviderKeyPairs,
+        secret: string
+    ) {
         const storage = new StorageApi(this.config);
 
-        return storage.backup<ProviderBackup>(providerBackup, secret);
+        // @ts-expect-error just to be sure to not backup the keyPairs
+        delete provider.keyPairs;
+
+        await storage.backup<PublicProvider>(provider, secret);
+
+        const providerBackup: ProviderBackup = {
+            version: "0.1",
+            providerKeyPairs,
+            createdAt: new Date().toISOString(),
+        };
+
+        const encryptedProviderBackup = await aesEncrypt(
+            JSON.stringify(providerBackup),
+            Buffer.from(encodeBase32(secret))
+        );
+
+        return encryptedProviderBackup;
     }
 
     /**
      * Restores relevant data of the provider from the storage backend.
      * Used for persistance.
      *
-     * @returns Promise<UserBackup>
+     * @returns Promise<ProviderBackup>
      */
-    public async restoreFromBackup(secret: string) {
+    public async restoreFromBackup(
+        encryptedLocalBackup: AESData,
+        secret: string
+    ) {
+        const decryptedKeyData = await aesDecrypt(
+            encryptedLocalBackup,
+            Buffer.from(encodeBase32(secret))
+        );
+
+        const localData = parseUntrustedJSON<ProviderBackup>(decryptedKeyData);
+
         const storage = new StorageApi(this.config);
 
-        return storage.restore<ProviderBackup>(secret);
+        const publicProvider = await storage.restore<Provider>(secret);
+
+        return {
+            publicProvider,
+            providerKeyPairs: localData?.providerKeyPairs,
+        };
     }
 
     /**
