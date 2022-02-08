@@ -340,7 +340,12 @@ describe("UserApi", () => {
                 appointment.provider.id
             );
 
-            expect(bookedAppointment.slotData[0].open).toEqual(false);
+            expect(
+                bookedAppointment.slotData.filter((s) => s.open).length
+            ).toEqual(1);
+            expect(
+                bookedAppointment.slotData.filter((s) => !s.open).length
+            ).toEqual(1);
 
             const cancelResult = await context.userApi.cancelBooking(booking);
 
@@ -361,7 +366,12 @@ describe("UserApi", () => {
                     appointment.provider.id
                 );
 
-            expect(canceledAppointment.slotData[0].open).toEqual(true);
+            expect(
+                canceledAppointment.slotData.filter((s) => s.open).length
+            ).toEqual(2);
+            expect(
+                canceledAppointment.slotData.filter((s) => !s.open).length
+            ).toEqual(0);
         });
 
         it("should have no bookings after cancelation by the provider", async () => {
