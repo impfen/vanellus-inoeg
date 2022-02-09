@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { NotFoundError, TransportError } from ".";
 import { AbstractApi } from "./AbstractApi";
 import type {
+    ActorPublicKeys,
     AggregatedPublicAppointment,
     ApiAppointment,
     ApiProviderAppointments,
@@ -24,11 +25,7 @@ export class AnonymousApi<
      *
      * @return Promise<PublicAppointment | null>
      */
-    public async getAppointment(
-        appointmentId: string,
-        providerId: string,
-        doVerify = false
-    ) {
+    public async getAppointment(appointmentId: string, providerId: string) {
         try {
             const signedAppointments = await this.transport.call(
                 "getAppointment",
@@ -38,9 +35,7 @@ export class AnonymousApi<
                 }
             );
 
-            return (
-                await this.parseAppointments(signedAppointments, doVerify)
-            )[0];
+            return (await this.parseAppointments(signedAppointments))[0];
         } catch (error) {
             if (error instanceof TransportError && error.code === -32602) {
                 throw new NotFoundError(
@@ -59,8 +54,7 @@ export class AnonymousApi<
         zipCode: number | string,
         from: Dayjs,
         to: Dayjs,
-        radius = 50,
-        doVerify = false
+        radius = 50
     ) {
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
@@ -76,10 +70,7 @@ export class AnonymousApi<
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
-                await this.parseAppointments(
-                    signedProviderAppointment,
-                    doVerify
-                )
+                await this.parseAppointments(signedProviderAppointment)
             );
         }
 
@@ -180,8 +171,7 @@ export class AnonymousApi<
      * @returns PublicAppointment[]
      */
     protected async parseAppointments(
-        signedAppointments: ApiProviderAppointments,
-        doVerify = false
+        signedAppointments: ApiProviderAppointments
     ) {
         const publicProvider = parseUntrustedJSON<PublicProvider>(
             signedAppointments.provider.data
@@ -194,9 +184,7 @@ export class AnonymousApi<
                 signedAppointment.data
             );
 
-            if (doVerify) {
-                await verify([signedAppointment.publicKey], signedAppointment);
-            }
+            await verify([signedAppointment.publicKey], signedAppointment);
 
             appointments.push(
                 enrichAppointment<Vaccine>(

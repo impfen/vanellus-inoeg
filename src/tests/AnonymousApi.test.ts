@@ -158,8 +158,7 @@ describe("AnonymousApi", () => {
 
             const verifiedAppointment = context.anonymousApi.getAppointment(
                 appointment.id,
-                appointment.provider.id,
-                true
+                appointment.provider.id
             );
 
             await expect(verifiedAppointment).resolves.not.toThrow();

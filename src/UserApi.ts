@@ -122,8 +122,7 @@ export class UserApi<Vaccine = string> extends AbstractApi<
 
         const appointment = await anonApi.getAppointment(
             booking.appointment.id,
-            booking.appointment.provider.id,
-            true
+            booking.appointment.provider.id
         );
 
         const slot = appointment.slotData.find(
