@@ -33,3 +33,8 @@ export interface ApiProviderData {
     description: string;
     accessible: boolean;
 }
+
+export interface ProviderKeyData {
+    signing: string;
+    encryption: string;
+}

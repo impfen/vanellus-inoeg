@@ -7,10 +7,12 @@ import dayjs from "dayjs";
 import { NotFoundError, TransportError } from ".";
 import { AbstractApi } from "./AbstractApi";
 import type {
-    ActorPublicKeys,
     AggregatedPublicAppointment,
     ApiAppointment,
     ApiProviderAppointments,
+    BackendPublicKeys,
+    MediatorKeyData,
+    ProviderKeyData,
     PublicAppointment,
     PublicProvider,
 } from "./interfaces";
@@ -27,6 +29,7 @@ export class AnonymousApi<
      */
     public async getAppointment(appointmentId: string, providerId: string) {
         try {
+            const backendKeys = await this.getKeys();
             const signedAppointments = await this.transport.call(
                 "getAppointment",
                 {
@@ -35,7 +38,9 @@ export class AnonymousApi<
                 }
             );
 
-            return (await this.parseAppointments(signedAppointments))[0];
+            return (
+                await this.parseAppointments(signedAppointments, backendKeys)
+            )[0];
         } catch (error) {
             if (error instanceof TransportError && error.code === -32602) {
                 throw new NotFoundError(
@@ -56,6 +61,7 @@ export class AnonymousApi<
         to: Dayjs,
         radius = 50
     ) {
+        const backendKeys = await this.getKeys();
         const signedProviderAppointments = await this.transport.call(
             "getAppointmentsByZipCode",
             {
@@ -70,7 +76,10 @@ export class AnonymousApi<
 
         for (const signedProviderAppointment of signedProviderAppointments) {
             appointments = appointments.concat(
-                await this.parseAppointments(signedProviderAppointment)
+                await this.parseAppointments(
+                    signedProviderAppointment,
+                    backendKeys
+                )
             );
         }
 
@@ -171,10 +180,27 @@ export class AnonymousApi<
      * @returns PublicAppointment[]
      */
     protected async parseAppointments(
-        signedAppointments: ApiProviderAppointments
+        signedAppointments: ApiProviderAppointments,
+        backendKeys: BackendPublicKeys
     ) {
         const publicProvider = parseUntrustedJSON<PublicProvider>(
             signedAppointments.provider.data
+        );
+        const mediatorPublicKeys = parseUntrustedJSON<MediatorKeyData>(
+            signedAppointments.keyChain.mediator.data
+        );
+        const providerPublicKeys = parseUntrustedJSON<ProviderKeyData>(
+            signedAppointments.keyChain.provider.data
+        );
+
+        // verify key chain
+        await verify(
+            [backendKeys.rootKey],
+            signedAppointments.keyChain.mediator
+        );
+        await verify(
+            [mediatorPublicKeys.signing],
+            signedAppointments.keyChain.provider
         );
 
         const appointments: PublicAppointment<Vaccine>[] = [];
@@ -184,7 +210,7 @@ export class AnonymousApi<
                 signedAppointment.data
             );
 
-            await verify([signedAppointment.publicKey], signedAppointment);
+            await verify([providerPublicKeys.signing], signedAppointment);
 
             appointments.push(
                 enrichAppointment<Vaccine>(
