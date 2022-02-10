@@ -172,7 +172,7 @@ describe("AnonymousApi", () => {
             context = await TestContext.createContext();
         });
 
-        it("shouldn get providers for single zip", async () => {
+        it("should get providers for single zip", async () => {
             const { provider } = await context.createVerifiedProvider({
                 zipCode: "30636",
             });
