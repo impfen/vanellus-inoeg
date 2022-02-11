@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 // https://base64.guru/standards/base64url
 export const encodeBase64url = (string: string | Buffer) => {
     return Buffer.from(string)

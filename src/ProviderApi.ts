@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Buffer } from "buffer";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { AbstractApi } from "./AbstractApi";
