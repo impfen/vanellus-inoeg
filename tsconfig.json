@@ -1,5 +1,6 @@
 {
     "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "vanellus",
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
@@ -10,8 +11,10 @@
         "allowSyntheticDefaultImports": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "preserveValueImports": true,
         "outDir": "./dist",
         "resolveJsonModule": true,
+        "sourceMap": true,
         "pretty": true,
         "importsNotUsedAsValues": "error"
     }
