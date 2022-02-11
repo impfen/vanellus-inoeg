@@ -203,6 +203,9 @@ export class AnonymousApi<
             signedAppointments.keyChain.provider
         );
 
+        // verify provider
+        await verify([mediatorPublicKeys.signing], signedAppointments.provider);
+
         const appointments: PublicAppointment<Vaccine>[] = [];
 
         for (const signedAppointment of signedAppointments.appointments) {
