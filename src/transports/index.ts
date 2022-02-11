@@ -3,5 +3,5 @@
 // README.md contains license information.
 
 export * from "./JsonRpcTransport";
-export * from "./RestTransport";
+// export * from "./RestTransport";
 export * from "./Transport";
