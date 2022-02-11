@@ -12,6 +12,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "preserveValueImports": true,
+        "isolatedModules": true,
         "outDir": "./dist",
         "resolveJsonModule": true,
         "sourceMap": true,
