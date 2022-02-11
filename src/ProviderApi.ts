@@ -444,7 +444,14 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
 
         const providerData: Provider = {
             id,
-            ...providerInput,
+            name: String(providerInput.name),
+            street: String(providerInput.street),
+            city: String(providerInput.city),
+            zipCode: String(providerInput.zipCode),
+            description: String(providerInput.description),
+            accessible: Boolean(providerInput.accessible),
+            website: String(providerInput.website || ""),
+            email: String(providerInput.email),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,

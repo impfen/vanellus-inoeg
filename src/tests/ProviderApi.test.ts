@@ -154,6 +154,34 @@ describe("ProviderApi", () => {
             expect(pendingProviders[0]?.name).toEqual("New Name");
         });
 
+        it("should update provider with resilience", async () => {
+            const { provider, providerKeyPairs } =
+                await context.createVerifiedProvider();
+
+            await context.providerApi.storeProvider(
+                {
+                    ...provider,
+                    website: undefined,
+                },
+                providerKeyPairs
+            );
+
+            const { verifiedProvider, publicProvider } =
+                await context.providerApi.checkProvider(providerKeyPairs);
+
+            expect(verifiedProvider).toEqual(provider);
+
+            expect(publicProvider?.id).toEqual(provider.id);
+
+            const pendingProviders =
+                await context.mediatorApi.getPendingProviders(
+                    context.mediatorKeyPairs
+                );
+
+            expect(pendingProviders[0]?.id).toEqual(provider.id);
+            expect(pendingProviders[0]?.website).toEqual("");
+        });
+
         it("should update unverified provider", async () => {
             const { provider, providerKeyPairs } =
                 await context.createUnverifiedProvider();
