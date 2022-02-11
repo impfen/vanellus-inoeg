@@ -565,7 +565,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      * @returns Promise<ProviderBackup>
      */
     public async backupData(
-        provider: PublicProvider,
+        provider: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         secret: string
     ) {
@@ -574,7 +574,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         // @ts-expect-error just to be sure to not backup the keyPairs
         delete provider.keyPairs;
 
-        await storage.backup<PublicProvider>(provider, secret);
+        await storage.backup<ProviderInput>(provider, secret);
 
         const providerBackup: ProviderBackup = {
             version: "0.1",
