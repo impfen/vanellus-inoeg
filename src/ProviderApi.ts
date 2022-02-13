@@ -426,10 +426,12 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
-     * Stores a provider for initial signup or save after a change of data
+     * Stores a provider for initial signup or save after a change of data.
+     * Automatically updates the updateAt field unless explicitly set.
      *
      * @param providerInput     Data to save
      * @param providerKeyPairs  KeyPairs of the provider to store
+     * @param updatedAt         Explicitly set the updatedAt timestamp
      * @param signupCode        Optional signup code
      *
      * @returns Promise<Provider>
@@ -455,7 +457,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             email: String(providerInput.email),
             version: "1.0",
             updatedAt: String(updatedAt || dayjs.utc()),
-            createdAt: String(dayjs.utc()),
+            createdAt: String(providerInput.createdAt),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,
