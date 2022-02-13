@@ -486,7 +486,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      * Checks if a provider is verified and, if yes, returns the verified data.
      * If the current provider, who provided the keys, is not verified yet, null is returned.
      *
-     * @return Promise<ProviderData>
+     * @return Promise<Provider | null>
      */
     public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
@@ -509,23 +509,11 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             const decryptedProviderDataJSON =
                 parseUntrustedJSON<SignedProvider>(providerDataString);
 
-            const verifiedProvider = parseUntrustedJSON<Provider>(
+            return parseUntrustedJSON<Provider>(
                 decryptedProviderDataJSON.signedData.data
             );
-
-            const publicProvider = parseUntrustedJSON<Provider>(
-                decryptedProviderDataJSON.signedPublicData.data
-            );
-
-            return {
-                verifiedProvider,
-                publicProvider,
-            };
         } catch (error) {
-            return {
-                verifiedProvider: null,
-                publicProvider: null,
-            };
+            return null;
         }
     }
 

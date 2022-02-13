@@ -74,8 +74,9 @@ describe("ProviderApi", () => {
             const { providerKeyPairs } =
                 await context.createUnverifiedProvider();
 
-            const { verifiedProvider } =
-                await context.providerApi.checkProvider(providerKeyPairs);
+            const verifiedProvider = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
 
             expect(verifiedProvider).toBeNull();
         });
@@ -119,8 +120,9 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            const { verifiedProvider } =
-                await context.providerApi.checkProvider(providerKeyPairs);
+            const verifiedProvider = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
 
             expect(provider).toEqual(verifiedProvider);
         });
@@ -137,13 +139,13 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            const { verifiedProvider, publicProvider } =
-                await context.providerApi.checkProvider(providerKeyPairs);
+            const verifiedProvider = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
 
             expect(verifiedProvider).toEqual(provider);
 
-            expect(publicProvider?.id).toEqual(provider.id);
-            expect(publicProvider?.email).not.toBeDefined();
+            expect(verifiedProvider?.id).toEqual(provider.id);
 
             const pendingProviders =
                 await context.mediatorApi.getPendingProviders(
@@ -166,12 +168,13 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            const { verifiedProvider, publicProvider } =
-                await context.providerApi.checkProvider(providerKeyPairs);
+            const verifiedProvider = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
 
             expect(verifiedProvider).toEqual(provider);
 
-            expect(publicProvider?.id).toEqual(provider.id);
+            expect(verifiedProvider?.id).toEqual(provider.id);
 
             const pendingProviders =
                 await context.mediatorApi.getPendingProviders(
@@ -194,11 +197,11 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
-            const { verifiedProvider, publicProvider } =
-                await context.providerApi.checkProvider(providerKeyPairs);
+            const verifiedProvider = await context.providerApi.checkProvider(
+                providerKeyPairs
+            );
 
             expect(verifiedProvider).toBeNull();
-            expect(publicProvider).toBeNull();
         });
 
         it("should validate provider", async () => {
