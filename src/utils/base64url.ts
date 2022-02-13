@@ -1,21 +1,11 @@
+import { base64url } from "@scure/base";
 import { Buffer } from "buffer";
 
 // https://base64.guru/standards/base64url
-export const encodeBase64url = (string: string | Buffer) => {
-    return Buffer.from(string)
-        .toString("base64")
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=/g, "");
+export const encodeBase64url = (string: string | Buffer | Uint8Array) => {
+    return base64url.encode(Buffer.from(string));
 };
 
-export const decodeBase64url = (base64url: string) => {
-    return Buffer.from(
-        base64url +
-            "==="
-                .slice((base64url.length + 3) % 4)
-                .replace(/-/g, "+")
-                .replace(/_/g, "/"),
-        "base64"
-    ).toString();
+export const decodeBase64url = (encodedString: string) => {
+    return Buffer.from(base64url.decode(encodedString)).toString();
 };
