@@ -129,12 +129,15 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
+            expect(provider.updatedAt).toEqual(provider.createdAt);
+
             await context.providerApi.storeProvider(
                 {
                     ...provider,
                     name: "New Name",
                 },
-                providerKeyPairs
+                providerKeyPairs,
+                String(dayjs.utc().add(1, "second"))
             );
 
             const { verifiedProvider, publicProvider } =
@@ -152,6 +155,9 @@ describe("ProviderApi", () => {
 
             expect(pendingProviders[0]?.id).toEqual(provider.id);
             expect(pendingProviders[0]?.name).toEqual("New Name");
+            expect(
+                pendingProviders[0]?.updatedAt > provider.updatedAt
+            ).toBeTruthy();
         });
 
         it("should update provider with resilience", async () => {

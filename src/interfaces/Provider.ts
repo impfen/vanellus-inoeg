@@ -2,6 +2,8 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import type { VersionMetadata } from "./VersionMetadata";
+
 export enum ProviderStatus {
     UNVERIFIED = "UNVERIFIED",
     VERIFIED = "VERIFIED",
@@ -14,7 +16,7 @@ export interface ProviderPublicKeys {
     data: string;
 }
 
-export interface ProviderInput {
+export interface ProviderInput extends VersionMetadata {
     name: string;
     street: string;
     city: string;

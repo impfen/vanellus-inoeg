@@ -437,6 +437,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     public async storeProvider(
         providerInput: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
+        updatedAt?: string,
         signupCode?: string
     ) {
         const systemPublicKeys = await this.transport.call("getKeys");
@@ -452,6 +453,9 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             accessible: Boolean(providerInput.accessible),
             website: String(providerInput.website || ""),
             email: String(providerInput.email),
+            version: "1.0",
+            updatedAt: String(updatedAt || dayjs.utc()),
+            createdAt: String(dayjs.utc()),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,

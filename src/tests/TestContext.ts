@@ -95,9 +95,12 @@ export class TestContext {
         city: "Berlin",
         zipCode: "10707",
         description: "This is dummy data",
-        email: "ada@lovelace.net",
-        website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
         accessible: true,
+        website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
+        email: "ada@lovelace.net",
+        version: "1.0",
+        updatedAt: String(dayjs.utc()),
+        createdAt: String(dayjs.utc()),
     };
 
     /**

@@ -61,6 +61,9 @@ export class MediatorApi extends AbstractApi<
             website: provider.website,
             description: provider.description,
             accessible: provider.accessible,
+            version: provider.version,
+            updatedAt: provider.updatedAt,
+            createdAt: provider.createdAt,
         };
 
         const confirmedProvider: Provider = {
@@ -69,11 +72,14 @@ export class MediatorApi extends AbstractApi<
             street: provider.street,
             city: provider.city,
             zipCode: provider.zipCode,
-            website: provider.website,
             description: provider.description,
             accessible: provider.accessible,
-            publicKeys: provider.publicKeys,
+            website: provider.website,
             email: provider.email,
+            version: provider.version,
+            updatedAt: provider.updatedAt,
+            createdAt: provider.createdAt,
+            publicKeys: provider.publicKeys,
         };
 
         const signedKeyData = await sign(
