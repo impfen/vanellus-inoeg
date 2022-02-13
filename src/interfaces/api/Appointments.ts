@@ -4,6 +4,7 @@
 
 import type { Slot } from "../Appointment";
 import type { PublicProvider } from "../Provider";
+import type { VersionMetadata } from "../VersionMetadata";
 import type { ApiEncryptedBooking } from "./Booking";
 import type { SignedData } from "./crypto";
 import type { ApiSignedProviderData } from "./Provider";
@@ -52,7 +53,8 @@ export interface ApiAggregatedAppointment {
 }
 
 export interface ApiAppointment
-    extends Omit<ApiAggregatedAppointment, "slotN"> {
+    extends Omit<ApiAggregatedAppointment, "slotN">,
+        VersionMetadata {
     slotData: Slot[];
     bookedSlots: BookedSlot[];
     publicKey: string;

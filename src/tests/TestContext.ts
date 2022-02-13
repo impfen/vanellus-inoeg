@@ -89,6 +89,7 @@ export class TestContext {
         return context;
     }
 
+    public startedAt = dayjs.utc().toISOString();
     public defaultProviderData: ProviderInput = {
         name: "Ada Lovelace",
         street: "Spielstraße 23",
@@ -99,8 +100,8 @@ export class TestContext {
         website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
         email: "ada@lovelace.net",
         version: "1.0",
-        updatedAt: String(dayjs.utc()),
-        createdAt: String(dayjs.utc()),
+        updatedAt: this.startedAt,
+        createdAt: this.startedAt,
     };
 
     /**

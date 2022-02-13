@@ -31,6 +31,9 @@ export const enrichAppointment = <Vaccine = string>(
             ),
         })),
         vaccine: appointmentData.vaccine as unknown as Vaccine,
+        version: appointmentData.version,
+        updatedAt: appointmentData.updatedAt,
+        createdAt: appointmentData.createdAt,
     };
 
     return appointment;
@@ -48,6 +51,9 @@ export const unenrichAppointment = <Vaccine = string>(
         slotData: appointment.slotData,
         vaccine: appointment.vaccine as unknown as string,
         bookedSlots: [],
+        version: appointment.version,
+        updatedAt: appointment.updatedAt,
+        createdAt: appointment.createdAt,
     };
 
     return apiAppointment;

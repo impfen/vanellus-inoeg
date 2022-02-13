@@ -129,8 +129,6 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            expect(provider.updatedAt).toEqual(provider.createdAt);
-
             await context.providerApi.storeProvider(
                 {
                     ...provider,
@@ -326,7 +324,6 @@ describe("ProviderApi", () => {
             expect(appointments[0].properties).toEqual(
                 publishResult.properties
             );
-            expect(appointments[0].updatedAt.isUTC()).toBeTruthy();
             expect(appointments[0].updatedAt).not.toEqual(
                 initialAppointments[0].updatedAt
             );

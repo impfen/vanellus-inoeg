@@ -81,6 +81,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         properties?: Record<string, unknown>
     ) {
+        const now = dayjs.utc().toISOString();
         const appointment: UnpublishedPublicAppointment<Vaccine> = {
             id: randomBytes(32),
             startAt: startAt.utc(),
@@ -92,6 +93,9 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
             unpublished: true,
+            version: "1.0",
+            updatedAt: now,
+            createdAt: now,
         };
 
         return appointment;
@@ -307,6 +311,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         const unpublishedAppointment: UnpublishedPublicAppointment<Vaccine> = {
             ...appointment,
             unpublished: true,
+            updatedAt: dayjs.utc().toISOString(),
         };
 
         const canceledAppointments = await this.publishAppointments(
@@ -335,6 +340,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             ...appointment,
             slotData: [],
             unpublished: true,
+            updatedAt: dayjs.utc().toISOString(),
         };
 
         const updatedAppointments = await this.publishAppointments(
@@ -456,7 +462,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             website: String(providerInput.website || ""),
             email: String(providerInput.email),
             version: "1.0",
-            updatedAt: String(updatedAt || dayjs.utc()),
+            updatedAt: String(updatedAt || dayjs.utc().toISOString()),
             createdAt: String(providerInput.createdAt),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
@@ -767,7 +773,6 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
 
                     const appointment: Appointment<Vaccine> = {
                         ...enrichedAppointment,
-                        updatedAt: dayjs.utc(signedAppointment.updatedAt),
                         status,
                         bookings,
                     };

@@ -5,6 +5,7 @@
 import type { Dayjs } from "dayjs";
 import type { ProviderBooking } from "./Booking";
 import type { PublicProvider } from "./Provider";
+import type { VersionMetadata } from "./VersionMetadata";
 
 export interface Slot {
     id: string;
@@ -22,7 +23,8 @@ export interface AggregatedPublicAppointment<Vaccine = string> {
 }
 
 export interface PublicAppointment<Vaccine = string>
-    extends AggregatedPublicAppointment<Vaccine> {
+    extends AggregatedPublicAppointment<Vaccine>,
+        VersionMetadata {
     slotData: Slot[];
     publicKey: string;
 }
@@ -44,5 +46,4 @@ export interface Appointment<Vaccine = string>
     extends PublicAppointment<Vaccine> {
     bookings: ProviderBooking<Vaccine>[];
     status: AppointmentStatus;
-    updatedAt: Dayjs;
 }
