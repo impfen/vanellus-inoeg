@@ -605,7 +605,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         const providerBackup: ProviderBackup = {
             providerKeyPairs,
             version: "0.1",
-            createdAt: dayjs.utc().toISOString();,
+            createdAt: dayjs.utc().toISOString(),
         };
 
         return aesEncrypt(
