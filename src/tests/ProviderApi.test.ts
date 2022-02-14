@@ -47,7 +47,7 @@ describe("ProviderApi", () => {
             const providerKeyPairs =
                 await context.providerApi.generateKeyPairs();
 
-            const provider = await context.providerApi.storeProvider(
+            const provider = await context.providerApi.createProvider(
                 context.defaultProviderData,
                 providerKeyPairs
             );
@@ -129,13 +129,12 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     name: "New Name",
                 },
-                providerKeyPairs,
-                String(dayjs.utc().add(1, "second"))
+                providerKeyPairs
             );
 
             const { verifiedProvider, publicProvider } =
@@ -153,6 +152,7 @@ describe("ProviderApi", () => {
 
             expect(pendingProviders[0]?.id).toEqual(provider.id);
             expect(pendingProviders[0]?.name).toEqual("New Name");
+            expect(pendingProviders[0]?.createdAt).toEqual(provider.createdAt);
             expect(
                 pendingProviders[0]?.updatedAt > provider.updatedAt
             ).toBeTruthy();
@@ -162,7 +162,7 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     website: undefined,
@@ -190,7 +190,7 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createUnverifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     name: "foobar",

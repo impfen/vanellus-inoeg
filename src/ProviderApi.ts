@@ -23,11 +23,11 @@ import {
     AppointmentSeries,
     AppointmentStatus,
     BookingData,
+    CreateProviderInput,
     ECDHData,
     Provider,
     ProviderBackup,
     ProviderBooking,
-    ProviderInput,
     ProviderKeyPairs,
     PublicAppointment,
     PublicProvider,
@@ -35,6 +35,7 @@ import {
     Slot,
     UnpublishedAppointmentSeries,
     UnpublishedPublicAppointment,
+    UpdateProviderInput,
 } from "./interfaces";
 import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
@@ -432,25 +433,48 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
-     * Stores a provider for initial signup or save after a change of data.
-     * Automatically updates the updateAt field unless explicitly set.
+     * Stores a provider for initial signup.
      *
      * @param providerInput     Data to save
      * @param providerKeyPairs  KeyPairs of the provider to store
-     * @param updatedAt         Explicitly set the updatedAt timestamp
      * @param signupCode        Optional signup code
      *
      * @returns Promise<Provider>
      */
-    public async storeProvider(
-        providerInput: ProviderInput,
+    public async createProvider(
+        providerInput: CreateProviderInput,
         providerKeyPairs: ProviderKeyPairs,
-        updatedAt?: string,
+        signupCode?: string
+    ) {
+        return this.storeProvider(providerInput, providerKeyPairs, signupCode);
+    }
+
+    /**
+     * Updates the data stored about the provider in the backend.
+     *
+     * @param providerInput     Data to save
+     * @param providerKeyPairs  KeyPairs of the provider to store
+     * @param signupCode        Optional signup code
+     *
+     * @returns Promise<Provider>
+     */
+    public async updateProvider(
+        providerInput: UpdateProviderInput,
+        providerKeyPairs: ProviderKeyPairs,
+        signupCode?: string
+    ) {
+        return this.storeProvider(providerInput, providerKeyPairs, signupCode);
+    }
+
+    protected async storeProvider(
+        providerInput: CreateProviderInput | UpdateProviderInput,
+        providerKeyPairs: ProviderKeyPairs,
         signupCode?: string
     ) {
         const systemPublicKeys = await this.transport.call("getKeys");
         const id = await this.generateProviderId(providerKeyPairs);
 
+        const now = dayjs.utc().toISOString();
         const providerData: Provider = {
             id,
             name: String(providerInput.name),
@@ -462,8 +486,10 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             website: String(providerInput.website || ""),
             email: String(providerInput.email),
             version: "1.0",
-            updatedAt: String(updatedAt || dayjs.utc().toISOString()),
-            createdAt: String(providerInput.createdAt),
+            updatedAt: String(now),
+            createdAt: String(
+                "createdAt" in providerInput ? providerInput.createdAt : now
+            ),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,

@@ -14,9 +14,9 @@ import {
 import type {
     AdminConfig,
     AdminKeyPairs,
+    CreateProviderInput,
     MediatorKeyPairs,
     Provider,
-    ProviderInput,
     ProviderKeyPairs,
     VanellusConfig,
 } from "../interfaces";
@@ -89,8 +89,7 @@ export class TestContext {
         return context;
     }
 
-    public startedAt = dayjs.utc().toISOString();
-    public defaultProviderData: ProviderInput = {
+    public defaultProviderData: CreateProviderInput = {
         name: "Ada Lovelace",
         street: "Spielstraße 23",
         city: "Berlin",
@@ -99,9 +98,6 @@ export class TestContext {
         accessible: true,
         website: "https://en.wikipedia.org/wiki/Ada_Lovelace",
         email: "ada@lovelace.net",
-        version: "1.0",
-        updatedAt: this.startedAt,
-        createdAt: this.startedAt,
     };
 
     /**
@@ -123,15 +119,15 @@ export class TestContext {
     /**
      * Helper to create an unverified provider and store it in the system
      *
-     * It creates and returns the provider and the associated keypair.
-     * That's, basically, all thats needed to represent a provider inside the system.
+     * It creates and returns the provider and the associated keypair. That's,
+     * basically, all thats needed to represent a provider inside the system.
      */
     public async createUnverifiedProvider(
-        providerInput: Partial<ProviderInput> = {}
+        providerInput: Partial<CreateProviderInput> = {}
     ) {
         const providerKeyPairs = await this.providerApi.generateKeyPairs();
 
-        const provider = await this.providerApi.storeProvider(
+        const provider = await this.providerApi.createProvider(
             {
                 ...this.defaultProviderData,
                 ...providerInput,
@@ -152,7 +148,7 @@ export class TestContext {
      * That's, basically, all thats needed to represent a provider inside the system.
      */
     public async createVerifiedProvider(
-        providerInput: Partial<ProviderInput> = {}
+        providerInput: Partial<CreateProviderInput> = {}
     ) {
         const { provider: unverifiedProvider, providerKeyPairs } =
             await this.createUnverifiedProvider({

@@ -16,7 +16,7 @@ export interface ProviderPublicKeys {
     data: string;
 }
 
-export interface ProviderInput extends VersionMetadata {
+export interface CreateProviderInput {
     name: string;
     street: string;
     city: string;
@@ -27,11 +27,15 @@ export interface ProviderInput extends VersionMetadata {
     email: string;
 }
 
-export interface PublicProvider extends Omit<ProviderInput, "email"> {
+export interface UpdateProviderInput
+    extends CreateProviderInput,
+        VersionMetadata {}
+
+export interface PublicProvider extends Omit<UpdateProviderInput, "email"> {
     id: string;
 }
 
-export interface Provider extends ProviderInput {
+export interface Provider extends UpdateProviderInput {
     id: string;
     publicKeys: ProviderPublicKeys;
 }
