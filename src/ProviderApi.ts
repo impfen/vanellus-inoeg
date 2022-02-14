@@ -24,8 +24,8 @@ import {
     type Appointment,
     type AppointmentSeries,
     type BookingData,
-    type ECDHData,
     type CreateProviderInput,
+    type ECDHData,
     type Provider,
     type ProviderBackup,
     type ProviderBooking,
@@ -600,7 +600,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         // @ts-expect-error just to be sure to not backup the keyPairs
         delete provider.keyPairs;
 
-        await storage.backup<ProviderInput>(provider, secret);
+        await storage.backup<UpdateProviderInput>(provider, secret);
 
         const providerBackup: ProviderBackup = {
             providerKeyPairs,
