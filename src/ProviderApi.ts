@@ -24,11 +24,11 @@ import {
     type Appointment,
     type AppointmentSeries,
     type BookingData,
+    type CreateProviderInput,
     type ECDHData,
     type Provider,
     type ProviderBackup,
     type ProviderBooking,
-    type ProviderInput,
     type ProviderKeyPairs,
     type PublicAppointment,
     type PublicProvider,
@@ -36,6 +36,7 @@ import {
     type Slot,
     type UnpublishedAppointmentSeries,
     type UnpublishedPublicAppointment,
+    type UpdateProviderInput,
 } from "./interfaces";
 import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
@@ -82,6 +83,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         providerKeyPairs: ProviderKeyPairs,
         properties?: Record<string, unknown>
     ) {
+        const now = dayjs.utc().toISOString();
         const appointment: UnpublishedPublicAppointment<Vaccine> = {
             id: randomBytes(32),
             startAt: startAt.utc(),
@@ -93,6 +95,9 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             publicKey: providerKeyPairs.encryption.publicKey,
             provider,
             unpublished: true,
+            version: "1.0",
+            updatedAt: now,
+            createdAt: now,
         };
 
         return appointment;
@@ -308,6 +313,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         const unpublishedAppointment: UnpublishedPublicAppointment<Vaccine> = {
             ...appointment,
             unpublished: true,
+            updatedAt: dayjs.utc().toISOString(),
         };
 
         const canceledAppointments = await this.publishAppointments(
@@ -336,6 +342,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             ...appointment,
             slotData: [],
             unpublished: true,
+            updatedAt: dayjs.utc().toISOString(),
         };
 
         const updatedAppointments = await this.publishAppointments(
@@ -427,7 +434,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
-     * Stores a provider for initial signup or save after a change of data
+     * Stores a provider for initial signup.
      *
      * @param providerInput     Data to save
      * @param providerKeyPairs  KeyPairs of the provider to store
@@ -435,14 +442,40 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      *
      * @returns Promise<Provider>
      */
-    public async storeProvider(
-        providerInput: ProviderInput,
+    public async createProvider(
+        providerInput: CreateProviderInput,
+        providerKeyPairs: ProviderKeyPairs,
+        signupCode?: string
+    ) {
+        return this.storeProvider(providerInput, providerKeyPairs, signupCode);
+    }
+
+    /**
+     * Updates the data stored about the provider in the backend.
+     *
+     * @param providerInput     Data to save
+     * @param providerKeyPairs  KeyPairs of the provider to store
+     * @param signupCode        Optional signup code
+     *
+     * @returns Promise<Provider>
+     */
+    public async updateProvider(
+        providerInput: UpdateProviderInput,
+        providerKeyPairs: ProviderKeyPairs,
+        signupCode?: string
+    ) {
+        return this.storeProvider(providerInput, providerKeyPairs, signupCode);
+    }
+
+    protected async storeProvider(
+        providerInput: CreateProviderInput | UpdateProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         signupCode?: string
     ) {
         const systemPublicKeys = await this.transport.call("getKeys");
         const id = await this.generateProviderId(providerKeyPairs);
 
+        const now = dayjs.utc().toISOString();
         const providerData: Provider = {
             id,
             name: String(providerInput.name),
@@ -453,6 +486,11 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             accessible: Boolean(providerInput.accessible),
             website: String(providerInput.website || ""),
             email: String(providerInput.email),
+            version: "1.0",
+            updatedAt: String(now),
+            createdAt: String(
+                "createdAt" in providerInput ? providerInput.createdAt : now
+            ),
             publicKeys: {
                 data: providerKeyPairs.data.publicKey,
                 signing: providerKeyPairs.signing.publicKey,
@@ -550,10 +588,10 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      *
      * The data is automatically deleted after 30 days of inactivity.
      *
-     * @returns Promise<ProviderBackup>
+     * @returns Promise<AESData>
      */
     public async backupData(
-        provider: ProviderInput,
+        provider: UpdateProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         secret: string
     ) {
@@ -562,20 +600,18 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         // @ts-expect-error just to be sure to not backup the keyPairs
         delete provider.keyPairs;
 
-        await storage.backup<ProviderInput>(provider, secret);
+        await storage.backup<UpdateProviderInput>(provider, secret);
 
         const providerBackup: ProviderBackup = {
-            version: "0.1",
             providerKeyPairs,
-            createdAt: new Date().toISOString(),
+            version: "0.1",
+            createdAt: dayjs.utc().toISOString(),
         };
 
-        const encryptedProviderBackup = await aesEncrypt(
+        return aesEncrypt(
             JSON.stringify(providerBackup),
             Buffer.from(encodeBase32(secret))
         );
-
-        return encryptedProviderBackup;
     }
 
     /**
@@ -750,7 +786,6 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
 
                     const appointment: Appointment<Vaccine> = {
                         ...enrichedAppointment,
-                        updatedAt: dayjs.utc(signedAppointment.updatedAt),
                         status,
                         bookings,
                     };

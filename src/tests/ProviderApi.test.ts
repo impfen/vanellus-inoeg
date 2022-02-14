@@ -47,7 +47,7 @@ describe("ProviderApi", () => {
             const providerKeyPairs =
                 await context.providerApi.generateKeyPairs();
 
-            const provider = await context.providerApi.storeProvider(
+            const provider = await context.providerApi.createProvider(
                 context.defaultProviderData,
                 providerKeyPairs
             );
@@ -131,7 +131,7 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     name: "New Name",
@@ -154,13 +154,17 @@ describe("ProviderApi", () => {
 
             expect(pendingProviders[0]?.id).toEqual(provider.id);
             expect(pendingProviders[0]?.name).toEqual("New Name");
+            expect(pendingProviders[0]?.createdAt).toEqual(provider.createdAt);
+            expect(
+                pendingProviders[0]?.updatedAt > provider.updatedAt
+            ).toBeTruthy();
         });
 
         it("should update provider with resilience", async () => {
             const { provider, providerKeyPairs } =
                 await context.createVerifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     website: undefined,
@@ -189,7 +193,7 @@ describe("ProviderApi", () => {
             const { provider, providerKeyPairs } =
                 await context.createUnverifiedProvider();
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...provider,
                     name: "foobar",
@@ -323,7 +327,6 @@ describe("ProviderApi", () => {
             expect(appointments[0].properties).toEqual(
                 publishResult.properties
             );
-            expect(appointments[0].updatedAt.isUTC()).toBeTruthy();
             expect(appointments[0].updatedAt).not.toEqual(
                 initialAppointments[0].updatedAt
             );

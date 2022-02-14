@@ -25,15 +25,6 @@ export interface ApiSignedProviderData extends SignedData {
     id: string;
 }
 
-export interface ApiProviderData {
-    name: string;
-    street: string;
-    city: string;
-    zipCode: string;
-    description: string;
-    accessible: boolean;
-}
-
 export interface ProviderKeyData {
     signing: string;
     encryption: string;

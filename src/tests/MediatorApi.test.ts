@@ -84,7 +84,7 @@ describe("MediatorService", () => {
             expect(provider.unverifiedProvider).toEqual(verifiedProvider);
             expect(provider.status).toEqual(ProviderStatus.VERIFIED);
 
-            await context.providerApi.storeProvider(
+            await context.providerApi.updateProvider(
                 {
                     ...verifiedProvider,
                     name: "New Name",
