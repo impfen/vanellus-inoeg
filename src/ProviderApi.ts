@@ -588,10 +588,10 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      *
      * The data is automatically deleted after 30 days of inactivity.
      *
-     * @returns Promise<ProviderBackup>
+     * @returns Promise<AESData>
      */
     public async backupData(
-        provider: ProviderInput,
+        provider: UpdateProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         secret: string
     ) {
@@ -603,17 +603,15 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         await storage.backup<ProviderInput>(provider, secret);
 
         const providerBackup: ProviderBackup = {
-            version: "0.1",
             providerKeyPairs,
-            createdAt: new Date().toISOString(),
+            version: "0.1",
+            createdAt: dayjs.utc().toISOString();,
         };
 
-        const encryptedProviderBackup = await aesEncrypt(
+        return aesEncrypt(
             JSON.stringify(providerBackup),
             Buffer.from(encodeBase32(secret))
         );
-
-        return encryptedProviderBackup;
     }
 
     /**
