@@ -5,14 +5,14 @@
 import { AbstractApi } from "./AbstractApi";
 import { UnexpectedError } from "./errors";
 import {
-    ApiEncryptedProvider,
-    MediatorKeyPairs,
-    Provider,
-    ProviderPair,
     ProviderStatus,
-    PublicProvider,
-    QueueData,
-    SignedProvider,
+    type ApiEncryptedProvider,
+    type MediatorKeyPairs,
+    type Provider,
+    type ProviderPair,
+    type PublicProvider,
+    type QueueData,
+    type SignedProvider,
 } from "./interfaces";
 import type { MediatorApiInterface } from "./interfaces/endpoints";
 import {

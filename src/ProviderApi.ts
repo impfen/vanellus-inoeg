@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import { Buffer } from "buffer";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { AbstractApi } from "./AbstractApi";
@@ -13,29 +14,29 @@ import {
     VanellusError,
 } from "./errors";
 import {
-    AESData,
-    ApiAppointment,
-    ApiBooking,
-    ApiEncryptedBooking,
-    ApiProviderProviderAppointments,
-    ApiSignedProviderAppointment,
-    Appointment,
-    AppointmentSeries,
     AppointmentStatus,
-    BookingData,
-    CreateProviderInput,
-    ECDHData,
-    Provider,
-    ProviderBackup,
-    ProviderBooking,
-    ProviderKeyPairs,
-    PublicAppointment,
-    PublicProvider,
-    SignedProvider,
-    Slot,
-    UnpublishedAppointmentSeries,
-    UnpublishedPublicAppointment,
-    UpdateProviderInput,
+    type AESData,
+    type ApiAppointment,
+    type ApiBooking,
+    type ApiEncryptedBooking,
+    type ApiProviderProviderAppointments,
+    type ApiSignedProviderAppointment,
+    type Appointment,
+    type AppointmentSeries,
+    type BookingData,
+    type ECDHData,
+    type CreateProviderInput,
+    type Provider,
+    type ProviderBackup,
+    type ProviderBooking,
+    type ProviderKeyPairs,
+    type PublicAppointment,
+    type PublicProvider,
+    type SignedProvider,
+    type Slot,
+    type UnpublishedAppointmentSeries,
+    type UnpublishedPublicAppointment,
+    type UpdateProviderInput,
 } from "./interfaces";
 import type { ProviderApiInterface } from "./interfaces/endpoints";
 import { StorageApi } from "./StorageApi";
@@ -523,7 +524,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      * Checks if a provider is verified and, if yes, returns the verified data.
      * If the current provider, who provided the keys, is not verified yet, null is returned.
      *
-     * @return Promise<ProviderData>
+     * @return Promise<Provider | null>
      */
     public async checkProvider(providerKeyPairs: ProviderKeyPairs) {
         try {
@@ -546,23 +547,11 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
             const decryptedProviderDataJSON =
                 parseUntrustedJSON<SignedProvider>(providerDataString);
 
-            const verifiedProvider = parseUntrustedJSON<Provider>(
+            return parseUntrustedJSON<Provider>(
                 decryptedProviderDataJSON.signedData.data
             );
-
-            const publicProvider = parseUntrustedJSON<Provider>(
-                decryptedProviderDataJSON.signedPublicData.data
-            );
-
-            return {
-                verifiedProvider,
-                publicProvider,
-            };
         } catch (error) {
-            return {
-                verifiedProvider: null,
-                publicProvider: null,
-            };
+            return null;
         }
     }
 
@@ -602,7 +591,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      * @returns Promise<ProviderBackup>
      */
     public async backupData(
-        provider: PublicProvider,
+        provider: ProviderInput,
         providerKeyPairs: ProviderKeyPairs,
         secret: string
     ) {
@@ -611,7 +600,7 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
         // @ts-expect-error just to be sure to not backup the keyPairs
         delete provider.keyPairs;
 
-        await storage.backup<PublicProvider>(provider, secret);
+        await storage.backup<ProviderInput>(provider, secret);
 
         const providerBackup: ProviderBackup = {
             version: "0.1",

@@ -7,7 +7,7 @@ import type {
     AnonymousApiInterface,
     VanellusConfig,
 } from "./interfaces";
-import { JsonRpcTransport, Transport } from "./transports";
+import { JsonRpcTransport, type Transport } from "./transports";
 
 export class AbstractApi<
     Api = AnonymousApiInterface,

@@ -5,7 +5,7 @@
 import { UnexpectedError } from "./errors";
 import type { AdminKeyPairs, VanellusConfig } from "./interfaces";
 import type { StorageApiInterface } from "./interfaces/endpoints";
-import { JsonRpcTransport, Transport } from "./transports";
+import { JsonRpcTransport, type Transport } from "./transports";
 import {
     aesDecrypt,
     aesEncrypt,

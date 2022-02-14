@@ -2,15 +2,15 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
-import { base32Decode, base32Encode } from "@ctrl/ts-base32";
+import { base32crockford } from "@scure/base";
 import { Buffer } from "buffer";
 
 export const encodeBase32 = (string: string | Buffer) => {
-    return base32Encode(Buffer.from(string), "Crockford");
+    return base32crockford.encode(Buffer.from(string));
 };
 
 export const decodeBase32 = (base32: string) => {
-    return Buffer.from(base32Decode(base32, "Crockford")).toString();
+    return Buffer.from(base32crockford.decode(base32)).toString();
 };
 
 export const bufferToBase64 = (buffer: ArrayBufferLike) => {
