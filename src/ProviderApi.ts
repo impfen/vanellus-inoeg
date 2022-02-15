@@ -461,10 +461,9 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
      */
     public async updateProvider(
         providerInput: UpdateProviderInput,
-        providerKeyPairs: ProviderKeyPairs,
-        signupCode?: string
+        providerKeyPairs: ProviderKeyPairs
     ) {
-        return this.storeProvider(providerInput, providerKeyPairs, signupCode);
+        return this.storeProvider(providerInput, providerKeyPairs);
     }
 
     protected async storeProvider(
