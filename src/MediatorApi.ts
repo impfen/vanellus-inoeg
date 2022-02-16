@@ -227,7 +227,7 @@ export class MediatorApi extends AbstractApi<
             ) {
                 status = ProviderStatus.VERIFIED;
             } else {
-                status = ProviderStatus.UPDATED;
+                status = ProviderStatus.CHANGED;
             }
         }
 

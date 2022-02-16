@@ -99,7 +99,7 @@ describe("MediatorService", () => {
 
             expect(provider.verifiedProvider).toEqual(verifiedProvider);
             expect(provider.unverifiedProvider.name).toEqual("New Name");
-            expect(provider.status).toEqual(ProviderStatus.UPDATED);
+            expect(provider.status).toEqual(ProviderStatus.CHANGED);
         });
 
         it("should get single unverified provider", async () => {

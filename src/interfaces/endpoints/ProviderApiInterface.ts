@@ -2,6 +2,7 @@
 // Copyright (C) 2021-2021 The Kiebitz Authors
 // README.md contains license information.
 
+import type { ProviderStatus } from "..";
 import type {
     ApiProviderProviderAppointments,
     ApiSignedProvider,
@@ -48,6 +49,9 @@ export interface ProviderApiInterface extends AnonymousApiInterface {
 
     // retrieve verified data of the provider
     checkProviderData: () => ApiSignedProvider;
+
+    // retrieve statsu of the provider
+    checkProviderStatus: () => ProviderStatus;
 
     // check if the provider is recognized in the backend
     isValidProvider: () => boolean;

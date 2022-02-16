@@ -4,7 +4,7 @@
 
 import dayjs from "dayjs";
 import { NotFoundError } from "../errors";
-import { AppointmentStatus } from "../interfaces";
+import { AppointmentStatus, ProviderStatus } from "../interfaces";
 import { TestContext } from "./TestContext";
 
 describe("ProviderApi", () => {
@@ -106,7 +106,12 @@ describe("ProviderApi", () => {
         });
 
         it("should verify provider", async () => {
-            const { provider } = await context.createUnverifiedProvider();
+            const { provider, providerKeyPairs } =
+                await context.createUnverifiedProvider();
+
+            expect(
+                await context.providerApi.checkStatus(providerKeyPairs)
+            ).toEqual(ProviderStatus.UNVERIFIED);
 
             const verifiedProvider = await context.mediatorApi.confirmProvider(
                 provider,
@@ -114,6 +119,14 @@ describe("ProviderApi", () => {
             );
 
             expect(verifiedProvider).toEqual(provider);
+
+            expect(
+                await context.providerApi.checkStatus(providerKeyPairs)
+            ).toEqual(ProviderStatus.VERIFIED_FIRST);
+
+            expect(
+                await context.providerApi.checkStatus(providerKeyPairs)
+            ).toEqual(ProviderStatus.VERIFIED);
         });
 
         it("should get data for verified provider", async () => {
@@ -139,6 +152,10 @@ describe("ProviderApi", () => {
                 providerKeyPairs
             );
 
+            expect(
+                await context.providerApi.checkStatus(providerKeyPairs)
+            ).toEqual(ProviderStatus.CHANGED);
+
             const verifiedProvider = await context.providerApi.checkProvider(
                 providerKeyPairs
             );
@@ -158,6 +175,15 @@ describe("ProviderApi", () => {
             expect(
                 pendingProviders[0]?.updatedAt > provider.updatedAt
             ).toBeTruthy();
+
+            await context.mediatorApi.confirmProvider(
+                provider,
+                context.mediatorKeyPairs
+            );
+
+            expect(
+                await context.providerApi.checkStatus(providerKeyPairs)
+            ).toEqual(ProviderStatus.VERIFIED);
         });
 
         it("should update provider with resilience", async () => {

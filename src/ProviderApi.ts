@@ -555,6 +555,19 @@ export class ProviderApi<Vaccine = string> extends AbstractApi<
     }
 
     /**
+     * Retrieves the provider status from the backend
+     *
+     * @return Promise<ProviderStatus>
+     */
+    public async checkStatus(providerKeyPairs: ProviderKeyPairs) {
+        return this.transport.call(
+            "checkProviderStatus",
+            undefined,
+            providerKeyPairs.signing
+        );
+    }
+
+    /**
      * Checks if the backend recognizes our id as a provider id
      *
      * @return Promise<boolean>

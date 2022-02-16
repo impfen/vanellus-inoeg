@@ -6,8 +6,9 @@ import type { VersionMetadata } from "./VersionMetadata";
 
 export enum ProviderStatus {
     UNVERIFIED = "UNVERIFIED",
+    VERIFIED_FIRST = "VERIFIED_FIRST",
     VERIFIED = "VERIFIED",
-    UPDATED = "UPDATED",
+    CHANGED = "CHANGED",
 }
 
 export interface ProviderPublicKeys {
