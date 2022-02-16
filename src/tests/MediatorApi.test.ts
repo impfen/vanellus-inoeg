@@ -116,6 +116,40 @@ describe("MediatorService", () => {
             expect(provider.status).toEqual(ProviderStatus.UNVERIFIED);
         });
 
+        it("should get all providers", async () => {
+            await context.createUnverifiedProvider();
+            await context.createVerifiedProvider();
+
+            const providers = await context.mediatorApi.getProviders(
+                context.mediatorKeyPairs
+            );
+
+            expect(providers).toHaveLength(2);
+            expect(
+                providers.filter(
+                    (p) => p.status == ProviderStatus.VERIFIED_FIRST
+                )
+            ).toHaveLength(1);
+            expect(
+                providers.filter((p) => p.status == ProviderStatus.UNVERIFIED)
+            ).toHaveLength(1);
+
+            // check that reading by mediator does not update the VERIFIED_FIRST
+            // status
+            const providers2 = await context.mediatorApi.getProviders(
+                context.mediatorKeyPairs
+            );
+
+            expect(
+                providers2.filter(
+                    (p) => p.status == ProviderStatus.VERIFIED_FIRST
+                )
+            ).toHaveLength(1);
+            expect(
+                providers2.filter((p) => p.status == ProviderStatus.VERIFIED)
+            ).toHaveLength(0);
+        });
+
         it("should validate mediator", async () => {
             expect(
                 await context.mediatorApi.isValidKeyPairs(

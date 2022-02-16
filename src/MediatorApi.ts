@@ -8,6 +8,7 @@ import {
     ProviderStatus,
     type ApiEncryptedProvider,
     type MediatorKeyPairs,
+    type MediatorProviderView,
     type Provider,
     type ProviderPair,
     type PublicProvider,
@@ -136,6 +137,39 @@ export class MediatorApi extends AbstractApi<
         }
 
         return confirmedProvider;
+    }
+
+    /**
+     * Returns the decrypted list of all providers
+     *
+     * @param mediatorKeyPairs  KeyPairs of the mediator
+     * @param limit Max number of providers to return. Number between 1 and
+     *        10000, defaults to 1000
+     *
+     * @return Promise<MediatorProviderView[]>
+     */
+    public async getProviders(
+        mediatorKeyPairs: MediatorKeyPairs,
+        limit = 1000
+    ) {
+        const encryptedProviders = await this.transport.call(
+            "getProviders",
+            { limit },
+            mediatorKeyPairs.signing
+        );
+
+        return Promise.all(
+            encryptedProviders.map(async (provider) => {
+                const decryptedProvider = await this.decryptProvider(
+                    provider,
+                    mediatorKeyPairs
+                );
+                return <MediatorProviderView>{
+                    ...decryptedProvider,
+                    status: provider.status,
+                };
+            })
+        );
     }
 
     /**

@@ -3,6 +3,7 @@
 // README.md contains license information.
 
 import type { ECDHData, SignedData } from "./crypto";
+import type { ProviderStatus } from "../Provider";
 
 export type ApiSignedProvider = SignedData;
 
@@ -13,6 +14,7 @@ export interface SignedProvider {
 
 export interface ApiEncryptedProvider {
     id: string;
+    status: ProviderStatus;
     encryptedData: ECDHData;
 }
 

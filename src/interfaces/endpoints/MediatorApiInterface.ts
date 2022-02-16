@@ -21,6 +21,12 @@ export interface MediatorApiInterface extends AnonymousApiInterface {
         signedKeyData: SignedData;
     }) => "ok";
 
+    getProviders: ({
+        limit,
+    }: {
+        limit: undefined | number;
+    }) => ApiEncryptedProvider[];
+
     getPendingProviderData: ({
         limit,
     }: {

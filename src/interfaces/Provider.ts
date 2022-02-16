@@ -9,6 +9,7 @@ export enum ProviderStatus {
     VERIFIED_FIRST = "VERIFIED_FIRST",
     VERIFIED = "VERIFIED",
     CHANGED = "CHANGED",
+    UNKNOWN = "UNKNOWN",
 }
 
 export interface ProviderPublicKeys {
@@ -39,6 +40,10 @@ export interface PublicProvider extends Omit<UpdateProviderInput, "email"> {
 export interface Provider extends UpdateProviderInput {
     id: string;
     publicKeys: ProviderPublicKeys;
+}
+
+export interface MediatorProviderView extends Provider {
+    status: ProviderStatus;
 }
 
 export interface ProviderPair {
