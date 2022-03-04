@@ -3,6 +3,7 @@
 // README.md contains license information.
 
 import dayjs from "dayjs";
+import fs from "fs";
 import {
     AdminApi,
     AnonymousApi,
@@ -48,11 +49,21 @@ export class TestContext {
      * It does all the heavy-lifting for you.
      */
     public static async createContext() {
+        const settingsRaw = fs.readFileSync(
+            `${
+                process.env.KIEBITZ_SETTINGS || "../../testing/fixtures/keys"
+            }/002_admin.json`,
+            "utf8"
+        );
+        const adminConfig = JSON.parse(settingsRaw);
+
+        /*
         const adminConfig = (await import(
             `${
                 process.env.KIEBITZ_SETTINGS || "../../testing/fixtures/keys"
             }/002_admin.json`
         )) as AdminConfig;
+        */
 
         const config: VanellusConfig = this.vanellusConfig;
         const adminApi = new AdminApi(config);
