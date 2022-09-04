@@ -32,7 +32,7 @@
         "prepare": "husky install"
     },
     "dependencies": {
-        "dayjs": "^1.11.0"
+        "dayjs": "^1.11.5"
     },
     "devDependencies": {
         "@scure/base": "^1.0.0",
